@@ -1,0 +1,96 @@
+/* Database layout; the decorative mark stays behind the working area. */
+main { position:relative; isolation:isolate; }
+.background-orbit { position:absolute; top:55px; right:0; width:270px; height:270px; overflow:hidden; pointer-events:none; z-index:-1; opacity:.2; }
+.background-orbit .orbit { top:25px; right:-35px; }
+.roster { border-top:0; padding-top:30px; }
+#roster-title { font-size:27px; font-weight:500; letter-spacing:-.7px; margin:0; }
+.toolbar { flex-wrap:wrap; }
+.select-filters { display:flex; gap:8px; flex-wrap:wrap; }
+.sidebar nav { display:grid; gap:7px; }
+.sidebar nav a { font-size:12px; }
+.sidebar nav small { margin-left:auto; }
+.card h3 { align-items:flex-start; line-height:1.4; min-height:48px; }
+.card-path { line-height:1.7; }
+.cones-grid .card-art img { object-fit:contain; padding:12px; }
+.relics-grid .card-art { height:150px; }
+.relics-grid .card-art img { object-fit:contain; padding:22px; }
+.missing-art .card-art:before { content:'✧'; position:absolute; inset:45px 0; text-align:center; font-size:65px; color:var(--accent); opacity:.4; }
+dialog { width:min(820px,calc(100% - 32px)); max-height:90dvh; padding:28px; scrollbar-width:thin; }
+.dialog-top { position:sticky; top:-28px; background:#191e27; z-index:3; padding:12px 0; }
+.profile-hero img { width:95px; height:110px; object-fit:contain; }
+.profile-hero h2 { line-height:1.3; }
+.profile-hero p { line-height:1.8; }
+.detail-heading { display:block; font-size:17px; margin:28px 0 12px; }
+.data-block { padding:17px; background:#141a22; border:1px solid #303a45; border-radius:7px; margin-bottom:12px; }
+.data-block h4 { font-size:14px; line-height:1.6; margin:0 0 6px; font-weight:500; }
+.game-text { font-size:12px; line-height:1.95; color:#d1d6df; white-space:pre-line; overflow-wrap:anywhere; margin:10px 0 0; }
+.data-meta { font-size:10px; color:#909bab; line-height:1.9; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:14px 0; }
+.stats-grid > div { padding:12px; border:1px solid #313b46; border-radius:5px; background:#141a22; }
+.stats-grid span { display:block; font-size:10px; color:#909bab; margin-bottom:8px; }
+.stats-grid strong { font-size:17px; font-weight:500; }
+.skill-heading { display:flex; justify-content:space-between; gap:12px; }
+.skill-heading label { flex-shrink:0; font-size:10px; color:#a0adba; }
+.skill-heading select { padding:6px; }
+.data-block details { margin-top:15px; }
+summary { cursor:pointer; color:var(--mint); font-size:11px; line-height:1.9; }
+.parameter-list { font-size:11px; color:#97a4b5; line-height:2; padding-top:10px; }
+.fields .primary { align-self:end; align-items:center; min-height:43px; }
+.table-wrap { overflow:auto; border:1px solid #303a45; border-radius:7px; }
+table { width:100%; border-collapse:collapse; font-size:11px; line-height:1.7; }
+th, td { padding:11px 14px; text-align:left; }
+th { background:#212934; font-weight:500; color:#aab8c8; }
+td { border-top:1px solid #29333f; }
+td:last-child { color:var(--mint); font-variant-numeric:tabular-nums; }
+#piece-name { font-size:14px; color:var(--mint); font-weight:500; }
+footer { line-height:1.8; }
+.toolbar { display:grid; gap:12px; margin-top:24px; }
+.filters { align-items:center; gap:6px; }
+.filters button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:7px 9px; }
+.game-icon { width:19px; height:19px; object-fit:contain; flex-shrink:0; }
+.card-art .game-icon { width:24px; height:24px; padding:0; object-fit:contain; }
+.card:hover .game-icon { transform:none; }
+.card h3 { min-height:0; margin-bottom:0; }
+.card-body { padding-bottom:18px; }
+.source-links { display:grid; gap:12px; padding-top:18px; border-top:1px solid var(--line); }
+.source-links .source-link { border:0; padding:0 10px; }
+#character-sources { display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; font-size:10px; color:#a6ba9f; }
+#character-sources a:hover,.fact-source:hover { text-decoration:underline; }
+.character-tabs { display:flex; flex-wrap:wrap; gap:5px; padding-bottom:14px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+.character-tabs button { display:flex; align-items:center; gap:8px; background:none; border:1px solid transparent; color:#98a5b5; border-radius:5px; padding:10px 12px; font-size:11px; }
+.character-tabs button[aria-selected="true"] { color:var(--mint); border-color:#596c52; background:#263025; }
+.character-tabs button:hover { background:#252d36; }
+.soon-dot { width:4px; height:4px; border-radius:50%; background:#758191; }
+.kit-resource { font-size:11px; color:var(--mint); margin:16px 0; }
+.skill-title { display:flex; gap:12px; align-items:center; }
+.skill-icon { width:40px; height:40px; object-fit:contain; flex-shrink:0; }
+.fact-source { display:inline-block; margin-top:12px; color:#a7b99f; font-size:10px; line-height:1.8; }
+.eidolon-heading { display:flex; align-items:center; gap:12px; }
+.eidolon-heading h4 { margin:0; }
+.eidolon-number { font-size:14px; font-weight:600; color:var(--mint); }
+.ex-empty { padding:24px 5px; }
+.ex-empty h3 { font-weight:500; font-size:17px; }
+.ex-empty p { color:#9ba7b6; font-size:12px; line-height:1.9; }
+@media(max-width:900px) { .stats-grid { grid-template-columns:repeat(3,1fr); } }
+@media(max-width:640px) {
+  .sidebar { flex-wrap:wrap; gap:14px; }
+  .sidebar nav { display:flex; width:100%; gap:7px; }
+  .sidebar nav a { flex:1; justify-content:center; padding:10px 8px; font-size:10px; gap:7px; }
+  .sidebar nav small { display:inline; margin-left:0; font-size:9px; }
+  .sidebar .brand { font-size:11px; }
+  .source-links { display:none; }
+  .filters button { font-size:10px; padding:7px 8px; }
+  .character-tabs { gap:4px; }
+  .character-tabs button { padding:9px 10px; font-size:10px; }
+  .topbar { font-size:10px; }
+  .section-heading { gap:15px; }
+  #roster-title { font-size:25px; }
+  dialog { padding:18px; }
+  .dialog-top { top:-18px; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .profile-hero { gap:14px; }
+  .profile-hero h2 { font-size:23px; }
+  .skill-heading { flex-wrap:wrap; }
+  .data-block { padding:13px; }
+  th, td { padding:9px; }
+}

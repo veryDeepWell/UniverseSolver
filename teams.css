@@ -1,0 +1,61 @@
+.icon-select {display:flex;align-items:center;gap:10px;text-align:left;width:100%;min-height:62px;background:#10161e;border:1px solid #3a4450;border-radius:6px;color:#e5eaf2;padding:8px;font-size:12px;}
+.icon-select img {width:42px;height:48px;object-fit:contain;background:#252c36;border-radius:4px;}
+.icon-select span:not(.picker-chevron) {min-width:0;overflow-wrap:anywhere;}
+.icon-select img {flex-shrink:0;}
+.picker-chevron {margin-left:auto;color:#899aaf;}
+.icon-picker {width:min(850px,calc(100% - 28px));}
+.picker-search,#team-search {width:100%;padding:12px;border:1px solid #3d4b5c;background:#101721;color:#dfe9f7;border-radius:5px;font-size:12px;margin-bottom:18px;}
+.picker-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;}
+.picker-option {display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid #3b4653;background:#141b24;color:#c9d5e3;border-radius:6px;padding:10px;font-size:11px;line-height:1.6;}
+.picker-option img {height:90px;width:100%;object-fit:contain;}
+.picker-option[aria-pressed="true"] {border-color:var(--mint);background:#29372a;}
+.picker-none {height:90px;display:grid;place-content:center;font-size:35px;}
+.inventory-thumb {width:45px;height:45px;object-fit:contain;float:left;margin:4px 12px 10px 0;}
+#teams {padding-top:30px;}
+.team-role-buttons {display:flex;gap:8px;flex-wrap:wrap;margin:18px 0;}
+.team-role-buttons button,.team-selection-toolbar>button,.team-chip button,.team-show-log,#team-import-build {background:#202c36;border:1px solid #3c4b5c;border-radius:5px;padding:10px 12px;color:#b4c4d8;font-size:11px;}
+.team-role-buttons button[aria-pressed="true"] {color:var(--mint);border-color:#859b77;background:#293a2a;}
+.team-selection-summary {display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.team-selection-summary h3 {font-size:12px;justify-content:flex-start;gap:10px;}
+.team-chips {display:flex;gap:8px;flex-wrap:wrap;color:#8e9fb4;font-size:11px;}
+.team-chip {display:flex;gap:8px;align-items:center;border:1px solid #354455;border-radius:6px;padding:6px;}
+.team-chip {max-width:100%;min-width:0;}
+.team-chip>span {min-width:0;overflow-wrap:anywhere;}
+.team-chip img {width:35px;height:38px;object-fit:contain;}
+.team-chip small {display:block;font-size:9px;color:var(--mint);margin-top:4px;}
+.team-chip button {padding:5px;}
+.team-selection-toolbar {display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin:20px 0;}
+.team-selection-toolbar input[type="search"] {max-width:300px;margin:0;}
+.team-roster {display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;max-height:500px;overflow:auto;padding:2px;}
+.team-roster-card {display:flex;flex-direction:column;gap:7px;align-items:center;background:#101923;border:1px solid #354455;color:#dae3ee;border-radius:6px;padding:10px;font-size:11px;line-height:1.6;}
+.team-roster-card img {width:75px;height:80px;object-fit:contain;}
+.team-roster-card small {color:#8399b3;font-size:9px;}
+.team-roster-card[aria-pressed="true"] {border-color:var(--mint);background:#27392a;}
+.team-roster-card:disabled {opacity:.4;cursor:default;}
+.team-dummy-info {display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+.team-dummy-info span {font-size:11px;color:#bed3b8;border:1px solid #3e5140;padding:8px;border-radius:5px;}
+.team-profile-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px;}
+.team-profile {display:flex;gap:12px;align-items:center;padding:12px;background:#111a24;border:1px solid #354457;border-radius:6px;color:#d3e0ef;text-align:left;}
+.team-profile img {width:50px;height:55px;object-fit:contain;}
+.team-profile strong {font-size:12px;font-weight:500;}
+.team-profile small {display:block;color:#8ca2bc;font-size:10px;line-height:1.9;margin-top:6px;}
+#team-progress {width:100%;height:7px;accent-color:var(--mint);margin-top:20px;}
+#team-status,#team-profile-status {font-size:12px;color:var(--mint);line-height:1.9;}
+.team-limitations {font-size:11px;color:#90a5bf;line-height:1.9;margin:20px 0;}
+.team-limitations a {color:var(--mint);}
+#team-model-notes {max-height:240px;overflow:auto;padding-right:8px;}
+.team-result {background:#101923;border:1px solid #34465a;border-radius:6px;margin:15px 0;padding:16px;}
+.team-result>summary {font-size:13px;}
+.team-result-portraits {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0;}
+.team-result-portraits>div {text-align:center;border:1px solid #304256;border-radius:6px;padding:10px;}
+.team-result-portraits img {width:75px;max-width:100%;height:85px;object-fit:contain;}
+.team-result-portraits span {display:block;font-size:11px;line-height:1.7;}
+.team-result-portraits small {display:block;font-size:9px;color:var(--mint);}
+.team-log {margin-top:20px;}
+.team-log .table-wrap {max-height:550px;}
+.team-log table {min-width:650px;}
+.team-log th {position:sticky;top:0;}
+#team-stats-error {font-size:12px;color:#f1bca2;}
+#team-stats-dialog .primary {width:auto;}
+@media(max-width:1050px){.team-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.team-selection-summary{grid-template-columns:1fr;}}
+@media(max-width:640px){.team-profile-grid{grid-template-columns:1fr;}.team-roster{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}.team-roster-card{padding:7px;font-size:10px;}.team-roster-card img{width:65px;height:70px;}.team-result-portraits{grid-template-columns:repeat(2,minmax(0,1fr));}.team-result{padding:12px;}.team-profile{min-width:0;}.team-roster-card span{overflow-wrap:anywhere;}.icon-select{font-size:11px;}.picker-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.picker-option{padding:7px;font-size:10px;}.picker-option img{height:72px;}}
