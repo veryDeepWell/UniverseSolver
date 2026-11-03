@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-11-03",
+  "stationSource": "https://starrailstation.com/en/characters",
+  "stationCount": 98,
+  "stationTags": [
+    "aventurinewaveflair", "robinsummeretto", "himekonova", "gilgamesh", "tohsakarin", "mortenaxblade", "silverwolflv999", "evanescia", "ashveil", "pearl", "yaoguang", "sparxie", "cyrene", "danhengpt", "evernight", "cerydra", "hysilens", "hyacine", "phainon", "castorice", "cipher", "anaxa", "mydei", "tribbie", "aglaea", "theherta", "dahlia", "rappa", "boothill", "jade", "sunday", "sam", "robin", "acheron", "blackswan", "sparkle", "drratio", "aventurine", "ruanmei", "argenti", "fugue", "lingsha", "yunli", "feixiao", "jiaoqiu", "huohuo", "danhengil", "jingliu", "bailu", "yanqing", "fuxuan", "blade", "jingyuan", "luocha", "topaz", "clara", "gepard", "seele", "bronya", "archer", "saber", "silverwolf", "kafka", "welt", "himeko",
+    "playerboy", "playergirl", "playerboy2", "playergirl2", "playerboy3", "playergirl3", "playerboy4", "playergirl4", "playerboy5", "playergirl5",
+    "misha", "gallagher", "mar7th2", "moze", "hanya", "xueyi", "guinaifen", "yukong", "sushang", "tingyun", "qingque", "luka", "lynx", "hook", "sampo", "pela", "natasha", "serval", "herta", "asta", "arlan", "danheng", "mar7th"
+  ],
+  "normalizationNotes": "Идентификаторы приведены к тегам снимка; Firefly = sam, The Dahlia = dahlia, Topaz & Numby = topaz, Dan Heng IL/PT и обе March 7th различены. Десять записей Trailblazer сопоставлены по полу и Пути.",
+  "prydwenSource": "https://www.prydwen.gg/star-rail/characters",
+  "prydwenCount": 96,
+  "prydwenPlayableFormsWithoutGenderDuplicates": 93,
+  "prydwenPreviewsOutsideSnapshot": [
+    { "name": "Aha", "url": "https://www.prydwen.gg/star-rail/characters/aha", "reason": "На странице нет навыков, следов и характеристик; прямо указано, что они появятся после выхода." },
+    { "name": "Astra Yao", "url": "https://www.prydwen.gg/star-rail/characters/astra-yao", "reason": "На странице нет навыков, следов и характеристик; прямо указано, что они появятся после выхода." },
+    { "name": "Ellen", "url": "https://www.prydwen.gg/star-rail/characters/ellen", "reason": "На странице нет навыков, следов и характеристик; прямо указано, что они появятся после выхода." }
+  ]
+}

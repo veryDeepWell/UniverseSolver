@@ -22,7 +22,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html styles.css database.css optimizer.css teams.css sets.css app.js database.js icon-picker.js optimizer-engine.js optimizer-ui.js optimizer-worker.js equipment-effects.js team-engine.js team-ui.js team-worker.js set-engine.js set-ui.js set-worker.js _site/
+          cp index.html styles.css database.css optimizer.css teams.css sets.css app.js database.js icon-picker.js optimizer-engine.js optimizer-ui.js optimizer-worker.js equipment-effects.js team-engine.js team-ui.js team-worker.js set-engine.js set-ui.js set-worker.js relic-engine.js relic-ui.js journey.js journey.css _site/
           cp -r data _site/
           cp -r assets _site/
       - uses: actions/upload-pages-artifact@v3

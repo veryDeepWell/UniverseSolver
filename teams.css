@@ -6,6 +6,9 @@
 .icon-picker {width:min(850px,calc(100% - 28px));}
 .picker-search,#team-search {width:100%;padding:12px;border:1px solid #3d4b5c;background:#101721;color:#dfe9f7;border-radius:5px;font-size:12px;margin-bottom:18px;}
 .picker-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;}
+.character-order,.picker-order {display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:#aebdce;font-size:12px;margin:0 0 16px;}
+.character-order select,.picker-order select {max-width:100%;min-height:40px;background:#101721;color:#dfe9f7;border:1px solid #3d4b5c;border-radius:5px;padding:9px 12px;}
+.team-selection-toolbar .character-order {margin:0;}
 .picker-option {display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid #3b4653;background:#141b24;color:#c9d5e3;border-radius:6px;padding:10px;font-size:11px;line-height:1.6;}
 .picker-option img {height:90px;width:100%;object-fit:contain;}
 .picker-option[aria-pressed="true"] {border-color:var(--mint);background:#29372a;}
@@ -59,3 +62,5 @@
 #team-stats-dialog .primary {width:auto;}
 @media(max-width:1050px){.team-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.team-selection-summary{grid-template-columns:1fr;}}
 @media(max-width:640px){.team-profile-grid{grid-template-columns:1fr;}.team-roster{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}.team-roster-card{padding:7px;font-size:10px;}.team-roster-card img{width:65px;height:70px;}.team-result-portraits{grid-template-columns:repeat(2,minmax(0,1fr));}.team-result{padding:12px;}.team-profile{min-width:0;}.team-roster-card span{overflow-wrap:anywhere;}.icon-select{font-size:11px;}.picker-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.picker-option{padding:7px;font-size:10px;}.picker-option img{height:72px;}}
+.panel-toggle{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left;padding:0;cursor:pointer}.panel-toggle:before{content:'▾';font-size:16px;color:#b8d6a2}.panel-toggle[aria-expanded="false"]:before{content:'▸'}.panel-collapsed>:not(.panel-collapse-header){display:none!important}.panel-collapsed>.panel-collapse-header{margin-bottom:0}.panel-toggle:focus-visible{outline:2px solid #b8d6a2;outline-offset:5px}
+.panel-collapsed>div.panel-collapse-header>:not(h2){display:none!important}

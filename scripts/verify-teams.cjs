@@ -3,7 +3,8 @@ const E=HSR_TEAM,D=HSR_DATA,scenario={targets:3,cycles:5,initialSP:3,energyPerce
 const profiles=Object.fromEntries(Object.keys(E.models).map(id=>[id,E.defaults(id,D)]));
 assert.throws(()=>E.createSearch([],[],profiles,scenario,D),/кор/);
 assert.throws(()=>E.createSearch(['1220'],['1101'],profiles,scenario,D),/недостаточно/);
-assert.throws(()=>E.createSearch(['1308'],[],profiles,scenario,D),/не поддержан/);
+const unsupported=Object.keys(D.characters).find(id=>!E.models[id])||'9999';
+assert.throws(()=>E.createSearch([unsupported],[],profiles,scenario,D),/не поддержан/);
 assert.throws(()=>E.simulate(['1220','1220','1101','1202'],profiles,scenario,D));
 assert.throws(()=>E.validateScenario({...scenario,targets:6}));
 assert.throws(()=>E.validateStats({...profiles['1220'],speed:0}));
@@ -34,7 +35,7 @@ assert.equal(result.total,4);result.top.forEach(r=>{assert.equal(r.ids[0],'1220'
 const oracle=E.combinations(['1101','1202','1106','1013'].sort(),3).map(t=>E.simulate(['1220',...t],profiles,{...scenario,focus:'1220'},D).total).sort((a,b)=>b-a);
 result.top.forEach((r,i)=>assert.ok(Math.abs(r.total-oracle[i])<1e-7));
 const locked=E.createSearch(team,[],profiles,scenario,D).step(1);assert.equal(locked.total,1);assert.deepEqual(locked.top[0].ids,team);
-const n=Object.keys(E.models).length-1;assert.equal(E.createSearch(['1220'],[],profiles,scenario,D).total,n*(n-1)*(n-2)/6);
+const validTeams=E.combinations(Object.keys(E.models).filter(id=>id!=='1220'&&!E.aliases[id]),3).filter(ids=>ids.filter(id=>/^80(?:0[1-9]|10)$/.test(id)).length<=1&&!(ids.includes('1001')&&ids.includes('1224')));assert.equal(E.createSearch(['1220'],[],profiles,scenario,D).total,validTeams.length);
 // A stat change belongs to one actor and affects that actor's contribution.
 const changed=structuredClone(profiles);changed['1105'].atk*=2;
 const before=E.simulate(aoeTeam,profiles,scenario,D),after=E.simulate(aoeTeam,changed,scenario,D);

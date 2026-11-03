@@ -5,7 +5,7 @@ const scene={targets:3,cycles:5,initialSP:3,energyPercent:0,seed:42,allowPartial
 function p(id,extra={}){return {...E.defaults(id,D),hp:5000,baseHP:1000,atk:1000,baseAtk:500,def:1000,baseDef:500,speed:100,baseSpeed:100,crit:0,critDamage:0,...extra};}
 function fight(ids,extra={},s={}){const profiles=Object.fromEntries(ids.map(id=>[id,p(id,extra[id])]));return E.simulate(ids,profiles,{...scene,...s},D,true);}
 function close(a,b){assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);}
-assert.equal(Object.keys(E.models).length,27);assert.ok(newIds.every(id=>D.characters[id].rarity===5));
+assert.equal(Object.keys(E.models).length,98);assert.ok(newIds.every(id=>D.characters[id].rarity===5));
 // Original Welt: 3 skill hits, each 72% ATK; Slow guaranteed with EHR.
 // Every hit also triggers 60% ATK talent, all with the broken-target trace.
 const welt=fight(['1004'],{'1004':{effectHit:1}},{targets:1,cycles:1});

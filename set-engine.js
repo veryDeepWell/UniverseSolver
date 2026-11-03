@@ -17,7 +17,7 @@
     if(!Array.isArray(input.context)||input.context.length>3||new Set(input.context).size!==input.context.length||input.context.includes(input.characterId)||input.context.some(id=>!T.models[id]))throw Error('Некорректный состав фиксированных союзников.');
     if(!Number.isInteger(input.position)||input.position<0||input.position>input.context.length)throw Error('Некорректная позиция персонажа.');
     const ids=[...input.context];ids.splice(input.position,0,input.characterId);if(!ids.includes(input.focus))throw Error('Выбери получателя адресных бафов.');
-    return ids;
+    if(!T.compatible(ids))throw Error('Доступен один Путь Первопроходца и одна форма Март 7.');return ids;
   }
   function run(input,pack,data,keepLog=false){
     const ids=validate(input,data),profiles={...input.contextProfiles,[input.characterId]:{...input.profile}};
