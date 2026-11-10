@@ -28,7 +28,12 @@
   }
   function run(input,pack,data,keepLog=false,cone=null){
     const ids=validate(input,data),profiles={...input.contextProfiles,[input.characterId]:buildProfile(input,pack,cone,data)};
-    return T.simulate(ids,profiles,{...input.scenario,allowPartial:true,focus:input.focus},data,keepLog);
+    const scenario={...input.scenario,allowPartial:true,focus:input.focus};
+    if(input.stableRanking){
+      const first=Math.min(scenario.cycles,Math.max(2,scenario.cycles-2));
+      scenario.sampleCycles=Array.from({length:scenario.cycles-first+1},(_,i)=>first+i);
+    }
+    return T.simulate(ids,profiles,scenario,data,keepLog);
   }
   function createSearch(input,data){
     validate(input,data);
@@ -44,13 +49,15 @@
         const pack=choices[Math.floor(checked/cones.length)];
         const cone=cones[checked%cones.length];
         const simulation=run(input,pack,data,false,cone);
-        const result={pack,cone,total:simulation.total,per100AV:simulation.per100AV,
+        const checkpoints=simulation.checkpoints;
+        const score=checkpoints?checkpoints.reduce((sum,sample)=>sum+sample.total*100/sample.av,0)/checkpoints.length:simulation.total;
+        const result={pack,cone,score,checkpoints,total:simulation.total,per100AV:simulation.per100AV,
           initialStats:simulation.initialStats[input.characterId],breakdown:simulation.breakdown,
           damageByTarget:simulation.damageByTarget};
         top.push(result);
-        top.sort((a,b)=>b.total-a.total);
+        top.sort((a,b)=>b.score-a.score);
         if(top.length>10)top.pop();
-        if(cone&&(!bestByCone[cone.id]||result.total>bestByCone[cone.id].total))bestByCone[cone.id]=result;
+        if(cone&&(!bestByCone[cone.id]||result.score>bestByCone[cone.id].score))bestByCone[cone.id]=result;
         checked++;
       }
       return {total,checked,done:checked===total,baseline:baseline.total,top,bestByCone:Object.values(bestByCone)};

@@ -24,14 +24,28 @@ $('#data-version').textContent=`StarRailRes · ${D.meta.revision.slice(0,8)} · 
 $('#data-version').title='Полнота и актуальность ограничены снимком источника; записи не подтверждают дату выхода персонажа.';
 function itemName(item){return section==='characters'?H.characterName(item,D.paths):item.name;}
 function route(){
-  const lab=location.hash.slice(1).split('/')[0]==='relic-lab';$('#relic-lab').hidden=!lab;$('[data-lab-link]').classList.toggle('nav-active',lab);if(lab){section='relic-lab';$('#teams').hidden=true;$('#optimizer').hidden=true;$('#catalog').hidden=true;for(const nav of document.querySelectorAll('[data-section],[data-teams-link],[data-optimizer-link]'))nav.classList.remove('nav-active');if($('#profile').open)$('#profile').close();document.title='Оценка реликвий · UniverseSolver';$('#breadcrumb').textContent='Оценка реликвий';window.RelicLab.show();window.USJourney.render();return;}
-  const isTeams=location.hash.slice(1).split('/')[0]==='teams';$('#teams').hidden=!isTeams;$('[data-teams-link]').classList.toggle('nav-active',isTeams);
-  if(isTeams){section='teams';$('#optimizer').hidden=true;$('#catalog').hidden=true;$('[data-optimizer-link]').classList.remove('nav-active');for(const nav of document.querySelectorAll('[data-section]')){nav.classList.remove('nav-active');nav.removeAttribute('aria-current');}if($('#profile').open)$('#profile').close();document.title='Команды · UniverseSolver';$('#breadcrumb').textContent='Команды';window.TeamOptimizer.show();window.USJourney.render();return;}
-  const isOptimizer=location.hash.slice(1).split('/')[0]==='optimizer';$('#optimizer').hidden=!isOptimizer;$('#catalog').hidden=isOptimizer;
-  $('[data-optimizer-link]').classList.toggle('nav-active',isOptimizer);
-  if(isOptimizer){section='optimizer';document.title='Оптимизатор · UniverseSolver';$('#breadcrumb').textContent='Оптимизатор';for(const nav of document.querySelectorAll('[data-section]')){nav.classList.remove('nav-active');nav.removeAttribute('aria-current');}if($('#profile').open)$('#profile').close();window.USOptimizer.show();window.USJourney.render();return;}
-  const target=location.hash.slice(1).split('/')[0];section=Object.hasOwn(groups,target)?target:'characters';
-  if($('#journey-bar'))$('#journey-bar').hidden=true;
+  const [target,step]=location.hash.slice(1).split('/');
+  const isCatalog=Object.hasOwn(groups,target);
+  $('#plan').hidden=isCatalog;
+  $('#catalog').hidden=!isCatalog;
+  const plannerLink=$('[data-plan-link]');
+  plannerLink.classList.toggle('nav-active',!isCatalog);
+  if(isCatalog)plannerLink.removeAttribute('aria-current');
+  else plannerLink.setAttribute('aria-current','page');
+  if($('#profile').open)$('#profile').close();
+  if(!isCatalog){
+    for(const nav of document.querySelectorAll('[data-section]')){
+      nav.classList.remove('nav-active');
+      nav.removeAttribute('aria-current');
+    }
+    document.title='План команды · UniverseSolver';
+    $('#breadcrumb').textContent='План команды';
+    const legacy={teams:'team',optimizer:'build','relic-lab':'relics'};
+    window.USPlan.show(target==='plan'?step:legacy[target]);
+    return;
+  }
+  window.USPlan.stop();
+  section=target;
   document.title=`${titles[section]} · UniverseSolver`;$('#roster-title').textContent=titles[section];$('#breadcrumb').textContent=titles[section];
   for(const nav of document.querySelectorAll('[data-section]')){const active=nav.dataset.section===section;nav.classList.toggle('nav-active',active);if(active)nav.setAttribute('aria-current','page');else nav.removeAttribute('aria-current');}
   $('#search').value='';for(const key of Object.keys(filters))filters[key]='';$('#elements').hidden=section!=='characters';$('#paths').hidden=section==='relics';$('#rarities').hidden=section==='relics';$('#set-kinds').hidden=section!=='relics';
@@ -93,8 +107,15 @@ function characterDetail(c){
   <section role="tabpanel" id="panel-eidolons" aria-labelledby="tab-eidolons" hidden><p class="data-meta">E1–E6. Описания эффектов; значения в ките выбираются независимо.</p><div id="ranks"></div></section>
   <section role="tabpanel" id="panel-stats" aria-labelledby="tab-stats" hidden>${levelControls(level)}<form id="profile-form"><div class="fields"><label>Эйдолоны<select name="eidolon">${Array.from({length:7},(_,i)=>`<option value="${i}" ${i===Number(saved?.eidolon||0)?'selected':''}>E${i}</option>`).join('')}</select></label><button class="primary" type="submit">Сохранить профиль ↗</button></div><p id="save-status" role="status"></p></form></section>
   <section role="tabpanel" id="panel-ex" aria-labelledby="tab-ex" hidden>${exEntries.length?exEntries.map(e=>textBlock(e.name,e.description)+`<a class="fact-source" href="${esc(e.source)}" target="_blank" rel="noreferrer">Источник ↗</a>`).join(''):'<div class="ex-empty"><h3>EX-эйдолоны</h3><p>Для этого персонажа EX-эйдолоны ещё не добавлены в каталог.</p></div>'}</section>`;
-  bindCharacterTabs();window.USJourney.characterGoals(c,$('#panel-stats'));
-  const optimize=document.createElement('button');optimize.type='button';optimize.className='primary optimize-character';optimize.textContent='Оптимизировать сборку ↗';optimize.addEventListener('click',()=>{window.USJourney.openBuild(c.id);});$('#detail-content').prepend(optimize);
+  bindCharacterTabs();
+  if(window.USPlan.supports(c.id)){
+    const start=document.createElement('button');
+    start.type='button';
+    start.className='primary optimize-character';
+    start.textContent='Подобрать команду для персонажа →';
+    start.addEventListener('click',()=>window.USPlan.start(c.id));
+    $('#detail-content').prepend(start);
+  }
   bindStats(D.character_promotions[c.id]);
   for(const id of c.skills){const skill=D.character_skills[id];if(!skill)continue;const max=skill.params?.length||1,defaultLevel=H.skillCap(c,skill,D);const block=document.createElement('article');block.className='data-block';block.innerHTML=`<div class="skill-heading"><div class="skill-title"><img class="skill-icon" src="${esc(asset(skill.icon))}" alt="" loading="lazy"><div><h4>${esc(skill.name)}</h4><div class="data-meta">${esc([skill.type_text,skill.effect_text].filter(Boolean).join(' · '))}</div></div></div><label>Ур. <select aria-label="Уровень: ${esc(skill.name)}">${Array.from({length:max},(_,i)=>`<option value="${i}" ${i===defaultLevel-1?'selected':''}>${i+1}</option>`).join('')}</select></label></div><p class="game-text"></p><details><summary>Числовые параметры</summary><div class="parameter-list"></div></details>${S.skill_parameters[id]?`<a class="fact-source" href="${esc(S.skill_parameters[id].source)}" target="_blank" rel="noreferrer">Порог HP уточнён по Prydwen ↗</a>`:''}`;
     const update=()=>{const params=H.skillParams(skill,Number(block.querySelector('select').value),S);block.querySelector('.game-text').textContent=H.describe(skill.desc,params);block.querySelector('.parameter-list').textContent=params.length?Array.from(params,(value,i)=>value===undefined?null:`#${i+1}: ${H.number(value,6)}`).filter(Boolean).join(' · '):'Нет отдельных параметров.';};block.querySelector('select').addEventListener('change',update);update();$('#skills').append(block);

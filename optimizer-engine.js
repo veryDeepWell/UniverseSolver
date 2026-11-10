@@ -127,5 +127,59 @@
     if(referenceRatios)Object.assign(referenceRatios,{hp:p.HPAddedRatio||0,atk:p.AttackAddedRatio||0,def:p.DefenceAddedRatio||0});
     return {hp:base.hp*(1+(p.HPAddedRatio||0))+(p.HPDelta||0),baseHP:base.hp,atk:base.atk*(1+(p.AttackAddedRatio||0))+(p.AttackDelta||0),baseAtk:base.atk,def:base.def*(1+(p.DefenceAddedRatio||0))+(p.DefenceDelta||0),baseDef:base.def,speed:base.spd*(1+(p.SpeedAddedRatio||0))+(p.SpeedDelta||0),baseSpeed:base.spd,crit:base.crit_rate+(p.CriticalChanceBase||0),critDamage:base.crit_dmg+(p.CriticalDamageBase||0),damageBonus:p.AllDamageTypeAddedRatio||0,elementBonus:p[c.element+'AddedRatio']||0,effectHit:p.StatusProbabilityBase||0,effectRes:p.StatusResistanceBase||0,breakEffect:p.BreakDamageAddedRatioBase||0,elation:p.ElationDamageAddedRatioBase||0,energyRegen:1+(p.SPRatioBase||0),policy:'auto'};
   }
-  root.HSR_OPT={slots,mainAffixes,subAffixes,validateItem,properties,actionProfiles,validateConfig,evaluate,limitations,createSearch,sheetWithoutSets};
+  function farmReference(id,archetype,data,includeCone=true,boots='speed'){
+    const character=data.characters[id];
+    const critBuild=['atk','hp','def'].includes(archetype);
+    const scale={hp:'HPAddedRatio',def:'DefenceAddedRatio'}[archetype]||'AttackAddedRatio';
+    const critSupport=['1101','1306','1313'].includes(id);
+    const attackSupport=['1202','1203','1309'].includes(id);
+    const mains=['HPDelta','AttackDelta',
+      critBuild?'CriticalChanceBase':critSupport?'CriticalDamageBase':archetype==='dot'?'StatusProbabilityBase':attackSupport?scale:'HPAddedRatio',
+      critBuild&&boots==='scaling'?scale:'SpeedDelta',
+      critBuild?character.element+'AddedRatio':archetype==='dot'||attackSupport?scale:'HPAddedRatio',
+      critBuild||archetype==='dot'?scale:archetype==='break'?'BreakDamageAddedRatioBase':'SPRatioBase'];
+    const priority=critBuild?['CriticalChanceBase','CriticalDamageBase',scale,'HPAddedRatio']:
+      archetype==='break'?['BreakDamageAddedRatioBase','SpeedDelta',scale,'HPAddedRatio']:
+      archetype==='dot'?['AttackAddedRatio','StatusProbabilityBase','SpeedDelta','HPAddedRatio']:
+      [critSupport?'CriticalDamageBase':attackSupport?scale:'HPAddedRatio','SpeedDelta','DefenceAddedRatio','AttackAddedRatio'];
+    const affixes=subAffixes(data);
+    const speedRoll=affixes.find(affix=>affix.property==='SpeedDelta');
+    const speedMain=mainAffixes(data,'FOOT').find(affix=>affix.property==='SpeedDelta');
+    let speedSlots=critBuild&&boots==='speed'?Math.max(0,Math.ceil(
+      (134-baseStats(data.character_promotions[id],80).spd-speedMain.base-15*speedMain.step)/
+      (speedRoll.base+speedRoll.step)
+    )):0;
+    const items=slots.map((slot,index)=>{
+      const main=mains[index];
+      const types=[...new Set([...priority,'HPAddedRatio','DefenceAddedRatio','StatusResistanceBase'])]
+        .filter(type=>type!==main).slice(0,4);
+      if(speedSlots>0&&main!=='SpeedDelta'){
+        types[3]='SpeedDelta';
+        speedSlots--;
+      }
+      return {id:'farm-'+slot,slot,setId:representative(data,slot).set_id,level:15,main,
+        subs:types.map((type,line)=>{
+          const affix=affixes.find(a=>a.property===type);
+          return {type,value:(affix.base+affix.step)*(line<2?3:1)};
+        })};
+    });
+    const ratios={};
+    const config={characterId:id,coneId:'',level:80,coneLevel:80,rank:1,actionId:'custom',
+      skillLevel:10,scaling:'atk',kind:'skill',coefficient:1,enemyLevel:95,targets:1,
+      debuffs:0,dots:0,resistance:0,resPen:0,defReduction:0,vulnerability:0,damageBonus:0,
+      atkBonus:0,hpBonus:0,defBonus:0,critBonus:0,critDamageBonus:0,speedFlat:0,minSpeed:0,
+      minCrit:0,boxerStacks:0,traces:true};
+    const profile=sheetWithoutSets(items,config,data,ratios);
+    const referenceCone=includeCone&&Object.values(data.light_cones)
+      .find(cone=>cone.path===character.path&&cone.rarity===4);
+    if(referenceCone){
+      const stats=baseStats(data.light_cone_promotions[referenceCone.id],80);
+      for(const [stat,base] of [['hp','baseHP'],['atk','baseAtk'],['def','baseDef']]){
+        profile[base]+=stats[stat];
+        profile[stat]+=stats[stat]*(1+ratios[stat]);
+      }
+    }
+    return {profile,ratios,items,config};
+  }
+  root.HSR_OPT={slots,mainAffixes,subAffixes,validateItem,properties,actionProfiles,validateConfig,evaluate,limitations,createSearch,sheetWithoutSets,farmReference};
 })(typeof window==='undefined'?globalThis:window);

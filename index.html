@@ -3,28 +3,25 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101319">
   <meta name="description" content="База Honkai: Star Rail: персонажи, навыки, эйдолоны, конусы и реликвии.">
-  <title>UniverseSolver</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="database.css"><link rel="stylesheet" href="optimizer.css"><link rel="stylesheet" href="teams.css"><link rel="stylesheet" href="sets.css"><link rel="stylesheet" href="journey.css">
-  <script src="data/game-data.js" defer></script><script src="data/supplements.js" defer></script><script src="database.js" defer></script><script src="icon-picker.js" defer></script><script src="optimizer-engine.js" defer></script><script src="optimizer-ui.js" defer></script><script src="equipment-effects.js" defer></script><script src="team-engine.js" defer></script><script src="team-ui.js" defer></script><script src="set-engine.js" defer></script><script src="set-ui.js" defer></script><script src="relic-engine.js" defer></script><script src="journey.js" defer></script><script src="relic-ui.js" defer></script><script src="app.js" defer></script>
+  <title>UniverseSolver</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="database.css"><link rel="stylesheet" href="planner.css">
+  <script src="data/game-data.js" defer></script><script src="data/supplements.js" defer></script><script src="database.js" defer></script><script src="optimizer-engine.js" defer></script><script src="equipment-effects.js" defer></script><script src="team-engine.js" defer></script><script src="set-engine.js" defer></script><script src="relic-engine.js" defer></script><script src="planner.js" defer></script><script src="app.js" defer></script>
 </head>
 <body>
   <aside class="sidebar">
-    <a class="brand" href="#characters"><span class="brand-icon">✧</span><span>UNIVERSE<span class="brand-light">SOLVER</span></span></a>
+    <a class="brand" href="#plan"><span class="brand-icon">✧</span><span>UNIVERSE<span class="brand-light">SOLVER</span></span></a>
     <div class="game-label">HONKAI: STAR RAIL</div>
     <nav aria-label="Разделы">
-      <a href="#optimizer/sets" data-optimizer-link><span>⌘</span> Оптимизатор</a>
-      <a href="#relic-lab" data-lab-link><span>◎</span> Оценка реликвий</a><a href="#teams" data-teams-link><span>◇</span> Команды</a>
+      <a href="#plan" data-plan-link><span>◇</span> План команды</a>
       <a href="#characters" data-section="characters"><span>◈</span> Персонажи <small></small></a>
       <a href="#cones" data-section="cones"><span>▱</span> Конусы <small></small></a>
       <a href="#relics" data-section="relics"><span>❖</span> Реликвии <small></small></a>
     </nav>
-    <div class="sidebar-note"><span class="signal"></span> Alpha<p>Билды и симуляция<br>команд.</p></div>
     <div class="source-links"><a class="source-link" href="https://www.prydwen.gg/star-rail/" target="_blank" rel="noreferrer">Prydwen.gg ↗</a><a class="source-link" href="https://github.com/Mar-7th/StarRailRes" target="_blank" rel="noreferrer">StarRailRes ↗</a></div>
   </aside>
   <main id="characters">
     <div class="background-orbit" aria-hidden="true"><div class="orbit"><span>✧</span><b>✦</b></div></div>
-    <header class="topbar"><strong id="breadcrumb">Персонажи</strong><span class="version">ALPHA 0.15</span></header>
-    <section id="optimizer" hidden aria-label="Оптимизатор сборки"></section>
-    <section id="relic-lab" hidden aria-label="Оценка реликвий"></section><section id="teams" hidden aria-label="Оптимизатор команды"></section>
+    <header class="topbar"><strong id="breadcrumb">План команды</strong><span class="version">ALPHA 0.16</span></header>
+    <section id="plan" aria-label="План команды"></section>
     <section id="catalog" aria-labelledby="roster-title" class="roster">
       <div class="section-heading"><h1 id="roster-title">Персонажи</h1><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Поиск по названию…" aria-label="Поиск по названию"></label></div>
       <div class="toolbar"><div id="elements" class="filters" role="group" aria-label="Тип урона"></div><div id="paths" class="filters" role="group" aria-label="Путь"></div><div id="rarities" class="filters" role="group" aria-label="Редкость"></div><div id="set-kinds" class="filters" role="group" aria-label="Тип набора" hidden></div></div>
