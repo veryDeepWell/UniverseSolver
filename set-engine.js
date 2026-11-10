@@ -19,15 +19,42 @@
     const ids=[...input.context];ids.splice(input.position,0,input.characterId);if(!ids.includes(input.focus))throw Error('Выбери получателя адресных бафов.');
     if(!T.compatible(ids))throw Error('Доступен один Путь Первопроходца и одна форма Март 7.');return ids;
   }
-  function run(input,pack,data,keepLog=false){
-    const ids=validate(input,data),profiles={...input.contextProfiles,[input.characterId]:{...input.profile}};
-    delete profiles[input.characterId].equipment;if(pack)profiles[input.characterId].equipment=pack;
+  function buildProfile(input,pack,cone,data){
+    const profile={...input.profile};
+    delete profile.equipment;
+    delete profile.cone;
+    if(pack)profile.equipment=pack;
+    return cone?G.coneProfile(input.characterId,profile,cone,input.coneRatios,data):profile;
+  }
+  function run(input,pack,data,keepLog=false,cone=null){
+    const ids=validate(input,data),profiles={...input.contextProfiles,[input.characterId]:buildProfile(input,pack,cone,data)};
     return T.simulate(ids,profiles,{...input.scenario,allowPartial:true,focus:input.focus},data,keepLog);
   }
   function createSearch(input,data){
-    validate(input,data);const choices=packs(input.caverns,input.planars,input.mixed,data,input.characterId);if(!choices.length)throw Error('В выбранной области поиска нет поддержанных сочетаний.');
-    const baseline=run(input,null,data),top=[];let checked=0;
-    return {total:choices.length,baseline,step(batch=3){for(let n=0;n<batch&&checked<choices.length;n++){const pack=choices[checked++],simulation=run(input,pack,data),result={pack,total:simulation.total,per100AV:simulation.per100AV,initialStats:simulation.initialStats[input.characterId],breakdown:simulation.breakdown,damageByTarget:simulation.damageByTarget};top.push(result);top.sort((a,b)=>b.total-a.total);if(top.length>10)top.pop();}return {total:choices.length,checked,done:checked===choices.length,baseline:baseline.total,top};}};
+    validate(input,data);
+    const choices=packs(input.caverns,input.planars,input.mixed,data,input.characterId);
+    if(!choices.length)throw Error('В выбранной области поиска нет поддержанных сочетаний.');
+    const cones=input.cones?.length?input.cones:[null];
+    for(const cone of cones)buildProfile(input,null,cone,data);
+    const baseline=run(input,null,data),top=[],bestByCone={};
+    const total=choices.length*cones.length;
+    let checked=0;
+    return {total,baseline,step(batch=3){
+      for(let n=0;n<batch&&checked<total;n++){
+        const pack=choices[Math.floor(checked/cones.length)];
+        const cone=cones[checked%cones.length];
+        const simulation=run(input,pack,data,false,cone);
+        const result={pack,cone,total:simulation.total,per100AV:simulation.per100AV,
+          initialStats:simulation.initialStats[input.characterId],breakdown:simulation.breakdown,
+          damageByTarget:simulation.damageByTarget};
+        top.push(result);
+        top.sort((a,b)=>b.total-a.total);
+        if(top.length>10)top.pop();
+        if(cone&&(!bestByCone[cone.id]||result.total>bestByCone[cone.id].total))bestByCone[cone.id]=result;
+        checked++;
+      }
+      return {total,checked,done:checked===total,baseline:baseline.total,top,bestByCone:Object.values(bestByCone)};
+    }};
   }
-  root.HSR_SETS={packs,validate,run,createSearch};
+  root.HSR_SETS={packs,validate,run,createSearch,buildProfile};
 })(typeof window==='undefined'?globalThis:window);

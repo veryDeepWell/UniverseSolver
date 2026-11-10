@@ -131,7 +131,7 @@
     for(const d of dummies){d.toughness=maxToughness;d.exo=0;d.breaks=0;}
     const rng=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return (seed>>>0)/4294967296;};
     const actors=ids.map(id=>({id,s:{...defaults(id,data),...(profiles[id]||{})},distance:10000,turn:0,buffs:[],energy:['1220','1308','1407','1408','1415','1506'].includes(id)?0:(data.characters[id].max_sp||0)*scenario.energyPercent/100,resource:id==='1220'?3:id==='1308'?5:0,fuaReady:true,fuaSinceTurn:true,charges:0,blessing:null,total:0,normal:0,ults:0,followups:0,actionKind:'basic',currentHP:(profiles[id]||defaults(id,data)).hp,hpLost:0,bladeCharges:0,ratioStacks:0,ratioMarks:0}));
-    actors.forEach(a=>{const d=defaults(a.id,data);a.s.baseHP??=d.hp;a.s.baseDef??=d.def;a.s.breakEffect??=0;if(G)G.init(a,data);});
+    actors.forEach(a=>{const d=defaults(a.id,data);a.s.baseHP??=d.hp;a.s.baseDef??=d.def;a.s.breakEffect??=0;if(G)G.init(a,data,scenario.targets);});
     const lord=ids.includes('1204')?{distance:10000,hits:3}:null;
     const numby=ids.includes('1112')?{distance:10000,enhanced:0,acting:false}:null;
     const fuyuan=ids.includes('1222')?{distance:10000,actions:0,acting:false}:null;
@@ -1053,15 +1053,50 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
     return {ids:[...ids],total,per100AV:total/horizon*100,horizon,damageByTarget,initialStats,memories:memories.map(m=>({owner:m.owner.id,name:m.name,active:m.active,hp:m.unit.currentHP,maxHP:m.baseHP?memoStat(m).hp:0,speed:m.baseHP?memoSpeed(m):0,turns:m.turn})),toughness:dummies.map(d=>({current:d.toughness,max:maxToughness,exo:d.exo,breaks:d.breaks})),breakdown:actors.map(a=>({id:a.id,damage:a.total,memoDamage:a.memoDamage||0,breakDamage:a.breakDamage||0,superDamage:a.superDamage||0,breaks:a.breakCount||0,turns:a.normal,ults:a.ults,followups:a.followups,energy:a.energy,resource:a.resource,currentHP:Math.min(a.currentHP,stat(a).hp),maxHP:stat(a).hp,shield:(a.shield?.amount||0)+(a.avenShield?.amount||0)+(a.dragonShield?.amount||0)+(a.marchShield?.amount||0)+(a.trailShield?.amount||0),recorded:a.bank||0,ode:a.ode||null,godmode:!!a.godmode,mood:a.mood||0,assistUses:a.assistUses||0,banger:banger(a),elation:elation(a),special:a.gems??a.enthusiasm??0})),events,finalSP:sp,maxSP};
   }
   function combinations(values,k){if(!Number.isInteger(k)||k<0||k>values.length)return [];const result=[];function visit(start,current){if(current.length===k){result.push(current);return;}for(let i=start;i<=values.length-(k-current.length);i++)visit(i+1,[...current,values[i]]);}visit(0,[]);return result;}
-  function createSearch(core,pool,profiles,scenario,data){
+  function createSearch(core,pool,profiles,scenario,data,candidates={}){
     if(!compatible(core))throw Error('Выбери один Путь Первопроходца и одну форму Март 7.');
     validateScenario(scenario);if(!Array.isArray(core)||core.length<1||core.length>4||new Set(core).size!==core.length)throw Error('Зафиксируй от 1 до 4 разных персонажей в коре.');
     if(!Array.isArray(pool)||new Set(pool).size!==pool.length)throw Error('В пуле есть повторяющиеся персонажи.');
     for(const id of [...core,...pool])if(!models[id])throw Error('Персонаж пока не поддержан симулятором: '+(data.characters[id]?.name||id));
     const available=(pool.length?pool:Object.keys(models).filter(id=>!aliases[id])).filter(id=>!core.includes(id)).sort(),choices=combinations(available,4-core.length).filter(choice=>compatible([...core,...choice])&&(!scenario.requireSustain||[...core,...choice].some(id=>models[id].role==='sustain')));if(!choices.length)throw Error(scenario.requireSustain?'Нет допустимой команды со састейном. Добавь састейна в пул или кор и оставь ему место.':'В пуле недостаточно персонажей для команды из четырёх.');
-    const used=[...new Set([...core,...available])];for(const id of used)validateStats(profiles[id]||defaults(id,data));
-    let checked=0;const top=[];
-    return {total:choices.length,step(batch=2){for(let i=0;i<batch&&checked<choices.length;i++){const ids=[...core,...choices[checked]],result=simulate(ids,profiles,{...scenario,focus:core[0]},data);checked++;top.push(result);top.sort((a,b)=>b.total-a.total);if(top.length>10)top.pop();}return {total:choices.length,checked,done:checked===choices.length,top};}};
+    const options={};
+    for(const id of [...new Set([...core,...available])]){
+      const variants=candidates[id]||[];
+      options[id]=variants.length?variants:[{profile:profiles[id]||defaults(id,data)}];
+      for(const variant of options[id])validateStats(variant.profile);
+    }
+    const battleCount=ids=>ids.reduce((count,id)=>count*options[id].length,1);
+    const total=choices.reduce((sum,choice)=>sum+battleCount([...core,...choice]),0);
+    if(total>250000)throw Error('Больше 250 000 боёв. Сузь пул персонажей или список кандидатов.');
+    let checked=0,rosterIndex=0,variantIndex=0,best=null;
+    const top=[];
+    return {total,step(batch=2){
+      for(let i=0;i<batch&&checked<total;i++){
+        const ids=[...core,...choices[rosterIndex]];
+        let cursor=variantIndex;
+        const battleProfiles={},builds={};
+        for(const id of ids){
+          const variants=options[id];
+          const variant=variants[cursor%variants.length];
+          cursor=Math.floor(cursor/variants.length);
+          battleProfiles[id]=variant.profile;
+          if(variant.id)builds[id]=variant.id;
+        }
+        const result=simulate(ids,battleProfiles,{...scenario,focus:core[0]},data);
+        if(!best||result.total>best.total)best={...result,builds,profiles:battleProfiles};
+        checked++;
+        variantIndex++;
+        if(variantIndex===battleCount(ids)){
+          top.push(best);
+          top.sort((a,b)=>b.total-a.total);
+          if(top.length>10)top.pop();
+          rosterIndex++;
+          variantIndex=0;
+          best=null;
+        }
+      }
+      return {total,checked,rosters:choices.length,done:checked===total,top};
+    }};
   }
   root.HSR_TEAM={models,aliases,canonical,defaults,validateStats,validateScenario,simulate,combinations,createSearch,compatible};
 })(typeof window==='undefined'?globalThis:window);
