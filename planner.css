@@ -92,6 +92,10 @@
 #plan dialog { width: min(690px,calc(100% - 24px)); }
 .plan-picker { display: grid; grid-template-columns: repeat(auto-fill,minmax(104px,1fr)); gap: 7px; max-height: 44vh; overflow: auto; padding: 4px; margin: 10px -4px; }
 .plan-picker strong { font-size: 12px; }
+.plan-picker-art { position: relative; display: block; }
+.plan-picker-art .plan-picker-badge { position: absolute; bottom: 0; left: -7px; padding: 2px; border-radius: 5px; background: #101720; }
+.plan-picker-art .plan-picker-badge:last-child { left: auto; right: -7px; }
+.plan-picker-art .plan-picker-badge img { display: block; width: 17px; height: 17px; }
 .plan-picker small { font-size: 11px; }
 .plan-status { color: var(--mint); }
 .plan-status:empty { display: none; }

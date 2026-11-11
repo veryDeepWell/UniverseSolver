@@ -14,6 +14,21 @@
     improve: ['Где докачать готовую команду?', 'Найди ближайшее улучшение для выбранного уровня.']
   };
   const slots = ['Голова', 'Руки', 'Тело', 'Ноги', 'Сфера', 'Верёвка'];
+  const coneSources = {
+    'Боевой пропуск': '21028 21029 21030 21031 21032 21033 21034 21052 21055 21056 21057 21058 21060 21061 21062 21065',
+    'Магазин Герты': '24000 24001 24002 24003 24004 24005 24006',
+    'Магазин зеркала': '21021 21022 21023 21024 21025 21026 21027 21035 21036 21037 21038 21039 21040 21041 21050 21064'
+  };
+  const signatures = {
+    1102:'23001', 1003:'23000', 1101:'23003', 1004:'23004', 1104:'23005', 1005:'23006', 1006:'23007',
+    1203:'23008',1205:'23009',1204:'23010',1208:'23011',1107:'23002',1209:'23012',1211:'23013',1212:'23014',
+    1213:'23015',1112:'23016',1217:'23017',1302:'23018',1303:'23019',1305:'23020',1306:'23021',
+    1307:'23022',1304:'23023',1308:'23024',1310:'23025',1309:'23026',1315:'23027',1314:'23028',
+    1218:'23029',1221:'23030',1220:'23031',1222:'23032',1317:'23033',1313:'23034',1225:'23035',
+    1402:'23036',1401:'23037',1403:'23038',1404:'23039',1407:'23040',1405:'23041',1409:'23042',
+    1406:'23043',1408:'23044',1014:'23045',1015:'23046',1410:'23047',1412:'23048',1413:'23049',1321:'23050',
+    1414:'23051',1415:'23052',1502:'23053',1501:'23054',1505:'23055',1504:'23056'
+  };
   const tiers = [
     ['early', 'Ранний · сюжет и мир'],
     ['initial', 'Начальный · MoC 36 / PF 12 / AS 12'],
@@ -52,7 +67,7 @@
   const state = {
     members: legacyIds, hero: legacyIds.includes(oldJourney?.characterId) ? oldJourney.characterId : legacyIds[0],
     scenario: {...scenarioDefaults, ...oldJourney?.context?.scenario},
-    tier: oldJourney?.stage || 'initial', pool:[], builds:{}, actual:{}, boots:{}, cones:{},
+    tier: oldJourney?.stage || 'initial', pool:[], builds:{}, actual:{}, boots:{}, eidolons:{}, ex:{},
     inventory:oldInventory?.inventory || [],
     equipped:Object.fromEntries(Object.entries(oldInventory?.builds || {}).map(([id, build]) => [id, build.equipped])),
     ...read('universesolver.plan.v1')
@@ -62,7 +77,7 @@
   }
   state.members = [...new Set(state.members.filter(id => T.models[id]))];
   state.scenario = {...scenarioDefaults, ...state.scenario};
-  let step, job = 0, report = null, itemSlot = 'HEAD';
+  let step, job = 0, report = null, itemSlot = 'HEAD', buildTab = 'sets';
   let storageError = false;
   function save() {
     try {
@@ -114,11 +129,14 @@
     if (items.every(Boolean)) return itemProfile(id,items);
     return planned;
   }
-  const profiles = (ids, useActual = true) => Object.fromEntries(ids.map(id => [id, profile(id, useActual)]));
+  const withRanks = (id,profile) => ({...profile,eidolon:state.eidolons[id]||0,exEidolon:Boolean(state.ex[id])});
+  const profiles = (ids, useActual = true) => Object.fromEntries(ids.map(id => [id, withRanks(id,profile(id, useActual))]));
+  const eidolonModels = T.eidolonModels;
+  const distinctForms = new Set(Object.keys(T.models).map(T.canonical)).size;
   const scenario = () => ({...state.scenario, focus:members()[0], allowPartial:true});
   const propertyName = key => esc(D.properties[key]?.name || key);
   const fieldValue = (key, value) => number(value * statFields[key][1]) + (statFields[key][1] === 100 ? '%' : '');
-  const portrait = id => `<img src="${asset(D.characters[id].icon)}" alt="" loading="lazy">`;
+  const portrait = id => `<img src="${D.characters[id].previewSource?esc(D.characters[id].previewSource):asset(D.characters[id].icon)}" alt="" loading="lazy">`;
   function context() {
     const editing = step === 'team' || !complete();
     return `<section class="plan-panel plan-context" aria-labelledby="plan-lineup">
@@ -155,34 +173,107 @@
       <p>Добавь обязательных героев в состав. Если оставишь места свободными, поиск проверит допустимые варианты из пула.</p>
       <div class="plan-actions">${button('Пул: '+(state.pool.length ? state.pool.length+' гер.' : 'весь ростер'), 'pool')}
       <label class="plan-check"><input type="checkbox" data-sustain ${state.scenario.requireSustain?'checked':''}> Обязательный састейн</label></div>
+      <p class="plan-muted">Боевые эффекты эйдолонов · ${eidolonModels.size} из ${distinctForms} игровых форм.</p>
+      ${members().length ? `<details class="plan-settings"><summary>Эйдолоны состава</summary>
+        <p class="plan-muted">Счётчик учитывает формы с отдельной моделью эффектов. Повышения уровней применяются к умениям, коэффициенты которых симулятор берёт из каталога. Эффекты убийств, контроля и смертельного урона зависят от условий боя.</p>
+        <div class="plan-fields">${members().map(id=>`<div><label>${esc(name(id))}<select data-eidolon="${id}">
+          ${Array.from({length:7},(_,rank)=>`<option value="${rank}" ${(state.eidolons[id]||0)===rank?'selected':''}>E${rank}</option>`).join('')}
+        </select></label>${window.HSR_SUPPLEMENTS.ex_eidolons[id]?`<label class="plan-check"><input type="checkbox" data-ex="${id}" ${state.ex[id]?'checked':''}> EX-эйдолон</label>`:''}
+        ${complete()&&eidolonModels.has(T.canonical(id))?button('Сравнить E0–E6','rank-estimate-'+id):''}</div>`).join('')}</div></details>`:''}
       <div class="plan-actions">${complete() ? button('Подобрать билд в этом составе →','to-build',true) : button('Найти команды','search-team',true)}
       ${complete() ? button('Сравнить урон состава','search-team') : ''}</div></section>`;
   }
   function buildPage() {
     const id = hero();
     if (!complete()) return emptyTeam('Заполни состав, чтобы сравнить билды в одном бою.');
-    const cones = G.cones.filter(cone => D.light_cones[cone]?.path === D.characters[id].path);
-    const selected = state.cones[id] || {};
     const saved = state.builds[id];
     return `<section class="plan-panel"><h2>Билд · ${esc(name(id))}</h2>
-      <p>Сеты сравниваются на одинаковом бюджете сабстатов. Экипировка союзников берётся из плана, остальные статы — из эталона.</p>
-      ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${saved.cone ? esc(D.light_cones[saved.cone.id].name)+' S'+saved.cone.rank : 'Эталонный конус 4★ без пассива'}</small>
+      <div class="plan-actions" role="group" aria-label="Разделы билда">
+        <button type="button" data-action="build-sets" aria-pressed="${buildTab==='sets'}">Артефакты</button>
+        <button type="button" data-action="build-cones" aria-pressed="${buildTab==='cones'}">Конус</button>
+      </div>
+      ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${coneLabel(saved.cone)}</small>
         ${saved.signature !== buildSignature(id) ? '<small>Состав, условия или экипировка союзников изменились. Перепроверь выбор.</small>' : ''}</div>` : ''}
+      ${buildTab==='cones' ? conePage(id) : setForm(id,saved)}
+      ${comparisonForm(id,saved)}
+      </section>`;
+  }
+  function setForm(id,saved) {
+    return `<p>Сеты сравниваются на одинаковом бюджете сабстатов с выбранными конусами.</p>
       <form data-form="build">
         <div class="plan-fields"><label>Обувь в эталоне<select name="boots"><option value="speed">Скорость</option><option value="scaling" ${state.boots[id]==='scaling'?'selected':''}>Основной стат урона</option></select></label>
         <label class="plan-check"><input name="mixed" type="checkbox" ${state.mixed?'checked':''}> Включить сочетания 2+2</label></div>
-        <details class="plan-settings"><summary>Конусы для сравнения · ${Object.keys(selected).length}</summary>
-        <p class="plan-muted">Здесь доступны конусы с реализованным пассивом. Если ничего не выбрать, берутся базовые статы конуса 4★.</p>
-        <div class="plan-fields">${cones.length ? cones.map(cone => `<label>${esc(D.light_cones[cone].name)}<select name="cone-${cone}"><option value="0">Пропустить</option>${[1,2,3,4,5].map(rank => `<option value="${rank}" ${selected[cone]===rank?'selected':''}>S${rank}</option>`).join('')}</select></label>`).join('') : '<p>Для этого Пути пассивы конусов пока не моделируются.</p>'}</div></details>
-        <div class="plan-actions"><button class="plan-primary" type="submit">Сравнить билды</button>${saved ? button('К целям по статам →','to-relics') : ''}</div>
-      </form></section>`;
+        <div class="plan-actions"><button class="plan-primary" type="submit" value="hero">Подобрать герою</button>
+        <button type="submit" value="team">Подобрать всей команде</button>${saved?.pack ? button('К целям по статам →','to-relics') : ''}</div>
+      </form>`;
+  }
+  function coneOptions(id) {
+    return Object.values(D.light_cones).filter(cone => cone.path===D.characters[id].path);
+  }
+  function coneLabel(cone) {
+    return cone ? esc(D.light_cones[cone.id].name)+' S'+cone.rank+(cone.baseOnly?' · только базовые статы':'') : 'Эталонный конус 4★';
+  }
+  function conePage(id) {
+    const options = coneOptions(id);
+    const groups = {'Сигна':signatures[id]||'',...coneSources,'Другие конусы':''};
+    const used = new Set(Object.values(groups).flatMap(ids => ids.split(' ')));
+    return `<p>Сравнение фиксирует текущий набор реликвий. Где пассив ещё не моделируется, в расчёт идут только базовые HP, ATK и DEF.</p>
+      <form data-form="cones"><div class="plan-fields"><label>Наложение для сравнения${rankSelect()}</label></div>
+      <div class="plan-actions"><button type="submit" class="plan-primary">Сравнить конусы</button></div></form>
+      ${Object.entries(groups).map(([label,ids])=>{
+        const rows=options.filter(cone=>ids ? ids.split(' ').includes(cone.id) : label==='Другие конусы'&&!used.has(cone.id));
+        return `<details class="plan-settings" ${label==='Другие конусы'?'':'open'}><summary>${label} · ${rows.length}</summary>
+          <div class="plan-gear">${rows.map(cone=>`<span><img src="${asset(cone.icon)}" alt="">${esc(cone.name)}${G.cones.includes(cone.id)?'':' · базовые статы'}</span>`).join('')||'<p>Для этого Пути нет вариантов.</p>'}</div></details>`;
+      }).join('')}`;
+  }
+  function rankSelect() {
+    return `<select name="rank">${[1,2,3,4,5].map(rank=>`<option value="${rank}">S${rank}</option>`).join('')}</select>`;
+  }
+  function comparisonForm(id,saved) {
+    const sets=Object.values(D.relic_sets).filter(set=>set.id.startsWith('1'));
+    const options=list=>list.map(set=>`<option value="${set.id}">${esc(set.name)}</option>`).join('');
+    return `<details class="plan-settings"><summary>Сравнить с другим сетом или конусом</summary>
+      <p class="plan-muted">Пустое поле сохраняет выбранный вариант. Для комплекта 2+2 выбери второй пещерный набор.</p>
+      <form data-form="compare-build"><div class="plan-fields">
+      <label>Пещерный набор<select name="first"><option value="">Как в билде</option>${options(sets)}</select></label>
+      <label>Второй пещерный набор<select name="second"><option value="">Без второго набора</option>${options(sets)}</select></label>
+      <label>Планарный набор<select name="planar"><option value="">Как в билде</option>${options(Object.values(D.relic_sets).filter(set=>set.id.startsWith('3')))}</select></label>
+      <label>Конус<select name="cone"><option value="">Как в билде</option><option value="reference">Эталон 4★</option>${coneOptions(id).map(cone=>`<option value="${cone.id}">${esc(cone.name)}${G.cones.includes(cone.id)?'':' · базовые статы'}</option>`).join('')}</select></label>
+      <label>Наложение${rankSelect()}</label></div>
+      <p class="plan-muted">Основа сравнения: ${saved?.pack?'выбранные сеты':'эталон без сетов'} и ${coneLabel(saved?.cone)}.</p>
+      <button type="submit">Сравнить урон команды</button></form></details>`;
   }
   function packLabel(pack) {
     return `<div class="plan-gear">${Object.entries(G.counts(pack)).map(([id,count]) =>
-      `<span><img src="${asset(D.relic_sets[id].icon)}" alt="">${count} × ${esc(D.relic_sets[id].name)}</span>`).join('')}</div>`;
+      `<span><img src="${asset(D.relic_sets[id].icon)}" alt="">${count} × ${esc(D.relic_sets[id].name)}</span>`).join('')}</div>
+      ${pack?.partial?'<small>Часть бонусов набора пока не участвует в расчёте.</small>':''}`;
+  }
+  function eidolonEstimate(id){
+    const usePlan=complete()&&members().includes(id);
+    if(!usePlan&&id!=='1511')throw Error('Сначала добавь персонажа в полный состав.');
+    const ids=usePlan?members():['1501','1511','1502','1503'];
+    const all=usePlan?profiles(ids):Object.fromEntries(ids.map(member=>[member,reference(member).profile]));
+    const settings=usePlan?scenario():{...scenarioDefaults,targets:3,cycles:5,focus:ids[0]};
+    const rows=Array.from({length:7},(_,rank)=>{
+      const result=T.simulate(ids,{...all,[id]:{...all[id],eidolon:rank}},settings,D);
+      const actor=result.breakdown.find(row=>row.id===id);
+      return {total:result.total,damage:actor.damage,ults:actor.ults};
+    });
+    return {rows,team:ids.map(name),cycles:settings.cycles,targets:settings.targets,usePlan};
+  }
+  function eidolonTable(id){
+    const {rows,team,cycles,targets,usePlan}=eidolonEstimate(id);
+    const gain=(current,base)=>base?((current>=base?'+':'')+number(100*(current/base-1),1)+'%'):'—';
+    return `<p>${usePlan?'Состав из плана':'Пример состава'} · ${esc(team.join(' / '))} · ${targets} цел. / ${cycles} ц.</p>
+      <div class="table-wrap"><table aria-label="Прирост от эйдолонов"><thead><tr><th scope="col">Эйдолон</th>
+      <th scope="col">Команда к предыдущему</th><th scope="col">Команда к E0</th><th scope="col">Личный урон</th><th scope="col">Ульт</th></tr></thead>
+      <tbody>${rows.map(({total,damage,ults},rank)=>`<tr><th scope="row">E${rank}</th><td>${rank?gain(total,rows[rank-1].total):'—'}</td>
+      <td>${gain(total,rows[0].total)}</td><td>${number(damage,0)}</td><td>${ults}</td></tr>`).join('')}</tbody></table></div>
+      <p class="data-meta">Один сценарий для всех строк. В таблицу входят эффекты, которые работают против тренировочных целей и подключены к симуляции.</p>`;
   }
   function buildSignature(id) {
-    return JSON.stringify([members(), state.scenario, members().filter(other => other !== id).map(other => profile(other))]);
+    return JSON.stringify([members(), state.scenario, state.eidolons[id]||0, Boolean(state.ex[id]),
+      members().filter(other => other !== id).map(other => withRanks(other,profile(other)))]);
   }
   function tierTargets(id) {
     const idx = Math.max(0, tiers.findIndex(([key]) => key === state.tier));
@@ -196,6 +287,10 @@
     if (archetype==='break') values.breakEffect = [.8,1.8,2.2,2.5][idx];
     if (archetype==='dot') { values.atk = [1800,2800,3000,3200][idx]; values.effectHit = [.3,.67,.67,.67][idx]; }
     if (archetype==='support') values.hp = [2500,3500,3750,4000][idx];
+    if (id==='1511') {
+      values.speed=idx<2?125:150;
+      values.critDamage=[1,1.4,1.6,1.8][idx];
+    }
     if (['1107','1221'].includes(T.canonical(id))) delete values.speed;
     if (['1101','1313'].includes(T.canonical(id))) {
       values.critDamage = [1,1.8,2,2.2][idx];
@@ -227,7 +322,7 @@
     const available = state.inventory.filter(item => item.slot===itemSlot);
     const priorities = Object.entries(R.defaultWeights(id,D)).filter(([,weight]) => weight > 0).sort((a,b) => b[1]-a[1]).slice(0,4);
     return `<section class="plan-panel"><div class="plan-panel-head"><h2>Цели · ${esc(name(id))}</h2>${tierControl()}</div>
-      ${build ? packLabel(build.pack) : '<p class="plan-muted">Основные статы предложены по роли. Выбранный сет появится здесь после подбора билда.</p>'}
+      ${build?.pack ? packLabel(build.pack) : '<p class="plan-muted">Основные статы предложены по роли. Выбранный сет появится здесь после подбора билда.</p>'}
       <div class="plan-chips">${statTargets(id)}</div>
       <p>Приоритет сабстатов по роли: ${priorities.map(([key]) => propertyName(key)).join(' · ')}.</p>
       ${complete() ? button('Проверить приоритеты в бою','rolls') : ''}
@@ -321,27 +416,97 @@
       report = {kind:'team',rows:result.top};
       results('Результаты подбора', `<p class="plan-muted">Урон за заданное число циклов. Для героев без введённых статов используются сохранённые билды или эталон.</p>
         <div class="plan-results">${result.top.map((row,i) => `<article><div class="plan-panel-head"><strong>${i+1}. ${row.ids.map(id => esc(name(id))).join(' · ')}</strong><span>${number(row.total,0)} урона</span></div>
+          ${row.aha ? `<p>Аха · ходов: ${row.aha.turns} · Юмор в конце боя: ${number(row.aha.punchline)}</p>` : ''}
           <div class="plan-mini-lineup">${row.ids.map(portrait).join('')}</div>${button('Выбрать состав и подобрать билд →','use-team-'+i,true)}</article>`).join('')}</div>`);
     });
   }
-  function searchBuild(form) {
-    const id = hero(), context = members().filter(member => member!==id);
-    const cones = [];
-    for (const [key,value] of form) {
-      if (key.startsWith('cone-') && Number(value)) cones.push({id:key.slice(5),rank:Number(value)});
+  function buildInput(id,cone,boots,contextProfiles=profiles(members())){
+    const farm=reference(id,!cone,boots);
+    return {
+      characterId:id, profile:withRanks(id,farm.profile), context:members().filter(member=>member!==id), contextProfiles,
+      position:members().indexOf(id), focus:members()[0], scenario:state.scenario,
+      caverns:Object.keys(D.relic_sets).filter(set=>/^1\d\d$/.test(set)), planars:G.planar,
+      cones:cone?[cone]:[], coneRatios:farm.ratios, mixed:state.mixed, stableRanking:true
+    };
+  }
+  const chosenCone = (id,rank) => ({id,rank,baseOnly:!G.cones.includes(id)});
+  function saveEquipment(id,pack,cone,boots) {
+    const input=buildInput(id,cone,boots,{});
+    state.builds[id]={pack,cone,boots,profile:S.buildProfile(input,pack,cone,D)};
+  }
+  function compareEquipment(id,pack,cone,boots){
+    return S.run(buildInput(id,cone,boots),pack,D,false,cone);
+  }
+  function searchCones(rank){
+    const id=hero(), saved=state.builds[id], pack=saved?.pack||null, boots=saved?.boots||state.boots[id];
+    const rows=coneOptions(id).map(option=>{
+      const cone=chosenCone(option.id,rank);
+      return {cone,total:compareEquipment(id,pack,cone,boots).total};
+    }).sort((a,b)=>b.total-a.total);
+    report={kind:'cones',rows,pack,boots};
+    results('Конусы в выбранном составе', `<p class="plan-muted">Одинаковые реликвии и условия боя для всех конусов.</p>
+      <div class="plan-results">${rows.map(({cone,total},i)=>`<article><div class="plan-panel-head">
+        <div class="plan-gear"><span><img src="${asset(D.light_cones[cone.id].icon)}" alt="">${coneLabel(cone)}</span></div>
+        <strong>${number(total,0)} урона</strong></div>${button('Выбрать конус','use-cone-'+i)}</article>`).join('')}</div>`);
+  }
+  function compareBuild(form) {
+    const id=hero(), saved=state.builds[id], boots=saved?.boots||state.boots[id];
+    const first=form.get('first'), second=form.get('second'), planar=form.get('planar');
+    let pack=saved?.pack||null;
+    if(first||second||planar){
+      const primary=first||pack?.cavern[0], ornament=planar||pack?.planar;
+      if(!primary||!ornament)throw Error('Выбери пещерный и планарный наборы.');
+      const cavern=first||second?[primary,primary,second||primary,second||primary]:pack.cavern;
+      pack={cavern,planar:ornament};
+      if(!G.planar.includes(ornament)||(cavern.every(set=>set===primary)&&!G.supportsFour(primary,id)))pack.partial=true;
     }
+    const selection=form.get('cone');
+    const cone=selection==='reference'?null:selection?chosenCone(selection,Number(form.get('rank'))):saved?.cone||null;
+    const base=compareEquipment(id,saved?.pack||null,saved?.cone||null,boots).total;
+    const other=compareEquipment(id,pack,cone,boots).total;
+    const change=base?100*(other/base-1):0;
+    report={kind:'compare-build',pack,cone,boots};
+    results('Сравнение билдов', `<div class="plan-stat-cards">
+      <div><strong>Текущий · ${number(base,0)} урона</strong>${packLabel(saved?.pack)}<small>${coneLabel(saved?.cone)}</small></div>
+      <div><strong>Вариант · ${number(other,0)} урона</strong>${packLabel(pack)}<small>${coneLabel(cone)}</small></div></div>
+      <p><strong>${change>0?'+':''}${number(change)}% командного урона</strong></p>${button('Сохранить вариант','use-comparison',true)}`);
+  }
+  function searchTeamSets() {
+    const ids=members(), context=profiles(ids), pending=[];
+    const inputs=ids.map(id=>buildInput(id,state.builds[id]?.cone,state.boots[id],context));
+    const total=inputs.reduce((sum,input)=>sum+S.packs(input.caverns,input.planars,input.mixed,D,input.characterId).length,0);
+    let index=0, finished=0, engine;
+    search(()=>({step(){
+      const input=inputs[index];
+      engine??=S.createSearch(input,D);
+      const progress=engine.step(1), checked=finished+progress.checked;
+      if(progress.done){
+        const row=progress.top[0], id=input.characterId;
+        context[id]=S.buildProfile(input,row.pack,row.cone,D);
+        pending.push({id,pack:row.pack,cone:row.cone,boots:state.boots[id]});
+        index++;
+        finished=checked;
+        engine=null;
+      }
+      return {total,checked,done:index===inputs.length};
+    }}),()=>{
+      report={kind:'team-build',rows:pending};
+      const before=T.simulate(ids,profiles(ids),scenario(),D).total;
+      const after=T.simulate(ids,context,scenario(),D).total;
+      results('Реликвии для всей команды', `<p>Подбор по очереди в порядке состава. Каждый следующий герой сравнивается с уже подобранными сетами союзников.</p>
+        <p>Командный урон · <strong>${number(before,0)} → ${number(after,0)}</strong></p>
+        <div class="plan-results">${pending.map(row=>`<article><strong>${esc(name(row.id))}</strong>${packLabel(row.pack)}<small>${coneLabel(row.cone)}</small></article>`).join('')}</div>
+        <div class="plan-actions">${button('Сохранить сеты всей команды','use-team-build',true)}</div>`);
+    });
+  }
+  function searchBuild(form,wholeTeam) {
+    const id = hero();
     const boots = form.get('boots');
     state.boots[id] = boots;
-    state.cones[id] = Object.fromEntries(cones.map(cone => [cone.id,cone.rank]));
     state.mixed = form.has('mixed');
     save();
-    const farm = reference(id,!cones.length,boots);
-    const input = {
-      characterId:id, profile:farm.profile, context, contextProfiles:profiles(context),
-      position:members().indexOf(id), focus:members()[0], scenario:state.scenario,
-      caverns:Object.keys(D.relic_sets).filter(set => /^1\d\d$/.test(set)), planars:G.planar,
-      cones, coneRatios:farm.ratios, mixed:state.mixed, stableRanking:true
-    };
+    if(wholeTeam){ searchTeamSets(); return; }
+    const input=buildInput(id,state.builds[id]?.cone,boots);
     const signature = buildSignature(id);
     search(() => S.createSearch(input,D), result => {
       const top = result.top[0].score;
@@ -351,7 +516,7 @@
         <div class="plan-results">${rows.map((row,i) => {
           const gap = top ? 100*(1-row.score/top) : 0;
           return `<article><div class="plan-panel-head"><strong>${i+1}. ${number(row.score,0)} / 100 AV</strong><span>${gap>0 && gap<.01 ? 'Отставание < 0,01%' : gap>0 ? 'Отставание '+number(gap)+'%' : 'Лучший результат'}</span></div>
-            ${packLabel(row.pack)}<p>${row.cone ? esc(D.light_cones[row.cone.id].name)+' S'+row.cone.rank : 'Эталонный конус'}</p>
+            ${packLabel(row.pack)}<p>${coneLabel(row.cone)}</p>
             ${row.checkpoints ? `<small>${row.checkpoints.map(sample => sample.cycles+' ц. · '+number(sample.total,0)).join(' / ')}</small>` : ''}
             ${button('Сохранить билд и перейти к статам →','use-build-'+i,true)}</article>`;
         }).join('')}</div>`);
@@ -368,6 +533,12 @@
     const draft = new Set(state.pool);
     const modal = dialog(pool ? 'Пул доступных героев' : 'Выбрать персонажа',
       `<label>Поиск по имени<input type="search" data-picker-search autofocus></label>
+      <div class="plan-fields">
+        <label>Путь<select data-picker-path><option value="">Все пути</option>${Object.entries(D.paths).filter(([,path])=>path.name).map(([id,path])=>`<option value="${id}">${esc(path.name)}</option>`).join('')}</select></label>
+        <label>Элемент<select data-picker-element><option value="">Все элементы</option>${Object.entries(D.elements).map(([id,element])=>`<option value="${id}">${esc(element.name)}</option>`).join('')}</select></label>
+        <label>Редкость<select data-picker-rarity><option value="">Любая</option><option value="4">4★</option><option value="5">5★</option></select></label>
+        ${pool?'<label class="plan-check"><input type="checkbox" data-picker-selected> Только выбранные</label>':''}
+      </div>
       <div class="plan-picker" data-picker></div>
       <div class="plan-actions">${pool ? '<button type="button" data-picker-save class="plan-primary">Сохранить пул</button><button type="button" data-picker-clear>Очистить выбор</button>' : state.members[index] ? '<button type="button" data-picker-clear>Освободить место</button>' : ''}</div>`);
     const input = modal.querySelector('[data-picker-search]');
@@ -376,7 +547,18 @@
     const names = id => `${name(id)} ${D.paths[D.characters[id].path]?.name||''} ${D.english_names?.[id]||''}`.toLocaleLowerCase('ru');
     function filter() {
       const query = input.value.trim().toLocaleLowerCase('ru');
-      grid.innerHTML = options.filter(id => names(id).includes(query)).map(id => `<button type="button" data-pick="${id}" ${pool ? `aria-pressed="${draft.has(id)}"` : ''}>${portrait(id)}<strong>${esc(name(id))}</strong><small>${esc(D.paths[D.characters[id].path]?.name)}</small></button>`).join('') || '<p>Персонажи не найдены.</p>';
+      const path=modal.querySelector('[data-picker-path]').value, element=modal.querySelector('[data-picker-element]').value;
+      const rarity=modal.querySelector('[data-picker-rarity]').value, selected=modal.querySelector('[data-picker-selected]')?.checked;
+      grid.innerHTML = options.filter(id=>{
+        const c=D.characters[id];
+        return names(id).includes(query)&&(!path||c.path===path)&&(!element||c.element===element)&&
+          (!rarity||String(c.rarity)===rarity)&&(!selected||draft.has(id));
+      }).map(id=>{
+        const c=D.characters[id], pathName=D.paths[c.path]?.name, elementName=D.elements[c.element]?.name;
+        return `<button type="button" data-pick="${id}" ${pool ? `aria-pressed="${draft.has(id)}"` : ''}><span class="plan-picker-art">${portrait(id)}
+          <span class="plan-picker-badge" title="${esc(pathName)}">${icon('path',c.path)}</span><span class="plan-picker-badge" title="${esc(elementName)}">${icon('element',c.element)}</span></span>
+          <strong>${esc(name(id))}</strong><small>${esc(pathName)} · ${esc(elementName)}</small></button>`;
+      }).join('') || '<p>Персонажи не найдены.</p>';
     }
     grid.onclick = event => {
       const btn = event.target.closest('[data-pick]');
@@ -386,12 +568,14 @@
         if (draft.has(id)) draft.delete(id);
         else draft.add(id);
         btn.setAttribute('aria-pressed',String(draft.has(id)));
+        if(modal.querySelector('[data-picker-selected]')?.checked)filter();
       } else {
         try { chooseMember(index,id); }
         catch (error) { modal.querySelector('[data-dialog-error]').textContent = error.message; }
       }
     };
     input.oninput = filter;
+    for(const field of modal.querySelectorAll('select,[data-picker-selected]'))field.onchange=filter;
     const clear = modal.querySelector('[data-picker-clear]');
     if (clear) clear.onclick = () => {
       if (pool) { draft.clear(); filter(); }
@@ -433,7 +617,7 @@
     const id = hero(), index = O.slots.indexOf(itemSlot);
     const build = state.builds[id];
     const main = item?.main || reference(id,true,build?.boots).items[index].main;
-    const suggested = item?.setId || (build && (index<4 ? build.pack.cavern[index] : build.pack.planar));
+    const suggested = item?.setId || (build?.pack && (index<4 ? build.pack.cavern[index] : build.pack.planar));
     const setIds = [...new Set(Object.values(D.relics).filter(item => item.rarity===5 && item.type===itemSlot).map(item => item.set_id))];
     const modal = dialog((item ? 'Изменить' : 'Добавить')+' реликвию · '+slots[index], `<form data-form="item" data-item="${esc(item?.id)}">
       <div class="plan-fields">
@@ -503,7 +687,7 @@
           const run = item => {
             const items = [...base];
             items[index] = item;
-            return T.simulate(members(),{...all,[id]:itemProfile(id,items)},scenario(),D).total;
+            return T.simulate(members(),{...all,[id]:withRanks(id,itemProfile(id,items))},scenario(),D).total;
           };
           const first = run(a), second = run(b);
           comparison += `<p>Урон команды с A → с B: <strong>${number(first,0)} → ${number(second,0)}</strong>${first ? ` (${second>=first?'+':''}${number(100*(second/first-1))}%)` : ''}.</p>`;
@@ -587,7 +771,26 @@
       else if (action==='close') target.closest('dialog').close();
       else if (action==='stop') { stop(); resultBox().replaceChildren(); live('Перебор остановлен.'); }
       else if (action==='search-team') searchTeam();
+      else if (action.startsWith('rank-estimate-')){
+        const id=action.slice(14);
+        stop(); report=null;
+        results('Эйдолоны · '+esc(name(id)),eidolonTable(id));
+      }
       else if (action==='to-build') go('build');
+      else if (action==='build-sets'||action==='build-cones') {buildTab=action.slice(6); show(step);}
+      else if (action.startsWith('use-cone-')&&report?.kind==='cones') {
+        saveEquipment(hero(),report.pack,report.rows[Number(action.slice(9))].cone,report.boots);
+        state.builds[hero()].signature=buildSignature(hero());
+        save(); show(step); live('Конус сохранён.');
+      } else if(action==='use-comparison'&&report?.kind==='compare-build'){
+        saveEquipment(hero(),report.pack,report.cone,report.boots);
+        state.builds[hero()].signature=buildSignature(hero());
+        save(); show(step); live('Билд сохранён.');
+      } else if(action==='use-team-build'&&report?.kind==='team-build'){
+        for(const row of report.rows)saveEquipment(row.id,row.pack,row.cone,row.boots);
+        for(const id of members())state.builds[id].signature=buildSignature(id);
+        save(); show(step); live('Наборы сохранены для всей команды.');
+      }
       else if (action==='to-relics') go('relics');
       else if (action==='to-improve') go('improve');
       else if (action==='new-item') editor();
@@ -626,7 +829,12 @@
     } catch (error) { live(error.message); }
   });
   root.addEventListener('change', event => {
-    if (event.target.matches('[data-tier]')) {
+    if(event.target.matches('[data-eidolon],[data-ex]')){
+      const {eidolon,ex}=event.target.dataset;
+      if(eidolon)state.eidolons[eidolon]=Number(event.target.value);
+      else state.ex[ex]=event.target.checked;
+      stop(); report=null; resultBox().replaceChildren(); save(); live('Эйдолоны сохранены.');
+    } else if (event.target.matches('[data-tier]')) {
       state.tier = event.target.value;
       save();
       show(step);
@@ -649,7 +857,9 @@
         state.scenario = next;
         save();
         show(step);
-      } else if (form.dataset.form==='build') searchBuild(values);
+      } else if (form.dataset.form==='build') searchBuild(values,event.submitter?.value==='team');
+      else if (form.dataset.form==='cones') searchCones(Number(values.get('rank')));
+      else if (form.dataset.form==='compare-build') compareBuild(values);
       else if (form.dataset.form==='stats') saveStats(form.dataset.id,values);
       else if (form.dataset.form==='item') storeItem(values,event.submitter?.value==='equip',form.dataset.item);
       else if (form.dataset.form==='compare') compare(values);
@@ -659,5 +869,5 @@
       else live(error.message);
     }
   });
-  window.USPlan = {show, stop, start, supports:id => Boolean(T.models[id])};
+  window.USPlan = {show, stop, start, eidolonTable, supports:id => Boolean(T.models[id])};
 })();

@@ -131,13 +131,13 @@
     const character=data.characters[id];
     const critBuild=['atk','hp','def'].includes(archetype);
     const scale={hp:'HPAddedRatio',def:'DefenceAddedRatio'}[archetype]||'AttackAddedRatio';
-    const critSupport=['1101','1306','1313'].includes(id);
+    const critSupport=['1101','1306','1313','1511'].includes(id);
     const attackSupport=['1202','1203','1309'].includes(id);
     const mains=['HPDelta','AttackDelta',
       critBuild?'CriticalChanceBase':critSupport?'CriticalDamageBase':archetype==='dot'?'StatusProbabilityBase':attackSupport?scale:'HPAddedRatio',
       critBuild&&boots==='scaling'?scale:'SpeedDelta',
       critBuild?character.element+'AddedRatio':archetype==='dot'||attackSupport?scale:'HPAddedRatio',
-      critBuild||archetype==='dot'?scale:archetype==='break'?'BreakDamageAddedRatioBase':'SPRatioBase'];
+      critBuild||archetype==='dot'?scale:archetype==='break'?'BreakDamageAddedRatioBase':id==='1511'?'HPAddedRatio':'SPRatioBase'];
     const priority=critBuild?['CriticalChanceBase','CriticalDamageBase',scale,'HPAddedRatio']:
       archetype==='break'?['BreakDamageAddedRatioBase','SpeedDelta',scale,'HPAddedRatio']:
       archetype==='dot'?['AttackAddedRatio','StatusProbabilityBase','SpeedDelta','HPAddedRatio']:

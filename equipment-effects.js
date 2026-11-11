@@ -3,15 +3,16 @@
   const cavern4=['101','102','103','104','105','107','108','109','110','111','112','113','115','116','117','118','119','120','122','123','124','125','127','126','131','134'];
   const planar=['301','302','303','304','305','306','307','308','309','310','311','312','313','314','315','316','317','318','319','320','321','322','323','324','326','328'];
   const supportsFour=(id,characterId)=>cavern4.includes(id)&&!(id==='115'&&['1005','1205','1112','1209','1314','1221','1222','1403','1406','1015','1223','1414'].includes(characterId));
-  const cones=['20000','20002','20005','20006','20009','21003','23001','24001'];
+  const cones=['20000','20002','20005','20006','20009','21001','21003','21008','21022','21029','23001','23024','24001','24003'];
   function coneProfile(characterId, reference, cone, ratios, data){
     const character=data.characters[characterId];
-    if(!cones.includes(cone.id)||data.light_cones[cone.id]?.path!==character.path||
+    if((!cone.baseOnly&&!cones.includes(cone.id))||data.light_cones[cone.id]?.path!==character.path||
        !Number.isInteger(cone.rank)||cone.rank<1||cone.rank>5)throw Error('Выбери поддержанный конус Пути персонажа и наложение S1–S5.');
-    const profile={...reference,cone:{...cone}};
+    const profile={...reference};
+    if(!cone.baseOnly)profile.cone={...cone};
     const characterBase=data.character_promotions[characterId].values[6];
     const coneBase=data.light_cone_promotions[cone.id].values[6];
-    const properties=Object.fromEntries(data.light_cone_ranks[cone.id].properties[cone.rank-1].map(p=>[p.type,p.value]));
+    const properties=cone.baseOnly?{}:Object.fromEntries(data.light_cone_ranks[cone.id].properties[cone.rank-1].map(p=>[p.type,p.value]));
     for(const [stat,base,property] of [['hp','baseHP','HPAddedRatio'],['atk','baseAtk','AttackAddedRatio'],['def','baseDef','DefenceAddedRatio']]){
       const expected=characterBase[stat].base+79*characterBase[stat].step;
       if(Math.abs(reference[base]-expected)>.001)throw Error('Для сравнения конусов укажи базовые HP, ATK и DEF героя ур. 80 без конуса.');
@@ -22,10 +23,18 @@
       profile[stat]+=added*(1+ratio)+profile[base]*(properties[property]||0);
     }
     profile.crit+=properties.CriticalChanceBase||0;
+    profile.critDamage+=properties.CriticalDamageBase||0;
+    profile.effectHit+=properties.StatusProbabilityBase||0;
+    profile.breakEffect=(profile.breakEffect||0)+(properties.BreakDamageAddedRatioBase||0);
     return profile;
   }
   function counts(pack){const result={};if(!pack)return result;for(const id of [...pack.cavern,...(pack.planars||[pack.planar,pack.planar])])result[id]=(result[id]||0)+1;return result;}
   function validate(pack,data){if(!pack)return;
+    if(pack.partial===true&&!pack.planars){
+      if(!Array.isArray(pack.cavern)||pack.cavern.length!==4||pack.cavern.some(id=>!/^1\d\d$/.test(id)||!data.relic_sets[id])||
+         !/^3\d\d$/.test(pack.planar)||!data.relic_sets[pack.planar]||Object.values(counts(pack)).some(count=>count!==2&&count!==4))throw Error('Некорректное сочетание наборов.');
+      return;
+    }
     if(pack.planars!==undefined){
       if(!Array.isArray(pack.cavern)||pack.cavern.length!==4||pack.cavern.some(id=>!/^1\d\d$/.test(id)||!data.relic_sets[id])||!Array.isArray(pack.planars)||pack.planars.length!==2||pack.planars.some(id=>!/^3\d\d$/.test(id)||!data.relic_sets[id]))throw Error('Некорректные наборы шести предметов.');
       for(const [id,n] of Object.entries(counts(pack))){if(n>=2&&/^3/.test(id)&&!planar.includes(id))throw Error('Эффект этих планарок пока не моделируется.');if(n===4&&!cavern4.includes(id))throw Error('Четыре предмета этого набора пока не моделируются.');}return;
@@ -34,7 +43,12 @@
   const has=(actor,id,n=2)=>(actor.eq?.counts[id]||0)>=n;
   const active=(actor,key)=>(actor.eq?.timed[key]?.expires??-1)>=(actor.turn||0);
   function timed(actor,key,values,turns){actor.eq.timed[key]={...values,expires:actor.turn+turns};}
-  function init(actor,data,targets){validate(actor.s.equipment,data);const c=counts(actor.s.equipment),p={};for(const [id,n] of Object.entries(c)){if(n<2)continue;if(n===4&&!supportsFour(id,actor.id))throw Error('Для этого персонажа эффект четырёх предметов ещё не подтверждён.');const set=data.relic_sets[id];for(const bonus of set.properties[0]||[])p[bonus.type]=(p[bonus.type]||0)+bonus.value;if(n>=4)for(const bonus of set.properties[1]||[])p[bonus.type]=(p[bonus.type]||0)+bonus.value;}
+  function init(actor,data,targets){validate(actor.s.equipment,data);const c=counts(actor.s.equipment),p={};
+    if(actor.s.equipment?.partial){
+      for(const [id,n] of Object.entries(c))if(n===4&&!supportsFour(id,actor.id))c[id]=2;
+      if(!planar.includes(actor.s.equipment.planar))delete c[actor.s.equipment.planar];
+    }
+    for(const [id,n] of Object.entries(c)){if(n<2)continue;if(n===4&&!supportsFour(id,actor.id))throw Error('Для этого персонажа эффект четырёх предметов ещё не подтверждён.');const set=data.relic_sets[id];for(const bonus of set.properties[0]||[])p[bonus.type]=(p[bonus.type]||0)+bonus.value;if(n>=4)for(const bonus of set.properties[1]||[])p[bonus.type]=(p[bonus.type]||0)+bonus.value;}
     actor.eq={counts:c,p,timed:{},attacks:0,duran:0,duke:0,assist:0,longevous:0,firstAttack:true,skillReady:false,guide:hasCounts(c,'131',4)?1:0};
     const cone=actor.s.cone;
     if(cone){
@@ -70,7 +84,7 @@
     if(has(actor,'115',4)&&active(actor,'duke'))r.atk+=actor.eq.duke*.06;
     if(actors.some(owner=>has(owner,'125',4)&&active(owner,'healerRain')))r.critDamage+=.15;for(const owner of actors){if(has(owner,'127',4)&&owner.eq.saver)r.damage+=.15;const q=owner.eq?.p||{},ownerSpeed=owner.s.speed+owner.s.baseSpeed*(q.SpeedAddedRatio||0)+owner.buffs.reduce((n,b)=>n+(b.values.speed||0)+owner.s.baseSpeed*(b.values.speedPct||0),0);
       if(has(owner,'302')&&ownerSpeed>=120)r.atk+=.08;
-      if(has(owner,'310')&&(owner.s.effectRes||0)+(q.StatusResistanceBase||0)+(owner.avenShield?.expires>=owner.turn?.5:0)+(owner.id==='1409'?.5:0)>=.3)r.critDamage+=.1;
+      if(has(owner,'310')&&(owner.s.effectRes||0)+(q.StatusResistanceBase||0)+(owner.avenShield?.expires>=owner.turn?.5:0)+(owner.id==='1409'?.5:0)+(actors.some(a=>a.id==='1104'&&a.s.eidolon>=4)?.2:0)+owner.buffs.reduce((sum,b)=>sum+(b.expires>=owner.turn?b.values.effectRes||0:0),0)>=.3)r.critDamage+=.1;
       if(has(owner,'312')&&owner!==actor&&data.characters[owner.id].element===data.characters[actor.id].element)r.damage+=.1;
       if(has(owner,'317')&&actors[0]===actor&&owner!==actors[0])r.atk+=.12;
     }
@@ -85,6 +99,11 @@
       if(cone.id==='20002'&&(kind==='basic'||kind==='skill'))r.damage+=p[0];
       if(cone.id==='20006'&&ultimate)r.damage+=p[0];
       if(cone.id==='20009')r.damage+=p[1]; // Training targets stay at full HP.
+      if(cone.id==='21001')r.damage+=Math.min(n,p[1])*p[0];
+      if(cone.id==='21008'&&dot)r.damage+=p[1];
+      if(cone.id==='21022'&&context.shockOrWind)r.damage+=p[1];
+      if(cone.id==='24003'&&dot&&active(actor,'solitaryHealing'))r.damage+=p[1];
+      if(cone.id==='23024'&&context.mirage)r.damage+=p[1]+(ultimate?p[2]:0);
       if(cone.id==='23001'){
         const stacks=Math.max(0,Math.min(p[4],Math.floor((stats.speed-100+1e-9)/p[1])));
         if(kind==='basic'||kind==='skill')r.damage+=stacks*p[2];
@@ -112,7 +131,7 @@
   function afterSkill(actor){if(has(actor,'127',4))actor.eq.saver=Boolean(actor.memoryActive);if(has(actor,'109',4))timed(actor,'lightning',{atk:.2},1);actor.eq.skillReady=false;}
   function afterBasic(actor){if(has(actor,'127',4))actor.eq.saver=Boolean(actor.memoryActive);if(has(actor,'134',4))timed(actor,'basicAtk',{atk:.2},2);}
   function beforeUltimate(actor){if(has(actor,'126',4)&&actor.eq.assist>=2){actor.eq.assist=0;timed(actor,'captain',{atk:.48},1);}}
-  function afterUltimate(actor){if(has(actor,'104',4))timed(actor,'ice',{critDamage:.25},2);if(has(actor,'107',4))actor.eq.fireReady=true;if(has(actor,'110',4))actor.distance=Math.max(0,actor.distance-2500);if(has(actor,'122',4))actor.eq.skillReady=true;if(has(actor,'131',4))actor.eq.guide=Math.max(0,actor.eq.guide-1);}
+  function afterUltimate(actor){if(actor.eq?.cone?.id==='24003')timed(actor,'solitaryHealing',{},actor.eq.cone.params[2]-1);if(has(actor,'104',4))timed(actor,'ice',{critDamage:.25},2);if(has(actor,'107',4))actor.eq.fireReady=true;if(has(actor,'110',4))actor.distance=Math.max(0,actor.distance-2500);if(has(actor,'122',4))actor.eq.skillReady=true;if(has(actor,'131',4))actor.eq.guide=Math.max(0,actor.eq.guide-1);}
   function afterAttack(actor){if(has(actor,'105',4)){actor.eq.attacks=Math.min(5,actor.eq.attacks+1);timed(actor,'boxer',{atk:actor.eq.attacks*.05},100000);}actor.eq.firstAttack=false;actor.eq.fireReady=false;}
   function followupStart(actor){if(has(actor,'115',4))actor.eq.duke=0;}
   function hitEnd(actor,hits,followup){if(followup&&has(actor,'115',4)){actor.eq.duke=Math.min(8,actor.eq.duke+hits);timed(actor,'duke',{},3);}if(hits&&has(actor,'316'))timed(actor,'forgeBE',{breakEffect:.4},1);}
