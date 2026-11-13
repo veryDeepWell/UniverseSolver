@@ -30,14 +30,16 @@ const input={characterId:hero,profile:fast,context:allies,contextProfiles:profil
   position:0,caverns:['110','120'],planars:['306','315'],mixed:false,stableRanking:true,scenario};
 const ranking=S.createSearch(input,D).step(20);
 assert.equal(ranking.checked,4);
-assert.deepEqual(ranking.top[0].pack,{cavern:['120','120','120','120'],planar:'315'});
-for(const row of ranking.top){
+const manualScores=S.packs(input.caverns,input.planars,input.mixed,D,hero).map(pack=>{
   const damagePerAV=[2,3].map(cycles=>{
-    const battle=S.run({...input,stableRanking:false,scenario:{...scenario,cycles}},row.pack,D);
+    const battle=S.run({...input,stableRanking:false,scenario:{...scenario,cycles}},pack,D);
     return battle.total*100/battle.horizon;
   });
-  close(row.score,(damagePerAV[0]+damagePerAV[1])/2);
-}
+  return {pack,score:(damagePerAV[0]+damagePerAV[1])/2};
+});
+for(const row of ranking.top)
+  close(row.score,manualScores.find(({pack})=>JSON.stringify(pack)===JSON.stringify(row.pack)).score);
+close(ranking.top[0].score,Math.max(...manualScores.map(row=>row.score)));
 assert.ok(ranking.top.every((row,i)=>!i||ranking.top[i-1].score>=row.score));
 
 function solo(overrides,profile=fast){

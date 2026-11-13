@@ -26,14 +26,20 @@
     if(pack)profile.equipment=pack;
     return cone?G.coneProfile(input.characterId,profile,cone,input.coneRatios,data):profile;
   }
-  function run(input,pack,data,keepLog=false,cone=null){
+  function battleArguments(input,pack,data,cone=null){
     const ids=validate(input,data),profiles={...input.contextProfiles,[input.characterId]:buildProfile(input,pack,cone,data)};
     const scenario={...input.scenario,allowPartial:true,focus:input.focus};
     if(input.stableRanking){
       const first=Math.min(scenario.cycles,Math.max(2,scenario.cycles-2));
       scenario.sampleCycles=Array.from({length:scenario.cycles-first+1},(_,i)=>first+i);
     }
-    return T.simulate(ids,profiles,scenario,data,keepLog);
+    return {ids,profiles,scenario};
+  }
+  function run(input,pack,data,keepLog=false,cone=null){
+    const {ids,profiles,scenario}=battleArguments(input,pack,data,cone);
+    return keepLog
+      ? T.simulate(ids,profiles,{...scenario,rollCrits:scenario.trials!==undefined||scenario.rollCrits},data,true)
+      : T.evaluate(ids,profiles,scenario,data);
   }
   function createSearch(input,data){
     validate(input,data);
@@ -51,17 +57,45 @@
         const simulation=run(input,pack,data,false,cone);
         const checkpoints=simulation.checkpoints;
         const score=checkpoints?checkpoints.reduce((sum,sample)=>sum+sample.total*100/sample.av,0)/checkpoints.length:simulation.total;
-        const result={pack,cone,score,checkpoints,total:simulation.total,per100AV:simulation.per100AV,
+        const result={pack,cone,score,checkpoints,encounter:simulation.encounter,trials:simulation.trials,total:simulation.total,per100AV:simulation.per100AV,
           initialStats:simulation.initialStats[input.characterId],breakdown:simulation.breakdown,
           damageByTarget:simulation.damageByTarget};
         top.push(result);
-        top.sort((a,b)=>b.score-a.score);
+        top.sort((a,b)=>a.encounter?T.compareResults(a,b):b.score-a.score);
         if(top.length>10)top.pop();
-        if(cone&&(!bestByCone[cone.id]||result.score>bestByCone[cone.id].score))bestByCone[cone.id]=result;
+        if(cone&&(!bestByCone[cone.id]||(result.encounter?T.compareResults(result,bestByCone[cone.id])<0:result.score>bestByCone[cone.id].score)))bestByCone[cone.id]=result;
         checked++;
       }
       return {total,checked,done:checked===total,baseline:baseline.total,top,bestByCone:Object.values(bestByCone)};
     }};
   }
-  root.HSR_SETS={packs,validate,run,createSearch,buildProfile};
+  function createLineupSearch(order,baseline,options,scenario,data,ids=order){
+    if(order.length!==ids.length||new Set(order).size!==ids.length||order.some(id=>!ids.includes(id)||!options[id]?.length))
+      throw Error('Для каждого героя состава нужен хотя бы один вариант сборки.');
+    const profiles={...baseline},chosen={},ranking=T.compareResults;
+    const before=T.evaluate(ids,baseline,scenario,data);
+    let actorIndex=0,optionIndex=0,checked=0,best=null,current=before;
+    const total=order.reduce((sum,id)=>sum+options[id].length,0);
+    return {step(batch=1){
+      for(let i=0;i<batch&&checked<total;i++){
+        const id=order[actorIndex],option=options[id][optionIndex++];
+        const candidate={...profiles,[id]:option.profile};
+        const result=T.evaluate(ids,candidate,scenario,data);
+        if(ranking(result,current)<0&&(!best||ranking(result,best.result)<0))best={option,result};
+        checked++;
+        if(optionIndex===options[id].length){
+          if(best){
+            profiles[id]=best.option.profile;
+            chosen[id]=best.option;
+            current=best.result;
+          }
+          actorIndex++;
+          optionIndex=0;
+          best=null;
+        }
+      }
+      return {total,checked,done:checked===total,before,after:current,profiles,chosen};
+    }};
+  }
+  root.HSR_SETS={packs,validate,run,createSearch,buildProfile,battleArguments,createLineupSearch};
 })(typeof window==='undefined'?globalThis:window);

@@ -48,14 +48,14 @@
     StatusResistanceBase:['effectRes'], BreakDamageAddedRatioBase:['breakEffect']
   };
   const references = new Map();
-  function reference(id, includeCone = true, boots = 'speed') {
-    const key = id+'-'+includeCone+'-'+boots;
-    if (!references.has(key)) references.set(key,O.farmReference(id,R.archetype(id,D),D,includeCone,boots));
+  function reference(id, includeCone = true, boots = 'speed', speedBudget) {
+    const key = id+'-'+includeCone+'-'+boots+'-'+speedBudget;
+    if (!references.has(key)) references.set(key,O.farmReference(id,R.archetype(id,D),D,includeCone,boots,speedBudget));
     return references.get(key);
   }
   const scenarioDefaults = {
     targets:1, cycles:3, enemyLevel:95, toughness:120, initialSP:3, energyPercent:50,
-    seed:42, externalDebuffs:0, enemyAttacks:'training', requireSustain:true
+    seed:42, trials:3, externalDebuffs:0, enemyAttacks:'training', requireSustain:true, encounter:'dummy', enemyHP:100000
   };
   function read(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
@@ -131,9 +131,14 @@
   }
   const withRanks = (id,profile) => ({...profile,eidolon:state.eidolons[id]||0,exEidolon:Boolean(state.ex[id])});
   const profiles = (ids, useActual = true) => Object.fromEntries(ids.map(id => [id, withRanks(id,profile(id, useActual))]));
+  const teamProfiles = ids => Object.fromEntries(ids.map(id => [id,withRanks(id,O.level80TraceProfile(id,D))]));
+  const spread = row => row.trials?.count>1 ? `<small>Мин. и макс. урон · ${number(row.trials.min,0)}–${number(row.trials.max,0)}</small>` : '';
   const eidolonModels = T.eidolonModels;
   const distinctForms = new Set(Object.keys(T.models).map(T.canonical)).size;
   const scenario = () => ({...state.scenario, focus:members()[0], allowPartial:true});
+  const encounterNotes = settings => settings.encounter==='gepard'
+    ? 'Гепард · три фазы, стражи и барьер. Числа и расписание атак пробные, сверка с записью игры ещё не выполнена.'
+    : 'Болванки · бесконечное HP и все уязвимости. Параметры задаются в условиях боя.';
   const propertyName = key => esc(D.properties[key]?.name || key);
   const fieldValue = (key, value) => number(value * statFields[key][1]) + (statFields[key][1] === 100 ? '%' : '');
   const portrait = id => `<img src="${D.characters[id].previewSource?esc(D.characters[id].previewSource):asset(D.characters[id].icon)}" alt="" loading="lazy">`;
@@ -150,15 +155,17 @@
           ${id ? portrait(id) : '<span class="plan-empty-slot" aria-hidden="true">+</span>'}
           <strong>${id ? esc(name(id)) : 'Добавить героя'}</strong><small>${i === 0 ? 'Получает адресные бафы' : 'Место '+(i+1)}</small></button>`;
       }).join('')}</div>
-      <details class="plan-settings"><summary>Условия боя · ${state.scenario.targets} цел. / ${state.scenario.cycles} ц.</summary>
+      <details class="plan-settings"><summary>Условия боя · ${state.scenario.encounter==='gepard'?'Гепард':state.scenario.targets+' цел.'} / ${state.scenario.cycles} ц.</summary>
         <form data-form="scenario" class="plan-fields">
+          <label>Противник<select name="encounter"><option value="dummy">Болванки</option><option value="gepard" ${state.scenario.encounter==='gepard'?'selected':''}>Гепард · пробный сценарий</option></select></label>
+          <label>HP фазы Гепарда<input name="enemyHP" type="number" min="1" max="10000000" value="${state.scenario.enemyHP}" required></label>
           ${[['targets','Целей',1,5],['cycles','Циклов',1,20],['enemyLevel','Уровень цели (0 = без DEF)',0,100],
             ['toughness','Стойкость цели',0,1000],['initialSP','Начальные очки навыков',0,5],
-            ['energyPercent','Начальная энергия, %',0,100],['seed','Seed',1,2147483647]].map(([key,label,min,max]) =>
+            ['energyPercent','Начальная энергия, %',0,100],['seed','Seed',1,2147483647],['trials','Прогонов на вариант',1,32]].map(([key,label,min,max]) =>
               `<label>${label}<input name="${key}" type="number" min="${min}" max="${max}" value="${state.scenario[key]}" required></label>`).join('')}
           <label>Атаки целей<select name="enemyAttacks"><option value="training" ${state.scenario.enemyAttacks==='training'?'selected':''}>Тренировочные</option><option value="off" ${state.scenario.enemyAttacks==='off'?'selected':''}>Отключены</option></select></label>
           <button type="submit">Сохранить условия</button>
-        </form><p class="plan-muted">Сценарий с бесконечным HP целей. Рейтинг отражает урон, а выживаемость в этом бою не проверяется.</p>
+        </form><p class="plan-muted">${encounterNotes(state.scenario)}</p>
       </details>
     </section>`;
   }
@@ -171,6 +178,7 @@
   function teamPage() {
     return `<section class="plan-panel"><h2>Подбор союзников</h2>
       <p>Добавь обязательных героев в состав. Если оставишь места свободными, поиск проверит допустимые варианты из пула.</p>
+      <p class="plan-muted">Подбор использует персонажей 80-го уровня с прокачанными следами и выбранными эйдолонами. Конусы и реликвии подбираются на этапе «Билд».</p>
       <div class="plan-actions">${button('Пул: '+(state.pool.length ? state.pool.length+' гер.' : 'весь ростер'), 'pool')}
       <label class="plan-check"><input type="checkbox" data-sustain ${state.scenario.requireSustain?'checked':''}> Обязательный састейн</label></div>
       <p class="plan-muted">Боевые эффекты эйдолонов · ${eidolonModels.size} из ${distinctForms} игровых форм.</p>
@@ -181,6 +189,7 @@
         </select></label>${window.HSR_SUPPLEMENTS.ex_eidolons[id]?`<label class="plan-check"><input type="checkbox" data-ex="${id}" ${state.ex[id]?'checked':''}> EX-эйдолон</label>`:''}
         ${complete()&&eidolonModels.has(T.canonical(id))?button('Сравнить E0–E6','rank-estimate-'+id):''}</div>`).join('')}</div></details>`:''}
       <div class="plan-actions">${complete() ? button('Подобрать билд в этом составе →','to-build',true) : button('Найти команды','search-team',true)}
+      ${button('Открыть запись боя','open-replay')}
       ${complete() ? button('Сравнить урон состава','search-team') : ''}</div></section>`;
   }
   function buildPage() {
@@ -188,11 +197,23 @@
     if (!complete()) return emptyTeam('Заполни состав, чтобы сравнить билды в одном бою.');
     const saved = state.builds[id];
     return `<section class="plan-panel"><h2>Билд · ${esc(name(id))}</h2>
+      <div class="plan-actions">${button('Подобрать ротацию','search-rotation')}${state.scenario.rotation?button('Вернуть автоматическую ротацию','reset-rotation'):''}</div>
+      <details class="plan-settings"><summary>Скорость и экипировка состава</summary>
+        <p class="plan-muted">Поиск по бюджетам скорости, выбранным конусам и сетам. В бою проверяются реальные ходы и продвижения.</p>
+        <form data-form="tune-team"><label>Кого настроить первым<select name="actor">
+        ${members().map(member=>`<option value="${member}" ${member===id?'selected':''}>${esc(name(member))}</option>`).join('')}</select></label>
+        <label>Альтернативный пещерный набор для первого героя<select name="cavern"><option value="">Текущий</option>
+        ${Object.values(D.relic_sets).filter(set=>/^1\d\d$/.test(set.id)).map(set=>`<option value="${set.id}">${esc(set.name)}</option>`).join('')}</select></label>
+        <label>Альтернативное планарное украшение для первого героя<select name="planar"><option value="">Текущее</option>
+        ${G.planar.map(id=>`<option value="${id}">${esc(D.relic_sets[id].name)}</option>`).join('')}</select></label>
+        <button type="submit">Проверить сборки состава</button></form></details>
+      ${state.scenario.rotation?`<p class="plan-muted">${rotationLabel(state.scenario.rotation)}</p>`:''}
       <div class="plan-actions" role="group" aria-label="Разделы билда">
         <button type="button" data-action="build-sets" aria-pressed="${buildTab==='sets'}">Артефакты</button>
         <button type="button" data-action="build-cones" aria-pressed="${buildTab==='cones'}">Конус</button>
       </div>
       ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${coneLabel(saved.cone)}</small>
+        ${saved.speedBudget!==undefined?`<small>${number(saved.profile.speed)} SPD до бонусов сетов · ${saved.boots==='speed'?'обувь на скорость':'обувь на основной стат'} · ${saved.speedBudget} средних роллов скорости</small>`:''}
         ${saved.signature !== buildSignature(id) ? '<small>Состав, условия или экипировка союзников изменились. Перепроверь выбор.</small>' : ''}</div>` : ''}
       ${buildTab==='cones' ? conePage(id) : setForm(id,saved)}
       ${comparisonForm(id,saved)}
@@ -240,6 +261,7 @@
       <label>Планарный набор<select name="planar"><option value="">Как в билде</option>${options(Object.values(D.relic_sets).filter(set=>set.id.startsWith('3')))}</select></label>
       <label>Конус<select name="cone"><option value="">Как в билде</option><option value="reference">Эталон 4★</option>${coneOptions(id).map(cone=>`<option value="${cone.id}">${esc(cone.name)}${G.cones.includes(cone.id)?'':' · базовые статы'}</option>`).join('')}</select></label>
       <label>Наложение${rankSelect()}</label></div>
+      <label class="plan-check"><input type="checkbox" name="optimizeRotation"> Подобрать ротацию выбранного героя отдельно для каждого билда</label>
       <p class="plan-muted">Основа сравнения: ${saved?.pack?'выбранные сеты':'эталон без сетов'} и ${coneLabel(saved?.cone)}.</p>
       <button type="submit">Сравнить урон команды</button></form></details>`;
   }
@@ -252,10 +274,10 @@
     const usePlan=complete()&&members().includes(id);
     if(!usePlan&&id!=='1511')throw Error('Сначала добавь персонажа в полный состав.');
     const ids=usePlan?members():['1501','1511','1502','1503'];
-    const all=usePlan?profiles(ids):Object.fromEntries(ids.map(member=>[member,reference(member).profile]));
+    const all=usePlan?teamProfiles(ids):Object.fromEntries(ids.map(member=>[member,reference(member).profile]));
     const settings=usePlan?scenario():{...scenarioDefaults,targets:3,cycles:5,focus:ids[0]};
     const rows=Array.from({length:7},(_,rank)=>{
-      const result=T.simulate(ids,{...all,[id]:{...all[id],eidolon:rank}},settings,D);
+      const result=T.evaluate(ids,{...all,[id]:{...all[id],eidolon:rank}},settings,D);
       const actor=result.breakdown.find(row=>row.id===id);
       return {total:result.total,damage:actor.damage,ults:actor.ults};
     });
@@ -303,6 +325,7 @@
       const custom = oldJourney?.goals?.[id]?.[state.tier]?.[key];
       if (Number.isFinite(custom)) values[key] = custom/statFields[key][1];
     }
+    if(state.builds[id]?.speedBudget!==undefined)values.speed=state.builds[id].profile.speed;
     return values;
   }
   function tierControl() {
@@ -317,13 +340,14 @@
   function relicPage() {
     const id = hero();
     if (!id) return emptyTeam('Добавь героя, для которого хочешь проверить статы и предметы.');
-    const build = state.builds[id], sample = reference(id,true,build?.boots || state.boots[id]).items;
+    const build = state.builds[id], sample = reference(id,true,build?.boots || state.boots[id],build?.speedBudget).items;
     const equipped = state.equipped[id] || {};
     const available = state.inventory.filter(item => item.slot===itemSlot);
     const priorities = Object.entries(R.defaultWeights(id,D)).filter(([,weight]) => weight > 0).sort((a,b) => b[1]-a[1]).slice(0,4);
     return `<section class="plan-panel"><div class="plan-panel-head"><h2>Цели · ${esc(name(id))}</h2>${tierControl()}</div>
       ${build?.pack ? packLabel(build.pack) : '<p class="plan-muted">Основные статы предложены по роли. Выбранный сет появится здесь после подбора билда.</p>'}
       <div class="plan-chips">${statTargets(id)}</div>
+      ${build?.speedBudget!==undefined?`<p>Цель выбранного билда · ${number(build.profile.speed)} SPD до сетовых бонусов и ${build.speedBudget} средних роллов скорости.</p>`:''}
       <p>Приоритет сабстатов по роли: ${priorities.map(([key]) => propertyName(key)).join(' · ')}.</p>
       ${complete() ? button('Проверить приоритеты в бою','rolls') : ''}
       <div class="plan-slots">${sample.map((item,i) => {
@@ -339,6 +363,12 @@
         <label>Предмет B<select name="b"><option value="">Без сравнения</option>${available.map(item => `<option value="${esc(item.id)}">${itemLabel(item)}</option>`).join('')}</select></label></div>
         <div class="plan-actions"><button type="submit">Оценить качество и сравнить</button>${button('Изменить A','edit-item')}
         ${equipped[itemSlot] ? button('Снять текущий предмет','unequip-item') : ''}</div></form>` : '<p class="plan-muted">Добавь текущую или выпавшую вещь. Второй предмет того же слота можно сравнить с первым.</p>'}
+      ${complete()&&equippedItems(id).every(Boolean)&&available.some(item=>item.id!==equipped[itemSlot])?
+        `<form data-form="farm"><label>Второй слот для совместной замены<select name="second"><option value="">Один слот</option>
+        ${O.slots.map((slot,i)=>slot!==itemSlot?`<option value="${slot}">${slots[i]}</option>`:'').join('')}</select></label>
+        <div class="plan-actions"><label class="plan-check"><input type="checkbox" name="alternate" checked>
+        Проверить также ${state.scenario.encounter==='gepard'?'бой с болванками':'пробный бой с Гепардом'}</label>
+        <button type="submit">Проверить замены из инвентаря</button></div></form>`:''}
       ${complete() ? `<div class="plan-actions">${button('Посмотреть, кого докачать →','to-improve')}</div>` : ''}
     </section>`;
   }
@@ -406,33 +436,37 @@
   }
   function searchTeam() {
     const core = members();
+    const settings = {...state.scenario,rotation:undefined,focus:core[0]};
     if (!core.length) throw Error('Сначала добавь героя в состав.');
     const pool = state.pool.filter(id => !core.includes(id));
     if (state.pool.length && pool.length < 4-core.length) throw Error('Добавь больше свободных героев в пул.');
     search(() => {
       const ids = [...new Set([...core,...(pool.length ? pool : supported)])];
-      return T.createSearch(core,pool,profiles(ids),state.scenario,D);
+      return T.createSearch(core,pool,teamProfiles(ids),settings,D);
     }, result => {
-      report = {kind:'team',rows:result.top};
-      results('Результаты подбора', `<p class="plan-muted">Урон за заданное число циклов. Для героев без введённых статов используются сохранённые билды или эталон.</p>
+      report = {kind:'team',rows:result.top,settings};
+      results('Результаты подбора', `<p class="plan-muted">Средний урон за ${settings.cycles} ц. · прогонов на состав: ${settings.trials}. Персонажи 80-го уровня с прокачанными следами и выбранными эйдолонами, без экипировки.</p>
         <div class="plan-results">${result.top.map((row,i) => `<article><div class="plan-panel-head"><strong>${i+1}. ${row.ids.map(id => esc(name(id))).join(' · ')}</strong><span>${number(row.total,0)} урона</span></div>
+          ${spread(row)}${encounterSummary(row)}
+          <p>${row.breakdown.map(unit=>`${esc(name(unit.id))} · ${number(unit.damage,0)} урона · ${number(unit.ults,1)} ульт`).join(' / ')}</p>
           ${row.aha ? `<p>Аха · ходов: ${row.aha.turns} · Юмор в конце боя: ${number(row.aha.punchline)}</p>` : ''}
-          <div class="plan-mini-lineup">${row.ids.map(portrait).join('')}</div>${button('Выбрать состав и подобрать билд →','use-team-'+i,true)}</article>`).join('')}</div>`);
+          <div class="plan-mini-lineup">${row.ids.map(portrait).join('')}</div>
+          <div class="plan-actions">${button('Выбрать состав и подобрать билд →','use-team-'+i,true)}${button('Журнал боя','team-replay-'+i)}</div></article>`).join('')}</div>`);
     });
   }
-  function buildInput(id,cone,boots,contextProfiles=profiles(members())){
-    const farm=reference(id,!cone,boots);
+  function buildInput(id,cone,boots,contextProfiles=profiles(members()),speedBudget=state.builds[id]?.speedBudget){
+    const farm=reference(id,!cone,boots,speedBudget);
     return {
       characterId:id, profile:withRanks(id,farm.profile), context:members().filter(member=>member!==id), contextProfiles,
-      position:members().indexOf(id), focus:members()[0], scenario:state.scenario,
+      position:members().indexOf(id), focus:members()[0], scenario:{...state.scenario},
       caverns:Object.keys(D.relic_sets).filter(set=>/^1\d\d$/.test(set)), planars:G.planar,
-      cones:cone?[cone]:[], coneRatios:farm.ratios, mixed:state.mixed, stableRanking:true
+      cones:cone?[cone]:[], coneRatios:farm.ratios, mixed:state.mixed
     };
   }
   const chosenCone = (id,rank) => ({id,rank,baseOnly:!G.cones.includes(id)});
-  function saveEquipment(id,pack,cone,boots) {
-    const input=buildInput(id,cone,boots,{});
-    state.builds[id]={pack,cone,boots,profile:S.buildProfile(input,pack,cone,D)};
+  function saveEquipment(id,pack,cone,boots,speedBudget=state.builds[id]?.speedBudget) {
+    const input=buildInput(id,cone,boots,{},speedBudget);
+    state.builds[id]={pack,cone,boots,speedBudget,profile:S.buildProfile(input,pack,cone,D)};
   }
   function compareEquipment(id,pack,cone,boots){
     return S.run(buildInput(id,cone,boots),pack,D,false,cone);
@@ -441,13 +475,14 @@
     const id=hero(), saved=state.builds[id], pack=saved?.pack||null, boots=saved?.boots||state.boots[id];
     const rows=coneOptions(id).map(option=>{
       const cone=chosenCone(option.id,rank);
-      return {cone,total:compareEquipment(id,pack,cone,boots).total};
-    }).sort((a,b)=>b.total-a.total);
+      const {total,encounter}=compareEquipment(id,pack,cone,boots);
+      return {cone,total,encounter};
+    }).sort(T.compareResults);
     report={kind:'cones',rows,pack,boots};
     results('Конусы в выбранном составе', `<p class="plan-muted">Одинаковые реликвии и условия боя для всех конусов.</p>
-      <div class="plan-results">${rows.map(({cone,total},i)=>`<article><div class="plan-panel-head">
+      <div class="plan-results">${rows.map(({cone,total,encounter},i)=>`<article><div class="plan-panel-head">
         <div class="plan-gear"><span><img src="${asset(D.light_cones[cone.id].icon)}" alt="">${coneLabel(cone)}</span></div>
-        <strong>${number(total,0)} урона</strong></div>${button('Выбрать конус','use-cone-'+i)}</article>`).join('')}</div>`);
+        <strong>${number(total,0)} урона</strong></div>${encounterSummary({encounter})}${button('Выбрать конус','use-cone-'+i)}</article>`).join('')}</div>`);
   }
   function compareBuild(form) {
     const id=hero(), saved=state.builds[id], boots=saved?.boots||state.boots[id];
@@ -462,14 +497,63 @@
     }
     const selection=form.get('cone');
     const cone=selection==='reference'?null:selection?chosenCone(selection,Number(form.get('rank'))):saved?.cone||null;
-    const base=compareEquipment(id,saved?.pack||null,saved?.cone||null,boots).total;
-    const other=compareEquipment(id,pack,cone,boots).total;
-    const change=base?100*(other/base-1):0;
-    report={kind:'compare-build',pack,cone,boots};
+    const inputs=[buildInput(id,saved?.cone||null,boots),buildInput(id,cone,boots)];
+    const packs=[saved?.pack||null,pack],cones=[saved?.cone||null,cone];
+    const battles=inputs.map((input,index)=>S.battleArguments(input,packs[index],D,cones[index]));
+    if(form.has('optimizeRotation')){
+      let index=0,finished=0,engine;
+      const rules=[];
+      search(()=>{
+        const searches=battles.map(({ids,profiles,scenario})=>T.createRotationSearch(ids,profiles,scenario,D,id));
+        const total=searches.reduce((sum,item)=>sum+item.total,0);
+        return {step(){
+          engine??=searches[index];
+          const progress=engine.step(1),checked=finished+progress.checked;
+          if(progress.done){
+            const best=progress.top[0];
+            rules.push(T.compareResults(best,progress.baseline)<0?best.rotation:undefined);
+            finished=checked;
+            index++;
+            engine=null;
+          }
+          return {total,checked,done:index===searches.length};
+        }};
+      },()=>{
+        const tuned=battles.map((input,i)=>({...input,scenario:{...input.scenario,rotation:rules[i]}}));
+        showBuildComparison(tuned,saved,pack,cone,boots,true);
+      });
+      return;
+    }
+    showBuildComparison(battles,saved,pack,cone,boots,false);
+  }
+  function showBuildComparison(battles,saved,pack,cone,boots,optimized){
+    const {rows:comparisons,method,outcomes,count,interval}=T.compareBattles(...battles,D);
+    const [base,other]=comparisons.map(row=>row.total);
+    const replays=battles.map(({ids,profiles,scenario})=>T.battleInput(ids,profiles,{...scenario,rollCrits:true},D));
+    const signed=value=>`${value>0?'+':''}${number(value)}`;
+    const change=base? `${signed(100*(other-base)/base)}% командного урона` : `${signed(other-base)} урона`;
+    const precision=method==='exact'
+      ? `Точное матожидание в рамках симулятора · исходов ${outcomes.join(' / ')}.`
+      : `${count} парных прогонов. ${interval
+        ? interval.lower===interval.upper
+          ? 'Во всех прогонах получилась одинаковая разница. Редкие исходы могли не попасть в выборку.'
+          : `Приблизительный 95% интервал разницы в уроне от ${signed(interval.lower)} до ${signed(interval.upper)}.${interval.lower<=0&&interval.upper>=0?' Интервал включает ноль. Преимущество по урону пока не подтверждено.':''}`
+        : 'Для оценки разброса увеличь число прогонов в условиях боя.'}`;
+    const encounterDetails=method==='exact'&&comparisons[0].encounter
+      ? comparisons.map(({encounter},index)=>`<small>${index?'Вариант':'Текущий'} · вероятность победы ${number(encounter.wins*100)}%</small>`).join('<br>')
+      : comparisons.map(encounterSummary).join('');
+    report={kind:'compare-build',pack,cone,boots,replays,optimized};
     results('Сравнение билдов', `<div class="plan-stat-cards">
       <div><strong>Текущий · ${number(base,0)} урона</strong>${packLabel(saved?.pack)}<small>${coneLabel(saved?.cone)}</small></div>
       <div><strong>Вариант · ${number(other,0)} урона</strong>${packLabel(pack)}<small>${coneLabel(cone)}</small></div></div>
-      <p><strong>${change>0?'+':''}${number(change)}% командного урона</strong></p>${button('Сохранить вариант','use-comparison',true)}`);
+      <p><strong>${change}</strong></p>
+      <p class="plan-muted">${precision}</p>
+      ${optimized?`<p>Ротации подобраны на той же серии прогонов. Для независимой проверки можно сменить seed.</p>
+        <p>Текущий · ${battles[0].scenario.rotation?rotationLabel(battles[0].scenario.rotation):'Автоматическая'}<br>
+        Вариант · ${battles[1].scenario.rotation?rotationLabel(battles[1].scenario.rotation):'Автоматическая'}</p>`:''}
+      ${encounterDetails}
+      <p class="plan-muted">Журналы показывают отдельный прогон с выбранным seed.</p>
+      <div class="plan-actions">${button('Журнал текущего билда','build-replay-0')}${button('Журнал варианта','build-replay-1')}${button('Сохранить вариант','use-comparison',true)}</div>`);
   }
   function searchTeamSets() {
     const ids=members(), context=profiles(ids), pending=[];
@@ -491,12 +575,72 @@
       return {total,checked,done:index===inputs.length};
     }}),()=>{
       report={kind:'team-build',rows:pending};
-      const before=T.simulate(ids,profiles(ids),scenario(),D).total;
-      const after=T.simulate(ids,context,scenario(),D).total;
+      const before=T.evaluate(ids,profiles(ids),scenario(),D).total;
+      const after=T.evaluate(ids,context,scenario(),D).total;
       results('Реликвии для всей команды', `<p>Подбор по очереди в порядке состава. Каждый следующий герой сравнивается с уже подобранными сетами союзников.</p>
         <p>Командный урон · <strong>${number(before,0)} → ${number(after,0)}</strong></p>
         <div class="plan-results">${pending.map(row=>`<article><strong>${esc(name(row.id))}</strong>${packLabel(row.pack)}<small>${coneLabel(row.cone)}</small></article>`).join('')}</div>
         <div class="plan-actions">${button('Сохранить сеты всей команды','use-team-build',true)}</div>`);
+    });
+  }
+  function tuneTeam(form) {
+    const ids=members(), actor=form.get('actor');
+    if(!ids.includes(actor))throw Error('Выбери участника состава.');
+    const settings=scenario(), baseline=profiles(ids,false);
+    const alternateCavern=form.get('cavern'),alternatePlanar=form.get('planar');
+    const order=[actor,...ids.filter(id=>id!==actor)];
+    const options=Object.fromEntries(order.map(id=>{
+      const saved=state.builds[id],pack=saved?.pack||null;
+      const packs=[pack];
+      if(id===actor&&(alternateCavern||alternatePlanar)){
+        const cavern=alternateCavern?Array(4).fill(alternateCavern):pack?.cavern;
+        const planar=alternatePlanar||pack?.planar;
+        if(!cavern||!planar)throw Error('Выбери оба набора, если у первого героя ещё нет полного комплекта.');
+        if(alternateCavern&&!G.supportsFour(alternateCavern,id))throw Error('Для этого героя бонус четырёх частей выбранного набора пока недоступен.');
+        if(JSON.stringify([cavern,planar])!==JSON.stringify([pack?.cavern,pack?.planar]))packs.push({cavern,planar});
+      }
+      const cones=[saved?.cone||null];
+      if(saved?.cone)cones.push(null);
+      const signature=(signatures[id]||'').split(' ').find(cone=>D.light_cones[cone]?.path===D.characters[id].path&&G.cones.includes(cone));
+      if(signature&&saved?.cone?.id!==signature)cones.push(chosenCone(signature,1));
+      const variants=[];
+      for(const boots of ['speed','scaling'])for(let speedBudget=0;speedBudget<=12;speedBudget++){
+        for(const cone of cones){
+          const farm=reference(id,!cone,boots,speedBudget);
+          const input={characterId:id,profile:withRanks(id,farm.profile),coneRatios:farm.ratios};
+          for(const candidate of packs)variants.push({id,pack:candidate,cone,boots,speedBudget,profile:S.buildProfile(input,candidate,cone,D)});
+        }
+      }
+      return [id,variants];
+    }));
+    search(()=>S.createLineupSearch(order,baseline,options,settings,D,ids),result=>{
+      const before={ids,profiles:baseline,scenario:settings};
+      const after={ids,profiles:result.profiles,scenario:settings};
+      const validationSeed=1+((settings.seed-1+1000000007)%2147483647);
+      const validation=[before,after].map(input=>({...input,scenario:{...settings,seed:validationSeed}}));
+      const sampled=T.compareBattles(...validation,D,{preferExact:false});
+      const journals=[before,after].map(({ids,profiles,scenario})=>T.battleInput(ids,profiles,{...scenario,rollCrits:true},D));
+      const logs=journals.map(input=>T.replayBattle(input,D));
+      const opening=battle=>battle.events.filter(event=>event.kind==='turn').slice(0,8)
+        .map(event=>esc(name(event.actor))+' '+number(event.time,1)+' AV').join(' → ');
+      const chosen=Object.values(result.chosen);
+      const validationGain=sampled.rows[0].total?100*(sampled.rows[1].total/sampled.rows[0].total-1):null;
+      report={kind:'tune-team',chosen,journals};
+      results('Скорость и экипировка состава',`
+        <p>Проверено ${result.checked} вариантов. Один проход по героям: ${order.map(id=>esc(name(id))).join(' → ')}.</p>
+        <p>На героя проверены два основных стата обуви, 0–12 средних роллов скорости, текущий конус, эталон 4★ и моделируемая сигна S1 при наличии. ${alternateCavern||alternatePlanar?'Для первого героя проверен и выбранный альтернативный комплект. ':''}Ротация фиксирована.</p>
+        <p>Средний урон при подборе · <strong>${number(result.before.total,0)} → ${number(result.after.total,0)}</strong></p>
+        <p>Средний урон на проверочной серии · <strong>${number(sampled.rows[0].total,0)} → ${number(sampled.rows[1].total,0)}</strong>
+          ${validationGain===null?'':` · ${validationGain>0?'+':''}${number(validationGain,1)}%`}</p>
+        ${sampled.rows.map(encounterSummary).join('')}
+        ${sampled.interval&&sampled.interval.lower!==sampled.interval.upper?`<p>Приблизительный 95% интервал парной разницы · ${number(sampled.interval.lower,0)} … ${number(sampled.interval.upper,0)} урона.${sampled.interval.lower<=0&&sampled.interval.upper>=0?' Преимущество по урону пока не подтверждено.':''}</p>`:'<p>Для оценки разброса по урону нужны прогоны с различающимися исходами.</p>'}
+        <p class="plan-muted">Проверочная серия использует отдельный seed. Журналы показывают первый прогон серии подбора.</p>
+        <p><strong>Ходы в первом прогоне</strong><br>Текущий · ${opening(logs[0])||'—'}<br>Новый · ${opening(logs[1])||'—'}</p>
+        <div class="plan-results">${chosen.map(row=>`<article><strong>${esc(name(row.id))} · ${number(baseline[row.id].speed)} → ${number(row.profile.speed)} SPD до бонусов сетов</strong>
+          <p>${row.boots==='speed'?'Обувь на скорость':'Обувь на основной стат'} · средних роллов скорости ${row.speedBudget}</p>
+          ${packLabel(row.pack)}<small>${coneLabel(row.cone)}</small></article>`).join('')}</div>
+        <div class="plan-actions">${button('Журнал текущего состава','tune-replay-0')}${button('Журнал нового состава','tune-replay-1')}
+        ${chosen.length?button('Сохранить сборки и цели SPD','use-tuning',true):'Улучшений в проверенной области не найдено.'}</div>`);
     });
   }
   function searchBuild(form,wholeTeam) {
@@ -510,13 +654,14 @@
     const signature = buildSignature(id);
     search(() => S.createSearch(input,D), result => {
       const top = result.top[0].score;
-      const rows = [...new Set([...result.top.slice(0,6),...result.bestByCone])].sort((a,b) => b.score-a.score);
+      const rows = [...new Set([...result.top.slice(0,6),...result.bestByCone])].sort((a,b) => a.encounter?T.compareResults(a,b):b.score-a.score);
       report = {kind:'build',rows,input,boots,signature};
-      results('Кандидаты для этого состава', `<p class="plan-muted">Сортировка по среднему командному урону на 100 AV за соседние длины боя. Сохранение варианта задаёт цель фарма.</p>
+      results('Кандидаты для этого состава', `<p class="plan-muted">Средний командный урон за ${input.scenario.cycles} ц. · прогонов на вариант: ${input.scenario.trials}. Для выбранного героя используются эталонные статы, чтобы сравнить бонусы сетов на равных.</p>
         <div class="plan-results">${rows.map((row,i) => {
-          const gap = top ? 100*(1-row.score/top) : 0;
-          return `<article><div class="plan-panel-head"><strong>${i+1}. ${number(row.score,0)} / 100 AV</strong><span>${gap>0 && gap<.01 ? 'Отставание < 0,01%' : gap>0 ? 'Отставание '+number(gap)+'%' : 'Лучший результат'}</span></div>
+          const gap = top&&!row.encounter ? 100*(1-row.score/top) : 0;
+          return `<article><div class="plan-panel-head"><strong>${i+1}. ${number(row.score,0)} урона</strong>${row.encounter?'':`<span>${gap>0 && gap<.01 ? 'Отставание < 0,01%' : gap>0 ? 'Отставание '+number(gap)+'%' : 'Лучший результат'}</span>`}</div>
             ${packLabel(row.pack)}<p>${coneLabel(row.cone)}</p>
+            ${spread(row)}${encounterSummary(row)}
             ${row.checkpoints ? `<small>${row.checkpoints.map(sample => sample.cycles+' ц. · '+number(sample.total,0)).join(' / ')}</small>` : ''}
             ${button('Сохранить билд и перейти к статам →','use-build-'+i,true)}</article>`;
         }).join('')}</div>`);
@@ -527,6 +672,61 @@
     modal.innerHTML = `<div class="plan-panel-head"><h2 id="plan-dialog-title">${title}</h2><button type="button" data-action="close" aria-label="Закрыть">✕</button></div>${body}<p class="plan-status" role="status" data-dialog-error></p>`;
     if (!modal.open) modal.showModal();
     return modal;
+  }
+  function replayTeam(index) {
+    const row=report.rows[index],settings=report.settings;
+    showReplay(T.battleInput(row.ids,row.profiles,{...settings,rollCrits:true},D));
+  }
+  function rotationLabel(rule) {
+    const action={basic:'базовая',skill:'навык'};
+    const details=[
+      rule.opening?.map(key=>action[key]).join(' → '),
+      rule.reserve&&'резерв SP '+rule.reserve,
+      rule.ultimate&&'ульт после атакующего бафа',
+      rule.ally&&'цель среди союзников '+name(rule.ally),
+      rule.enemy&&'враг с наименьшим текущим HP'
+    ].filter(Boolean);
+    return esc(name(rule.actor)+' · '+(details.join(' · ')||'автоматическая ротация'));
+  }
+  function searchRotation() {
+    const ids=members(),all=profiles(ids),settings=scenario(),actor=hero();
+    search(()=>T.createRotationSearch(ids,all,settings,D,actor),result=>{
+      report={kind:'rotation',rows:result.top,ids,profiles:all,settings};
+      results('Ротации · '+esc(name(actor)),`
+        <p>Проверено ${result.total} правил для выбранного героя. Состав, билды и серия seed одинаковы. Первые два хода задают приоритет, а игра навыком зависит от доступных SP и состояния героя.</p>
+        <p>Автоматическая ротация · ${number(result.baseline.total,0)} урона</p>${encounterSummary(result.baseline)}
+        <div class="plan-results">${result.top.map((row,i)=>`<article><strong>${rotationLabel(row.rotation)}</strong>
+          <p>${number(row.total,0)} урона</p>${spread(row)}${encounterSummary(row)}
+          <div class="plan-actions">${button('Журнал боя','rotation-replay-'+i)}${button('Применить к билдам','use-rotation-'+i)}</div>
+        </article>`).join('')}</div>`);
+    });
+  }
+  function encounterSummary(row) {
+    const fight=row.encounter;
+    if(!fight)return '';
+    if(fight.count)return `<p>Победы ${fight.wins}/${fight.count} · среднее завершение ${number(fight.meanFinishAV,1)} AV · фаз пройдено ${number(fight.meanPhases,1)}/3</p>`;
+    const result={victory:'Победа',defeat:'Поражение',timeout:'Лимит циклов'}[fight.result];
+    return `<p>${result} · ${number(fight.finishAV,1)} AV · фаз пройдено ${fight.phasesCleared}/3 · в строю ${fight.survivors}</p>`;
+  }
+  function showReplay(input) {
+    const battle=T.replayBattle(input,D),settings=input.scenario,row=input;
+    dialog('Журнал боя', `<p>Прогон 1 из ${settings.trials??1} · seed ${settings.seed} · ${number(battle.total,0)} урона.</p>
+      ${encounterSummary(battle)}
+      <p class="plan-muted">Движок ${esc(input.battleVersion)} · данные ${esc(input.dataVersion)}. ${encounterNotes(settings)}</p>
+      <details><summary>Запись для повторного прогона</summary><textarea readonly rows="6" aria-label="Запись боя в JSON">${esc(JSON.stringify(input,null,2))}</textarea></details>
+      <p>${settings.encounter==='gepard'?'Гепард':settings.targets+' цел.'} · ${settings.cycles} ц. · ур. цели ${settings.enemyLevel} · стойкость ${settings.toughness} · начальные SP ${settings.initialSP}</p>
+      <details><summary>Статы и эйдолоны участников</summary><ul>${row.ids.map(id=>{
+        const p=row.profiles[id];
+        return `<li>${esc(name(id))} · E${p.eidolon||0}${p.exEidolon?' + EX':''} · ATK ${number(p.atk,0)} · SPD ${number(p.speed,1)}
+          · крит. шанс ${number(p.crit*100,1)}% · крит. урон ${number(p.critDamage*100,1)}%</li>`;
+      }).join('')}</ul></details>
+      <ol>${battle.events.map(event=>`<li>${number(event.time,1)} AV · ${event.actor==='dummy'?'Противник':esc(name(event.actor))} · ${esc(event.label)}
+        ${event.targets?.length?` · цели ${event.targets.map(i=>i+1).join(', ')}`:''}
+        ${event.before!==undefined?` · ${event.before} → ${event.after}`:''}
+        ${event.reason?` · ${esc(event.reason)}`:''}
+        ${event.waitAV!==undefined?` · ожидание ${number(event.waitAV,1)} AV`:''}
+        ${event.hpLoss!==undefined?` · −${number(event.hpLoss,0)} HP`:''}
+        ${event.damage? ` · ${number(event.damage,0)} урона` : ''}${event.crits?.length? ` · криты ${event.crits.filter(Boolean).length}/${event.crits.length}` : ''} · SP ${event.sp}</li>`).join('')}</ol>`);
   }
   function picker(index) {
     const pool = index===null;
@@ -594,7 +794,7 @@
   }
   function itemProfile(id,items) {
     const build = state.builds[id], cone = build?.cone;
-    const farm = reference(id,!cone,build?.boots);
+    const farm = reference(id,!cone,build?.boots,build?.speedBudget);
     const ratios = {};
     let result = O.sheetWithoutSets(items,farm.config,D,ratios);
     if (cone) result = G.coneProfile(id,result,cone,ratios,D);
@@ -616,7 +816,7 @@
   function editor(item) {
     const id = hero(), index = O.slots.indexOf(itemSlot);
     const build = state.builds[id];
-    const main = item?.main || reference(id,true,build?.boots).items[index].main;
+    const main = item?.main || reference(id,true,build?.boots,build?.speedBudget).items[index].main;
     const suggested = item?.setId || (build?.pack && (index<4 ? build.pack.cavern[index] : build.pack.planar));
     const setIds = [...new Set(Object.values(D.relics).filter(item => item.rarity===5 && item.type===itemSlot).map(item => item.set_id))];
     const modal = dialog((item ? 'Изменить' : 'Добавить')+' реликвию · '+slots[index], `<form data-form="item" data-item="${esc(item?.id)}">
@@ -639,11 +839,14 @@
     }
   }
   function equip(id,item) {
-    if (members().some(other => other!==id && Object.values(state.equipped[other]||{}).includes(item.id))) {
+    if (equippedByAlly(id,item)) {
       throw Error('Эта реликвия уже надета на другого участника.');
     }
     state.equipped[id] ??= {};
     state.equipped[id][item.slot] = item.id;
+  }
+  function equippedByAlly(id,item){
+    return members().some(other=>other!==id&&Object.values(state.equipped[other]||{}).includes(item.id));
   }
   function storeItem(form, shouldEquip, itemId) {
     const subs = Array.from({length:4},(_,i) => {
@@ -676,7 +879,7 @@
         reroll = `<p>Оценка шанса улучшения при реролле: <strong>${number(100*roll.chance)}%</strong> при равновероятных роллах.</p>`;
       } catch { /* A legacy item may not include its initial roll count. */ }
     }
-    let comparison = '';
+    let comparison = '', replays=[];
     if (b) {
       const diff = R.compare(a,b,weights,D).delta;
       comparison = `<p>B относительно A по сабстатам: ${diff>0?'+':''}${number(diff)} взвешенных ролла.</p>`;
@@ -687,16 +890,81 @@
           const run = item => {
             const items = [...base];
             items[index] = item;
-            return T.simulate(members(),{...all,[id]:withRanks(id,itemProfile(id,items))},scenario(),D).total;
+            return {ids:members(),profiles:{...all,[id]:withRanks(id,itemProfile(id,items))},scenario:scenario()};
           };
-          const first = run(a), second = run(b);
-          comparison += `<p>Урон команды с A → с B: <strong>${number(first,0)} → ${number(second,0)}</strong>${first ? ` (${second>=first?'+':''}${number(100*(second/first-1))}%)` : ''}.</p>`;
+          const builds=[run(a),run(b)];
+          comparison += farmFight(T.compareBattles(...builds,D),builds[0].scenario);
+          replays=builds.map(({ids,profiles,scenario})=>T.battleInput(ids,profiles,{...scenario,rollCrits:true},D));
         } catch (error) { comparison += `<p>Сравнение в бою: ${esc(error.message)}</p>`; }
       } else comparison += '<p class="plan-muted">Для сравнения урона нужны полный состав и остальные пять предметов героя.</p>';
     }
-    report = {kind:'items',rows:b?[a,b]:[a]};
+    report = {kind:'items',rows:b?[a,b]:[a],replays};
     results('Оценка реликвии', `<p>${itemLabel(a)}</p><p><strong>${number(current)} из ${number(max.score)}</strong> взвешенных роллов. Потолок рассчитан для того же основного стата и сета по весам роли.</p>
-      ${reroll}${comparison}<div class="plan-actions">${button('Надеть A','use-item-0')}${b ? button('Надеть B','use-item-1',true) : ''}</div>`);
+      ${reroll}${comparison}<div class="plan-actions">${button('Надеть A','use-item-0')}${b ? button('Надеть B','use-item-1',true) : ''}
+      ${replays.length?button('Журнал A','item-replay-0')+button('Журнал B','item-replay-1'):''}</div>`);
+  }
+  function farmFight(fight,settings){
+    const [base,variant]=fight.rows;
+    const delta=variant.total-base.total;
+    const change=base.total?100*delta/base.total:null;
+    const {interval}=fight;
+    const boss=settings.encounter==='gepard';
+    const wins=row=>number(100*row.encounter.wins/row.encounter.count,1)+'%';
+    const finish=boss&&[base,variant].every(row=>row.encounter.wins===row.encounter.count)
+      ? ` · среднее время победы ${number(base.encounter.meanFinishAV,1)} → ${number(variant.encounter.meanFinishAV,1)} AV`:'';
+    return `<p><strong>${boss?'Гепард':'Болванки'} · ${settings.cycles} ц.</strong> · средний урон
+      ${number(base.total,0)} → ${number(variant.total,0)}${change===null?'':` (${change>0?'+':''}${number(change)}%)`}
+      ${boss?`<br>Доля побед ${wins(base)} → ${wins(variant)}${finish}`:''}
+      <br><small>${fight.method==='exact'?'Точное матожидание в модели':`${fight.count} парных прогонов`}
+      ${interval&&interval.lower!==interval.upper?` · прибл. 95% интервал разницы ${number(interval.lower,0)} … ${number(interval.upper,0)} урона${interval.lower<=0&&interval.upper>=0?' · включает ноль':''}`
+      :fight.method==='paired'?' · разброс по этой серии оценить нельзя':''}</small></p>`;
+  }
+  function searchFarm(form){
+    const id=hero(),ids=members(),items=equippedItems(id),index=O.slots.indexOf(itemSlot);
+    if(!complete()||!items.every(Boolean))throw Error('Нужны полный состав и шесть надетых реликвий героя.');
+    const second=form.get('second');
+    if(second&&(!O.slots.includes(second)||second===itemSlot))throw Error('Выбери другой слот.');
+    const baseline={...profiles(ids.filter(other=>other!==id)),[id]:withRanks(id,itemProfile(id,items))};
+    const variants=[],skipped=[];
+    const candidates=slot=>state.inventory.filter(item=>item.slot===slot&&item.id!==items[O.slots.indexOf(slot)].id)
+      .filter(item=>{
+        if(!equippedByAlly(id,item))return true;
+        skipped.push(itemLabel(item)+' · надета на союзника');
+        return false;
+      });
+    const primary=candidates(itemSlot),secondary=second?candidates(second):[];
+    if(second&&(!primary.length||!secondary.length))throw Error('В каждом из двух слотов нужна хотя бы одна свободная замена.');
+    const count=primary.length+secondary.length+primary.length*secondary.length;
+    if(count>2000)throw Error('Больше 2000 сборок. Выбери один слот или меньшую пару слотов.');
+    for(const changes of O.slotReplacements(primary,secondary)){
+      const replacement=[...items];
+      for(const item of changes)replacement[O.slots.indexOf(item.slot)]=item;
+      try {
+        variants.push({id:variants.length,changes,profiles:{...baseline,[id]:withRanks(id,itemProfile(id,replacement))}});
+      } catch(error){skipped.push(changes.map(itemLabel).join(' + ')+' · '+esc(error.message));}
+    }
+    if(!variants.length)throw Error('Для этого слота нет свободных замен с поддерживаемыми сетовыми бонусами.');
+    const settings=scenario(),scenarios=[settings];
+    if(form.has('alternate'))scenarios.push({...settings,encounter:settings.encounter==='gepard'?'dummy':'gepard'});
+    search(()=>T.createFarmSearch(ids,baseline,variants,scenarios,D),result=>{
+      const byId=new Map(variants.map(variant=>[variant.id,variant]));
+      const rows=result.rows.map(row=>({...row,...byId.get(row.id)}))
+        .sort((a,b)=>T.compareResults(a.fights[0].rows[1],b.fights[0].rows[1]));
+      const baselineBuild=baseline[id];
+      report={kind:'farm',ids,baseline,rows,scenarios,hero:id};
+      const targetSlots=[index,...(second?[O.slots.indexOf(second)]:[])];
+      results('Замены реликвий · '+esc(name(id)),`
+        <p>Текущие предметы · ${targetSlots.map(i=>itemLabel(items[i])).join(' + ')}.</p>
+        <p>Порядок по основному сценарию. Проверено ${variants.length} сборок в ${result.checked} сравнениях${second?', включая одиночные замены и пары':''}.</p>
+        <p>${tierTargets(id).speed===undefined?'':`Цель SPD ${fieldValue('speed',tierTargets(id).speed)} · `}текущий SPD ${fieldValue('speed',baselineBuild.speed)} до сетовых бонусов.</p>
+        ${state.actual[id]?'<p>В этой проверке статы героя рассчитаны по надетым предметам.</p>':''}
+        <div class="plan-results">${rows.map((row,i)=>`<article><strong>${row.changes.map(item=>slots[O.slots.indexOf(item.slot)]+' · '+itemLabel(item)).join(' + ')}</strong>
+          <p>SPD до сетовых бонусов · ${fieldValue('speed',row.profiles[id].speed)}</p>
+          ${row.fights.map((fight,j)=>farmFight(fight,scenarios[j])+ `<div class="plan-actions">
+          ${button('Журнал текущего','farm-log-'+i+'-'+j+'-0')}${button('Журнал замены','farm-log-'+i+'-'+j+'-1')}</div>`).join('')}
+          ${button(row.changes.length===2?'Надеть обе реликвии':'Надеть замену','use-farm-'+i)}</article>`).join('')}</div>
+        ${skipped.length?`<details><summary>Пропущенные варианты · ${skipped.length}</summary><ul>${skipped.map(item=>`<li>${item}</li>`).join('')}</ul></details>`:''}`);
+    });
   }
   function statEditor(id) {
     let p = profile(id,false);
@@ -771,6 +1039,19 @@
       else if (action==='close') target.closest('dialog').close();
       else if (action==='stop') { stop(); resultBox().replaceChildren(); live('Перебор остановлен.'); }
       else if (action==='search-team') searchTeam();
+      else if(action.startsWith('item-replay-')&&report?.kind==='items')showReplay(report.replays[Number(action.slice(12))]);
+      else if(action.startsWith('farm-log-')&&report?.kind==='farm'){
+        const [item,fight,variant]=action.slice(9).split('-').map(Number);
+        const {ids,baseline,rows,scenarios}=report;
+        showReplay(T.battleInput(ids,variant?rows[item].profiles:baseline,{...scenarios[fight],rollCrits:true},D));
+      }
+      else if(action.startsWith('use-farm-')&&report?.kind==='farm'){
+        const {hero:id,rows}=report;
+        const {changes}=rows[Number(action.slice(9))];
+        if(changes.some(item=>equippedByAlly(id,item)))throw Error('Одна из реликвий уже надета на союзника.');
+        state.equipped[id]={...state.equipped[id],...Object.fromEntries(changes.map(item=>[item.slot,item.id]))};
+        save(); show(step); live(changes.length===2?'Обе реликвии надеты.':'Реликвия надета.');
+      }
       else if (action.startsWith('rank-estimate-')){
         const id=action.slice(14);
         stop(); report=null;
@@ -784,6 +1065,11 @@
         save(); show(step); live('Конус сохранён.');
       } else if(action==='use-comparison'&&report?.kind==='compare-build'){
         saveEquipment(hero(),report.pack,report.cone,report.boots);
+        if(report.optimized){
+          const rotation=report.replays[1].scenario.rotation;
+          if(rotation)state.scenario.rotation=rotation;
+          else delete state.scenario.rotation;
+        }
         state.builds[hero()].signature=buildSignature(hero());
         save(); show(step); live('Билд сохранён.');
       } else if(action==='use-team-build'&&report?.kind==='team-build'){
@@ -809,6 +1095,29 @@
       else if (action.startsWith('stats-')) statEditor(action.slice(6));
       else if (action.startsWith('reset-stats-')) { delete state.actual[action.slice(12)]; save(); show(step); }
       else if (action.startsWith('improve-hero-')) { state.hero=action.slice(13); save(); go('relics'); }
+      else if (action==='open-replay') dialog('Открыть запись боя', '<form data-form="replay"><label>Запись боя в JSON<textarea name="replay" rows="8" required></textarea></label><button type="submit">Повторить бой</button></form>');
+      else if (action==='search-rotation') searchRotation();
+      else if (action.startsWith('tune-replay-')&&report?.kind==='tune-team') showReplay(report.journals[Number(action.slice(12))]);
+      else if (action==='use-tuning'&&report?.kind==='tune-team') {
+        for(const row of report.chosen){
+          state.boots[row.id]=row.boots;
+          saveEquipment(row.id,row.pack,row.cone,row.boots,row.speedBudget);
+        }
+        for(const id of members())if(state.builds[id])state.builds[id].signature=buildSignature(id);
+        save(); show(step); live('Сборки и цели по скорости сохранены.');
+      }
+      else if (action==='reset-rotation') { delete state.scenario.rotation; save(); show(step); }
+      else if (action.startsWith('rotation-replay-')&&report?.kind==='rotation') {
+        const rotation=report.rows[Number(action.slice(16))].rotation;
+        showReplay(T.battleInput(report.ids,report.profiles,{...report.settings,rotation,rollCrits:true},D));
+      }
+      else if (action.startsWith('use-rotation-')&&report?.kind==='rotation') {
+        state.scenario.rotation=report.rows[Number(action.slice(13))].rotation;
+        save();
+        show(step);
+      }
+      else if (action.startsWith('build-replay-')&&report?.kind==='compare-build') showReplay(report.replays[Number(action.slice(13))]);
+      else if (action.startsWith('team-replay-') && report?.kind==='team') replayTeam(Number(action.slice(12)));
       else if (action.startsWith('use-team-') && report?.kind==='team') {
         state.members = report.rows[Number(action.slice(9))].ids;
         state.hero = hero();
@@ -816,8 +1125,8 @@
         go('build');
       } else if (action.startsWith('use-build-') && report?.kind==='build') {
         const row = report.rows[Number(action.slice(10))];
-        state.builds[hero()] = {pack:row.pack,cone:row.cone,profile:S.buildProfile(report.input,row.pack,row.cone,D),
-          boots:report.boots,signature:report.signature};
+        saveEquipment(hero(),row.pack,row.cone,report.boots);
+        state.builds[hero()].signature=report.signature;
         save();
         go('relics');
       } else if (action.startsWith('use-item-') && report?.kind==='items') {
@@ -852,17 +1161,20 @@
     try {
       if (form.dataset.form==='scenario') {
         const next = {...state.scenario};
-        for (const [key,value] of values) next[key] = key==='enemyAttacks' ? value : Number(value);
+        for (const [key,value] of values) next[key] = ['enemyAttacks','encounter'].includes(key) ? value : Number(value);
         T.validateScenario(next);
         state.scenario = next;
         save();
         show(step);
-      } else if (form.dataset.form==='build') searchBuild(values,event.submitter?.value==='team');
+      } else if (form.dataset.form==='replay') showReplay(JSON.parse(values.get('replay')));
+      else if (form.dataset.form==='build') searchBuild(values,event.submitter?.value==='team');
       else if (form.dataset.form==='cones') searchCones(Number(values.get('rank')));
       else if (form.dataset.form==='compare-build') compareBuild(values);
+      else if (form.dataset.form==='tune-team') tuneTeam(values);
       else if (form.dataset.form==='stats') saveStats(form.dataset.id,values);
       else if (form.dataset.form==='item') storeItem(values,event.submitter?.value==='equip',form.dataset.item);
       else if (form.dataset.form==='compare') compare(values);
+      else if (form.dataset.form==='farm') searchFarm(values);
     } catch (error) {
       const errorBox = form.closest('dialog')?.querySelector('[data-dialog-error]');
       if (errorBox) errorBox.textContent = error.message;
