@@ -78,5 +78,6 @@ for(const id of ids)for(const targets of [1,3,5])for(const toughness of [0,120])
 const input={characterId:'1014',profile:profile('1014'),context:['1412','1414','1203'],contextProfiles:{},position:0,focus:'1014',caverns:['102','111','120'],planars:['307','318'],mixed:true,scenario:{...scene,cycles:3,toughness:120,externalDebuffs:0}};
 const search=S.createSearch(input,D);let result;do{result=search.step(2);}while(!result.done);
 const oracle=S.packs(input.caverns,input.planars,true,D,'1014').map(pack=>S.run(input,pack,D).total).sort((a,b)=>b-a);assert.equal(result.checked,12);result.top.forEach((r,i)=>near(r.total,oracle[i]));
-assert.equal(HSR_EQUIPMENT.supportsFour('115','1223'),false);
+assert.equal(HSR_EQUIPMENT.supportsFour('115'),true);
+assert.ok(HSR_EQUIPMENT.approximateDuke({cavern:Array(4).fill('115'),planar:'306'},'1223'));
 console.log('Fourth ten verified: 98 entries, Saber overflow, Archer SP chains, Mydei HP/extra actions, Cerydra copy before original, Souldragon timeline, Qingque hand, Yukong/Hanya timing, Moze absence, March charges, conservation, seeded 1/3/5-target fights and exhaustive set rankings.');

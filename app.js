@@ -77,10 +77,10 @@ function bindStats(record){
   input.addEventListener('input',update);input.addEventListener('change',()=>{input.value=Math.max(1,Math.min(80,Number(input.value)||1));update();});
   promotion.addEventListener('change',()=>{const phase=Number(promotion.value),min=phase===0?1:phase===1?20:10+phase*10,max=phase===0?20:20+phase*10;input.value=Math.max(min,Math.min(max,Number(input.value)||1));update();});update();
 }
-function openDetail(c){
-  $('#profile-name').textContent=itemName(c);$('#profile-meta').textContent=section==='characters'?`${elementName(c.element)} · ${pathName(c.path)} · ${c.rarity} ★`:section==='cones'?`${pathName(c.path)} · ${c.rarity} ★`:(setKinds[c.id]==='planar'?'Планарные украшения':'Пещерные реликвии');
-  $('#profile-image').hidden=false;$('#profile-image').src=recordArt(c);$('#profile-image').onerror=()=>{$('#profile-image').hidden=true;};$('#detail-label').textContent=titles[section].toLocaleUpperCase('ru');
-  $('#character-sources').innerHTML=section==='characters'?`<a href="${esc(prydwenUrl(c))}" target="_blank" rel="noreferrer">Гайд Prydwen ↗</a><a href="${esc(D.meta.source)}" target="_blank" rel="noreferrer">Данные: StarRailRes ↗</a>`:'';
+function openDetail(c,kind=section){
+  $('#profile-name').textContent=kind==='characters'?H.characterName(c,D.paths):c.name;$('#profile-meta').textContent=kind==='characters'?`${elementName(c.element)} · ${pathName(c.path)} · ${c.rarity} ★`:kind==='cones'?`${pathName(c.path)} · ${c.rarity} ★`:(setKinds[c.id]==='planar'?'Планарные украшения':'Пещерные реликвии');
+  $('#profile-image').hidden=false;$('#profile-image').src=recordArt(c);$('#profile-image').onerror=()=>{$('#profile-image').hidden=true;};$('#detail-label').textContent=titles[kind].toLocaleUpperCase('ru');
+  $('#character-sources').innerHTML=kind==='characters'?`<a href="${esc(prydwenUrl(c))}" target="_blank" rel="noreferrer">Гайд Prydwen ↗</a><a href="${esc(D.meta.source)}" target="_blank" rel="noreferrer">Данные: StarRailRes ↗</a>`:'';
   if(c.kit&&c.previewSource){
     $('#character-sources').innerHTML=`<a href="${esc(c.source)}" target="_blank" rel="noreferrer">Данные версии 4.7 ↗</a>`;
     $('#detail-content').innerHTML=`${window.USPlan.supports(c.id)?'<button type="button" class="primary optimize-character" id="plan-aeon">Подобрать команду для персонажа →</button>':''}
@@ -97,8 +97,12 @@ function openDetail(c){
       try { content.innerHTML=window.USPlan.eidolonTable(c.id); }
       catch(error) { content.textContent=error.message; }
     });
-  }else if(section==='characters')characterDetail(c);else if(section==='cones')coneDetail(c);else relicDetail(c);$('#profile').showModal();$('#profile').scrollTop=0;
+  }else if(kind==='characters')characterDetail(c);else if(kind==='cones')coneDetail(c);else relicDetail(c);if(!$('#profile').open)$('#profile').showModal();$('#profile').scrollTop=0;
 }
+window.openCatalogDetail=(kind,id)=>{
+  const entry=groups[kind]?.find(record=>record.id===id);
+  if(entry)openDetail(entry,kind);
+};
 function prydwenUrl(c){
   if(S.characters[c.id]?.source)return S.characters[c.id].source;
   const special={'1112':'topaz','1224':'march-7th-swordmaster','1213':'imbibitor-lunae','1225':'tingyun-fugue','1305':'dr-ratio','1413':'march-7th-evernight','1414':'dan-heng-permansor-terrae','1506':'silver-wolf-lv-999','1512':'robin-summeretto','1513':'aventurine-waveflair'};
@@ -205,15 +209,15 @@ function coneDetail(c){
   bindStats(D.light_cone_promotions[c.id]);const update=()=>{const index=Number($('#superimposition').value);$('#cone-effect').textContent=rank?H.describe(rank.desc,rank.params?.[index]||[]):'В источнике нет описания эффекта.';$('#cone-properties').textContent=(rank?.properties?.[index]||[]).map(propertyText).join(' · ');};$('#superimposition').addEventListener('change',update);update();
 }
 function relicDetail(c){
-  const pieces=Object.values(D.relics).filter(r=>r.set_id===c.id),rarities=[...new Set(pieces.map(p=>p.rarity))].sort((a,b)=>b-a);
-  $('#detail-content').innerHTML=`${c.desc.map((desc,i)=>textBlock(`${i===0?2:4} предмета`,H.clean(desc))).join('')}<h3 class="detail-heading">Предметы набора</h3><div class="fields"><label>Редкость<select id="relic-rarity">${rarities.map(r=>`<option value="${r}">${r} ★</option>`).join('')}</select></label><label>Слот<select id="relic-slot"></select></label><label>Уровень реликвии<input id="relic-level" type="number" min="0" value="15"></label></div><h4 id="piece-name"></h4><h3 class="detail-heading">Основная характеристика</h3><div id="main-affixes"></div><h3 class="detail-heading">Дополнительные характеристики</h3><p class="data-meta">Значения одного выпадения или улучшения. Характеристика не может одновременно быть основной и дополнительной. Не все варианты могут присутствовать на одном предмете.</p><div id="sub-affixes"></div>`;
-  function update(){const piece=pieces.find(p=>p.rarity===Number($('#relic-rarity').value)&&p.type===$('#relic-slot').value);if(!piece)return;$('#piece-name').textContent=piece.name;$('#relic-level').max=piece.max_level;const level=Math.max(0,Math.min(piece.max_level,Number($('#relic-level').value)||0));$('#relic-level').value=level;
+  const pieces=Object.values(D.relics).filter(r=>r.set_id===c.id);
+  $('#detail-content').innerHTML=`${c.desc.map((desc,i)=>textBlock(`${i===0?2:4} предмета`,H.clean(desc))).join('')}<h3 class="detail-heading">Предметы набора · 5★</h3><div class="fields"><label>Слот<select id="relic-slot"></select></label><label>Уровень реликвии<input id="relic-level" type="number" min="0" value="15"></label></div><h4 id="piece-name"></h4><h3 class="detail-heading">Основная характеристика</h3><div id="main-affixes"></div><h3 class="detail-heading">Дополнительные характеристики</h3><p class="data-meta">Значения одного выпадения или улучшения. Характеристика не может одновременно быть основной и дополнительной. Не все варианты могут присутствовать на одном предмете.</p><div id="sub-affixes"></div>`;
+  function update(){const piece=pieces.find(p=>p.type===$('#relic-slot').value);if(!piece)return;$('#piece-name').textContent=piece.name;$('#relic-level').max=piece.max_level;const level=Math.max(0,Math.min(piece.max_level,Number($('#relic-level').value)||0));$('#relic-level').value=level;
     const main=D.relic_main_affixes[piece.main_affix_id]?.affixes||{},sub=D.relic_sub_affixes[piece.sub_affix_id]?.affixes||{};
     $('#main-affixes').innerHTML=affixTable(Object.values(main).map(a=>[D.properties[a.property]?.name||a.property,affixNumber(a.property,a.base+a.step*level)]),'Значение');
     $('#sub-affixes').innerHTML=affixTable(Object.values(sub).map(a=>[D.properties[a.property]?.name||a.property,Array.from({length:a.step_num+1},(_,i)=>affixNumber(a.property,a.base+a.step*i)).join(' / ')]),'Варианты одного ролла');
   }
-  function updateSlots(){const old=$('#relic-slot').value;$('#relic-slot').replaceChildren();for(const piece of pieces.filter(p=>p.rarity===Number($('#relic-rarity').value)))$('#relic-slot').add(new Option(slots[piece.type]||piece.type,piece.type));if([...$('#relic-slot').options].some(o=>o.value===old))$('#relic-slot').value=old;update();}
-  $('#relic-rarity').addEventListener('change',updateSlots);$('#relic-slot').addEventListener('change',update);$('#relic-level').addEventListener('change',update);updateSlots();
+  function updateSlots(){const old=$('#relic-slot').value;$('#relic-slot').replaceChildren();for(const piece of pieces)$('#relic-slot').add(new Option(slots[piece.type]||piece.type,piece.type));if([...$('#relic-slot').options].some(o=>o.value===old))$('#relic-slot').value=old;update();}
+  $('#relic-slot').addEventListener('change',update);$('#relic-level').addEventListener('change',update);updateSlots();
 }
 function affixNumber(type,value){const percent=D.properties[type]?.percent;return H.number(value*(percent?100:1),3)+(percent?'%':'');}
 function affixTable(rows,label){return `<div class="table-wrap"><table><thead><tr><th>Характеристика</th><th>${esc(label)}</th></tr></thead><tbody>${rows.map(([name,value])=>`<tr><td>${esc(name)}</td><td>${esc(value)}</td></tr>`).join('')}</tbody></table></div>`;}

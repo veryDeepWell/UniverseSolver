@@ -35,9 +35,13 @@ for(const table of ['character_skills','character_skill_trees','light_cone_ranks
 for(const c of Object.values(D.light_cones)){assert.ok(D.light_cone_ranks[c.id]);assert.ok(D.light_cone_promotions[c.id]);}
 for(const set of Object.values(D.relic_sets))assert.ok(Object.values(D.relics).some(r=>r.set_id===set.id),`Empty set ${set.id}`);
 for(const piece of Object.values(D.relics)){
+  assert.equal(piece.rarity,5);
   assert.ok(D.relic_sets[piece.set_id]);assert.ok(D.relic_main_affixes[piece.main_affix_id]);assert.ok(D.relic_sub_affixes[piece.sub_affix_id]);
   for(const a of Object.values(D.relic_main_affixes[piece.main_affix_id].affixes)){assert.ok(D.properties[a.property]);assert.ok(Number.isFinite(a.base+a.step*piece.max_level));}
 }
+assert.deepEqual(Object.keys(D.relic_sub_affixes),['5']);
+assert.deepEqual(new Set(Object.keys(D.relic_main_affixes)),
+  new Set(Object.values(D.relics).map(piece=>piece.main_affix_id)));
 const head=Object.values(D.relics).find(r=>r.rarity===5&&r.type==='HEAD');
 const hp=Object.values(D.relic_main_affixes[head.main_affix_id].affixes)[0];
 assert.ok(Math.abs(hp.base+15*hp.step-705.6)<.01);

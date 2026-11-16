@@ -17,7 +17,7 @@
     if(items.some(i=>!i))throw Error('Нужны шесть текущих реликвий: по одной на каждый слот.');
     if(snapshot.config.level!==80)throw Error('Для переноса в симуляцию нужен персонаж ур. 80.');
     const profile=O.sheetWithoutSets(items,snapshot.config,D),cavern=items.slice(0,4).map(i=>i.setId),planars=items.slice(4).map(i=>i.setId);
-    profile.equipment={cavern,planars};window.HSR_EQUIPMENT.validate(profile.equipment,D);for(const [set,count] of Object.entries(window.HSR_EQUIPMENT.counts(profile.equipment)))if(count===4&&!window.HSR_EQUIPMENT.supportsFour(set,snapshot.config.characterId))throw Error('Эффект четырёх предметов этого набора пока не подтверждён для персонажа.');
+    profile.equipment={cavern,planars};window.HSR_EQUIPMENT.validate(profile.equipment,D);
     profile.policy=state.context?.profiles[snapshot.config.characterId]?.policy||'auto';return profile;
   }
   function battle(items){const snapshot=window.USOptimizer.snapshot(),id=snapshot.config.characterId,profile=profileFor(items,snapshot),context=state.context?.ids.includes(id)?state.context:{ids:[id],profiles:{},scenario:{targets:3,cycles:5,initialSP:3,energyPercent:50,seed:42,toughness:120,enemyAttacks:'training'}};

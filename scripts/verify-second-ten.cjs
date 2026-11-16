@@ -17,11 +17,15 @@ close(topaz.events.find(e=>e.label==='Счетовод · атака').time,125)
 const boosted=fight(['1112'],{'1112':{speed:1}},{targets:1,cycles:2,energyPercent:100});
 assert.equal(boosted.events.filter(e=>e.label==='Счетовод · усиленная атака').length,2);close(boosted.breakdown[0].energy,25);
 const pushed=fight(['1112','1220'],{'1112':{speed:1}},{cycles:2});assert.ok(pushed.events.find(e=>e.label==='Счетовод · атака').time<125);
-assert.throws(()=>E.simulate(['1112'],{'1112':p('1112',{equipment:{cavern:['115','115','115','115'],planar:'306'}})},scene,D));
+assert.ok(fight(['1112'],{'1112':{equipment:{cavern:['115','115','115','115'],planar:'306'}}}).total>0);
 // Yanqing skill immediately activates crit stats; HP consumption is not
 // incoming damage. His FUA probability is seeded and cannot recurse.
-const yan=fight(['1209'],{'1209':{crit:1}});close(yan.events.find(e=>e.label==='Навык Яньцина').damage,2200*1.3);
-assert.ok(yan.events.filter(e=>e.label==='Яньцин · бонус-атака').length<=1);
+const yan=fight(['1209'],{'1209':{crit:1}});
+const yanHits=yan.events.filter(e=>e.label==='Навык Яньцина');
+assert.equal(yanHits.length,4);
+close(yanHits.reduce((sum,event)=>sum+event.damage,0),2200*1.3);
+assert.ok(yan.breakdown[0].followups<=1);
+assert.equal(yan.events.filter(e=>e.label==='Яньцин · бонус-атака').length,2*yan.breakdown[0].followups);
 // DHIL hit-by-hit coefficients and stacks: plain Basic 30/70; Fulgurant
 // Leap 14.2%*6+14.8%, adjacent damage only on the last four hits.
 const plain=fight(['1213'],{'1213':{policy:'basic'}},{targets:1,initialSP:0});close(plain.total,300+700*1.1);assert.equal(plain.finalSP,1);

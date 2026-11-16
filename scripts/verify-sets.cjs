@@ -5,15 +5,40 @@ const scenario={targets:3,cycles:5,initialSP:3,energyPercent:50,seed:42,external
 const input={characterId:'1220',profile:T.defaults('1220',D),context:[],contextProfiles:{},position:0,focus:'1220',caverns:['102','115','120'],planars:['306','309','315'],mixed:true,scenario};
 assert.equal(S.packs(input.caverns,input.planars,false,D,'1220').length,9);
 assert.equal(S.packs(input.caverns,input.planars,true,D,'1220').length,18);
-assert.equal(S.packs(['115'],['306'],false,D,'1205').length,0);
-assert.throws(()=>S.run({...input,characterId:'1205',focus:'1205',profile:T.defaults('1205',D)},{cavern:['115','115','115','115'],planar:'306'},D));
-assert.throws(()=>S.createSearch({...input,planars:['325']},D));
+assert.equal(S.packs(['115'],['306'],false,D,'1205').length,1);
+const duke={cavern:Array(4).fill('115'),planar:'306'};
+assert.ok(G.approximateDuke(duke,'1205'));
+assert.ok(S.run({...input,characterId:'1205',focus:'1205',profile:T.defaults('1205',D)},duke,D).total>0);
+assert.throws(()=>S.createSearch({...input,planars:['399']},D));
+assert.equal(S.createSearch({...input,planars:['325']},D).step(30).checked,6);
 assert.throws(()=>S.createSearch({...input,context:['1220']},D));
 assert.throws(()=>S.createSearch({...input,profile:{...input.profile,baseHP:0}},D));
 const before=JSON.stringify(input),search=S.createSearch(input,D);let result;do{result=search.step(2);}while(!result.done);
 assert.equal(result.checked,18);assert.equal(result.top.length,10);assert.equal(JSON.stringify(input),before,'Set search must not mutate reference stats');
 const oracle=S.packs(input.caverns,input.planars,true,D,'1220').map(p=>S.run(input,p,D).total).sort((a,b)=>b-a);result.top.forEach((r,i)=>near(r.total,oracle[i]));
 const best=result.top[0],logged=S.run(input,best.pack,D,true);near(logged.total,best.total);
+// A targeted support competes with four-piece Musketeer at the same base stats.
+const sunday='1313',carry='1220';
+const support={...input,characterId:sunday,profile:{...T.defaults(sunday,D),speed:140},
+  context:[carry],contextProfiles:{[carry]:T.defaults(carry,D)},position:1,focus:carry,
+  caverns:['102','114','121'],planars:['306'],mixed:false,scenario:{...scenario,energyPercent:100,audit:true}};
+const supportRanking=S.createSearch(support,D).step(3);
+assert.equal(supportRanking.checked,3);
+for(const [set,key] of [['114','messenger'],['121','sacerdos']]){
+  const result=S.run(support,{cavern:Array(4).fill(set),planar:'306'},D,true);
+  assert.ok(result.events.some(event=>event.kind==='buff'&&event.actor===carry&&event.label.endsWith(key)));
+  assert.ok(result.events.every(event=>event.kind!=='buff'||!event.label.endsWith('sacerdos')||event.values.critDamage<=.36));
+}
+const saber='1014';
+const attackOnly={...input,characterId:saber,focus:saber,profile:T.defaults(saber,D),context:[carry],
+  contextProfiles:{[carry]:T.defaults(carry,D)},caverns:['114','121'],planars:['306'],
+  mixed:false,scenario:{...scenario,energyPercent:100,audit:true}};
+assert.equal(S.createSearch(attackOnly,D).step(2).checked,2);
+for(const set of attackOnly.caverns){
+  const battle=S.run(attackOnly,{cavern:Array(4).fill(set),planar:'306'},D,true);
+  near(battle.initialStats[saber].speed,attackOnly.profile.speed+attackOnly.profile.baseSpeed*.06);
+  assert.ok(!battle.events.some(event=>event.kind==='buff'&&/sacerdos|messenger/.test(event.label)));
+}
 // Stat bonuses use base values, not the already geared totals.
 const custom={...input,characterId:'1205',focus:'1205',profile:{...T.defaults('1205',D),hp:6000,baseHP:1200,atk:3000,baseAtk:1000,speed:110,baseSpeed:100}};
 let run=S.run(custom,{cavern:['113','113','113','113'],planar:'319'},D);near(run.initialStats['1205'].hp,6000+1200*.24);

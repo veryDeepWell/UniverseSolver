@@ -16,6 +16,11 @@ const englishResponse = await fetch(`${base}index_new/en/characters.json`);
 if (!englishResponse.ok) throw new Error(`English names: HTTP ${englishResponse.status}`);
 const english = await englishResponse.json();
 const data = Object.fromEntries(entries);
+data.relics = Object.fromEntries(Object.entries(data.relics).filter(([,piece]) => piece.rarity === 5));
+for (const [table, field] of [['relic_main_affixes','main_affix_id'],['relic_sub_affixes','sub_affix_id']]) {
+  const used = new Set(Object.values(data.relics).map(piece => piece[field]));
+  data[table] = Object.fromEntries(Object.entries(data[table]).filter(([id]) => used.has(id)));
+}
 data.english_names = Object.fromEntries(Object.values(english).map(c => [c.id, c.name]));
 data.meta = {source:'https://github.com/Mar-7th/StarRailRes',revision,generated_at:new Date().toISOString(),language:'ru',asset_base:base};
 await mkdir(root, {recursive:true});

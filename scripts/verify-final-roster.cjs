@@ -32,6 +32,17 @@ const novaOff=fight(['1510','1313','1414','1004'],{}, {cycles:4,novaAssistPolicy
 const summer=fight(['1512','1501','1502','1409'],{'1512':{hp:8000,speed:140}}, {cycles:8,energyPercent:50});assert.ok(summer.events.some(e=>e.label==='Раж · Музыканты выходят на сцену'));assert.ok(summer.events.some(e=>e.label.includes('Щебечущий квартет')));assert.ok(summer.events.some(e=>e.label.startsWith('Раж · отсчёт')));assert.equal(summer.memories.find(m=>m.owner==='1512').name,'Музыканты ясного неба');
 const wave=fight(['1513','1105','1106','1013'],{}, {cycles:5});assert.ok(wave.breakdown[0].followups>0);assert.ok(wave.events.some(e=>e.label==='Прибой · расход Пыла'));
 const multi=fight(['1513','1502','1105','1013'],{}, {cycles:5});assert.equal(multi.breakdown[0].followups,0);
+for(const ids of [['1513','1105','1106','1013'],['1106','1513','1105','1013'],['1513','1502','1105','1013']]){
+ const battle=fight(ids,{}, {focus:ids[0],cycles:5,audit:true});
+ let instantPunchline,hadStoredBanger=false;
+ for(const event of battle.events){
+  if(/^Аха · (?:дополнительный )?ход · Юмор /.test(event.label))instantPunchline=Number(event.label.split(' ').at(-1));
+  if(event.kind!=='wave-skill')continue;
+  assert.equal(event.punchlineUsed,event.instant?instantPunchline:20);
+  hadStoredBanger ||= event.instant&&event.banger>0;
+ }
+ assert.ok(hadStoredBanger);
+}
 // Cyrene's first Ultimate activates resource-based allies and unlocks an Ode.
 const cy=fight(['1408','1415','1313','1203'],{}, {cycles:12});assert.ok(cy.events.some(e=>e.label==='Рябь прошлого · ульты команды активированы'));assert.ok(cy.events.some(e=>e.label==='Вечное горение · новые 8 действий'));assert.equal(cy.breakdown[0].ode,'phainon');
 for(const heir of ['1402','1403','1404','1405','1406','1407','1409','1410','1412','1413','1414','8007']){

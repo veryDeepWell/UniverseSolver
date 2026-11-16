@@ -21,6 +21,31 @@ assert.throws(()=>gear.coneProfile(hero,{...reference,baseAtk:reference.baseAtk+
 const solo=(targets)=>team.simulate([hero],{[hero]:equipped},{...scenario,targets,allowPartial:true},data);
 assert.ok(Math.abs(solo(2).initialStats[hero].crit-solo(3).initialStats[hero].crit-.15)<1e-8);
 
+const close=(actual,expected)=>assert.ok(Math.abs(actual-expected)<1e-8,`${actual} != ${expected}`);
+const baseStatCone=(id,coneId,rank,ratios={})=>{
+  const stats=team.defaults(id,data);
+  const profile=gear.coneProfile(id,{...stats,speed:stats.speed*(1+(ratios.speed||0))},
+    {id:coneId,rank,baseOnly:true},ratios,data);
+  assert.equal(profile.cone,undefined);
+  return profile;
+};
+const amber=baseStatCone('1104','20003',5);
+close(amber.def,amber.baseDef*1.32);
+const postOp=baseStatCone('1105','21000',5);
+close(postOp.energyRegen,1.16);
+close(postOp.healingBonus||0,0);
+const gilded=baseStatCone('1402','23036',1,{speed:.2});
+close(gilded.baseSpeed,team.defaults('1402',data).baseSpeed+12);
+close(gilded.speed,gilded.baseSpeed*1.2);
+const oath=baseStatCone('1205','21012',1);
+close(oath.damageBonus,.2);
+const flame=baseStatCone('1404','23039',1);
+close(flame.healingTaken,.2);
+const simulatedAmber=team.simulate(['1104'],{'1104':amber},{...scenario,allowPartial:true},data);
+close(simulatedAmber.initialStats['1104'].def,amber.def);
+const simulatedPostOp=team.simulate(['1105'],{'1105':postOp},{...scenario,allowPartial:true},data);
+close(simulatedPostOp.initialStats['1105'].energyRegen,postOp.energyRegen);
+
 const shortlist=sets.createSearch(input,data).step(100);
 assert.equal(shortlist.checked,4);
 assert.equal(shortlist.bestByCone.length,2);

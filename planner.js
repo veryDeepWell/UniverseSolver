@@ -41,6 +41,34 @@
     effectHit: ['Шанс попадания эффектов', 100], breakEffect: ['Эффект пробития', 100],
     energyRegen: ['Восстановление энергии', 100]
   };
+  const symbols = {
+    hp:['♥','health'], atk:['⚔','attack'], def:['⬟','defense'], speed:['»','speed'],
+    crit:['◎','crit'], critDamage:['✷','crit-damage'], effectHit:['⊙','debuff'],
+    effectRes:['◈','defense'], breakEffect:['ϟ','break'], energyRegen:['◆','energy'],
+    humor:['✦','humor'], banger:['★','humor'], sp:['◇','energy'], resource:['❖','resource'],
+    buff:['↑','buff'], debuff:['↓','debuff'], zone:['◉','zone'], state:['◈','resource'],
+    shield:['⬟','defense'], break:['ϟ','break'], attack:['⚔','attack'],
+    followup:['↪','attack'], dot:['◌','debuff'], turn:['»','speed'], expire:['⌛','muted']
+  };
+  function mark(key,content){
+    const [symbol,tone]=symbols[key]||symbols.state;
+    return `<span class="plan-mark mark-${tone}"><span aria-hidden="true">${symbol}</span> ${content}</span>`;
+  }
+  function eventTag({label,kind}){
+    if(kind==='buff-expired'||/ист[ёе]к|рассеял/i.test(label))return ['expire','Окончание'];
+    if(kind==='shield-break'||/щит|барьер/i.test(label))return ['shield','Щит'];
+    if(/стойкость|пробит/i.test(label)||['break','superbreak'].includes(kind))return ['break','Стойкость'];
+    if(/зона|поле ·/i.test(label))return ['zone','Зона'];
+    if(/юмор|навыка радости/i.test(label))return ['humor','Юмор'];
+    if(/настоящий хит/i.test(label))return ['banger','Настоящий хит'];
+    if(/миг ахи|^аха ·/.test(label.toLowerCase()))return ['humor','Миг Ахи'];
+    if(/замороз|замедлен|ослаблен|уязвим/i.test(label))return ['debuff','Ослабление'];
+    return ({buff:['buff','Усиление'], debuff:['debuff','Ослабление'],resource:['resource','Ресурс'],
+      attack:['attack','Атака'],incoming:['attack','Атака врага'],followup:['followup','Бонус-атака'],
+      dot:['dot','Периодический урон'],true:['attack','Истинный урон'],turn:['turn','Ход'],
+      decision:['turn','Решение'],'ally-defeated':['hp','Выбыл'],'enemy-defeated':['hp','Побеждён'],
+      sp:['sp','Очки навыков']})[kind]||['state','Состояние'];
+  }
   const subFields = {
     HPDelta:['hp'], HPAddedRatio:['hp','baseHP'], AttackDelta:['atk'], AttackAddedRatio:['atk','baseAtk'],
     DefenceDelta:['def'], DefenceAddedRatio:['def','baseDef'], SpeedDelta:['speed'],
@@ -55,7 +83,7 @@
   }
   const scenarioDefaults = {
     targets:1, cycles:3, enemyLevel:95, toughness:120, initialSP:3, energyPercent:50,
-    seed:42, trials:3, externalDebuffs:0, enemyAttacks:'training', requireSustain:true, encounter:'dummy', enemyHP:100000
+    seed:42, trials:3, externalDebuffs:0, enemyAttacks:'training', requireSustain:true, encounter:'dummy', enemyHP:100000, incomingHits:1
   };
   function read(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
@@ -140,8 +168,15 @@
     ? 'Гепард · три фазы, стражи и барьер. Числа и расписание атак пробные, сверка с записью игры ещё не выполнена.'
     : 'Болванки · бесконечное HP и все уязвимости. Параметры задаются в условиях боя.';
   const propertyName = key => esc(D.properties[key]?.name || key);
+  const propertyMark = key => mark(subFields[key]?.[0]||'state',propertyName(key));
   const fieldValue = (key, value) => number(value * statFields[key][1]) + (statFields[key][1] === 100 ? '%' : '');
   const portrait = id => `<img src="${D.characters[id].previewSource?esc(D.characters[id].previewSource):asset(D.characters[id].icon)}" alt="" loading="lazy">`;
+  const catalogButton = (kind,id,image,label) =>
+    `<button type="button" class="plan-db-icon" data-open-catalog="${kind}" data-record="${esc(id)}" aria-label="Открыть в базе: ${esc(label)}" title="${esc(label)}">${image}</button>`;
+  const characterIcon = id => catalogButton('characters',id,portrait(id),name(id));
+  const relicIcon = id => catalogButton('relics',id,`<img src="${asset(D.relic_sets[id].icon)}" alt="">`,D.relic_sets[id].name);
+  const coneIcon = id => catalogButton('cones',id,`<img src="${asset(D.light_cones[id].icon)}" alt="">`,D.light_cones[id].name);
+  const coneBadge = cone => cone?coneIcon(cone.id)+coneLabel(cone):coneLabel(cone);
   function context() {
     const editing = step === 'team' || !complete();
     return `<section class="plan-panel plan-context" aria-labelledby="plan-lineup">
@@ -150,14 +185,15 @@
         const id = state.members[i];
         if (!id && !editing) return '';
         const selected = id && hero() === id;
-        return `<button type="button" class="plan-member" data-action="${editing ? 'slot-'+i : 'hero-'+id}"
+        return `<div class="plan-member-card">${id?characterIcon(id):''}<button type="button" class="plan-member" data-action="${editing ? 'slot-'+i : 'hero-'+id}"
           ${!editing ? `aria-pressed="${Boolean(selected)}"` : ''} aria-label="${editing ? 'Место '+(i+1)+': ' : 'Выбрать героя: '}${id ? esc(name(id)) : 'Добавить героя'}">
-          ${id ? portrait(id) : '<span class="plan-empty-slot" aria-hidden="true">+</span>'}
-          <strong>${id ? esc(name(id)) : 'Добавить героя'}</strong><small>${i === 0 ? 'Получает адресные бафы' : 'Место '+(i+1)}</small></button>`;
+          ${id ? '' : '<span class="plan-empty-slot" aria-hidden="true">+</span>'}
+          <strong>${id ? esc(name(id)) : 'Добавить героя'}</strong><small>${i === 0 ? 'Получает адресные бафы' : 'Место '+(i+1)}</small></button></div>`;
       }).join('')}</div>
       <details class="plan-settings"><summary>Условия боя · ${state.scenario.encounter==='gepard'?'Гепард':state.scenario.targets+' цел.'} / ${state.scenario.cycles} ц.</summary>
         <form data-form="scenario" class="plan-fields">
           <label>Противник<select name="encounter"><option value="dummy">Болванки</option><option value="gepard" ${state.scenario.encounter==='gepard'?'selected':''}>Гепард · пробный сценарий</option></select></label>
+          <label>Попаданий за атаку цели<input name="incomingHits" type="number" min="1" max="10" value="${state.scenario.incomingHits??1}" required></label>
           <label>HP фазы Гепарда<input name="enemyHP" type="number" min="1" max="10000000" value="${state.scenario.enemyHP}" required></label>
           ${[['targets','Целей',1,5],['cycles','Циклов',1,20],['enemyLevel','Уровень цели (0 = без DEF)',0,100],
             ['toughness','Стойкость цели',0,1000],['initialSP','Начальные очки навыков',0,5],
@@ -212,7 +248,7 @@
         <button type="button" data-action="build-sets" aria-pressed="${buildTab==='sets'}">Артефакты</button>
         <button type="button" data-action="build-cones" aria-pressed="${buildTab==='cones'}">Конус</button>
       </div>
-      ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${coneLabel(saved.cone)}</small>
+      ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${coneBadge(saved.cone)}</small>
         ${saved.speedBudget!==undefined?`<small>${number(saved.profile.speed)} SPD до бонусов сетов · ${saved.boots==='speed'?'обувь на скорость':'обувь на основной стат'} · ${saved.speedBudget} средних роллов скорости</small>`:''}
         ${saved.signature !== buildSignature(id) ? '<small>Состав, условия или экипировка союзников изменились. Перепроверь выбор.</small>' : ''}</div>` : ''}
       ${buildTab==='cones' ? conePage(id) : setForm(id,saved)}
@@ -232,19 +268,19 @@
     return Object.values(D.light_cones).filter(cone => cone.path===D.characters[id].path);
   }
   function coneLabel(cone) {
-    return cone ? esc(D.light_cones[cone.id].name)+' S'+cone.rank+(cone.baseOnly?' · только базовые статы':'') : 'Эталонный конус 4★';
+    return cone ? esc(D.light_cones[cone.id].name)+' S'+cone.rank+(cone.baseOnly?' · условный эффект не рассчитан':'') : 'Эталонный конус 4★';
   }
   function conePage(id) {
     const options = coneOptions(id);
     const groups = {'Сигна':signatures[id]||'',...coneSources,'Другие конусы':''};
     const used = new Set(Object.values(groups).flatMap(ids => ids.split(' ')));
-    return `<p>Сравнение фиксирует текущий набор реликвий. Где пассив ещё не моделируется, в расчёт идут только базовые HP, ATK и DEF.</p>
+    return `<p>Сравнение фиксирует текущий набор реликвий. В расчёт входят базовые характеристики и постоянные бонусы конуса. Для части конусов условные эффекты ещё не рассчитываются.</p>
       <form data-form="cones"><div class="plan-fields"><label>Наложение для сравнения${rankSelect()}</label></div>
       <div class="plan-actions"><button type="submit" class="plan-primary">Сравнить конусы</button></div></form>
       ${Object.entries(groups).map(([label,ids])=>{
         const rows=options.filter(cone=>ids ? ids.split(' ').includes(cone.id) : label==='Другие конусы'&&!used.has(cone.id));
         return `<details class="plan-settings" ${label==='Другие конусы'?'':'open'}><summary>${label} · ${rows.length}</summary>
-          <div class="plan-gear">${rows.map(cone=>`<span><img src="${asset(cone.icon)}" alt="">${esc(cone.name)}${G.cones.includes(cone.id)?'':' · базовые статы'}</span>`).join('')||'<p>Для этого Пути нет вариантов.</p>'}</div></details>`;
+          <div class="plan-gear">${rows.map(cone=>`<span>${coneIcon(cone.id)}${esc(cone.name)}${G.cones.includes(cone.id)?'':' · базовые статы'}</span>`).join('')||'<p>Для этого Пути нет вариантов.</p>'}</div></details>`;
       }).join('')}`;
   }
   function rankSelect() {
@@ -265,10 +301,12 @@
       <p class="plan-muted">Основа сравнения: ${saved?.pack?'выбранные сеты':'эталон без сетов'} и ${coneLabel(saved?.cone)}.</p>
       <button type="submit">Сравнить урон команды</button></form></details>`;
   }
-  function packLabel(pack) {
-    return `<div class="plan-gear">${Object.entries(G.counts(pack)).map(([id,count]) =>
-      `<span><img src="${asset(D.relic_sets[id].icon)}" alt="">${count} × ${esc(D.relic_sets[id].name)}</span>`).join('')}</div>
-      ${pack?.partial?'<small>Часть бонусов набора пока не участвует в расчёте.</small>':''}`;
+  const dukeNote=(pack,id)=>G.approximateDuke(pack,T.canonical(id))
+    ? '<small>Герцог · стаки рассчитаны по смоделированным попаданиям. Разбивка бонус-атак героя требует сверки.</small>' : '';
+  function packLabel(pack,id=hero()) {
+    return `<div class="plan-gear">${Object.entries(G.counts(pack)).map(([set,count]) =>
+      `<span>${relicIcon(set)}${count} × ${esc(D.relic_sets[set].name)}</span>`).join('')}</div>
+      ${pack?.partial?'<small>Часть бонусов набора пока не участвует в расчёте.</small>':''}${dukeNote(pack,id)}`;
   }
   function eidolonEstimate(id){
     const usePlan=complete()&&members().includes(id);
@@ -333,7 +371,7 @@
       ${tiers.map(([key,label]) => `<option value="${key}" ${state.tier===key?'selected':''}>${label}</option>`).join('')}</select></label>`;
   }
   const statTargets = id => Object.entries(tierTargets(id)).map(([key,value]) =>
-    `<span class="plan-chip">${statFields[key][0]} <strong>${fieldValue(key,value)}</strong></span>`).join('');
+    `<span class="plan-chip">${mark(key,statFields[key][0]+' <strong>'+fieldValue(key,value)+'</strong>')}</span>`).join('');
   function itemLabel(item) {
     return `${esc(D.relic_sets[item.setId]?.name)} · ${propertyName(item.main)} · +${item.level}`;
   }
@@ -343,12 +381,13 @@
     const build = state.builds[id], sample = reference(id,true,build?.boots || state.boots[id],build?.speedBudget).items;
     const equipped = state.equipped[id] || {};
     const available = state.inventory.filter(item => item.slot===itemSlot);
+    const currentItem = available.find(item=>item.id===equipped[itemSlot]);
     const priorities = Object.entries(R.defaultWeights(id,D)).filter(([,weight]) => weight > 0).sort((a,b) => b[1]-a[1]).slice(0,4);
     return `<section class="plan-panel"><div class="plan-panel-head"><h2>Цели · ${esc(name(id))}</h2>${tierControl()}</div>
       ${build?.pack ? packLabel(build.pack) : '<p class="plan-muted">Основные статы предложены по роли. Выбранный сет появится здесь после подбора билда.</p>'}
       <div class="plan-chips">${statTargets(id)}</div>
       ${build?.speedBudget!==undefined?`<p>Цель выбранного билда · ${number(build.profile.speed)} SPD до сетовых бонусов и ${build.speedBudget} средних роллов скорости.</p>`:''}
-      <p>Приоритет сабстатов по роли: ${priorities.map(([key]) => propertyName(key)).join(' · ')}.</p>
+      <p>Приоритет сабстатов по роли: ${priorities.map(([key]) => propertyMark(key)).join(' · ')}.</p>
       ${complete() ? button('Проверить приоритеты в бою','rolls') : ''}
       <div class="plan-slots">${sample.map((item,i) => {
         const actual = state.inventory.find(r => r.id===equipped[item.slot]);
@@ -357,6 +396,7 @@
       }).join('')}</div>
     </section>
     <section class="plan-panel"><h2>Проверить реликвию · ${slots[O.slots.indexOf(itemSlot)]}</h2>
+      ${currentItem?`<p>${relicIcon(currentItem.setId)} ${itemLabel(currentItem)}</p>`:''}
       <div class="plan-actions">${button('Добавить реликвию','new-item',true)}</div>
       ${available.length ? `<form data-form="compare"><div class="plan-fields">
         <label>Предмет A<select name="a">${available.map(item => `<option value="${esc(item.id)}" ${item.id===equipped[itemSlot]?'selected':''}>${itemLabel(item)}</option>`).join('')}</select></label>
@@ -450,7 +490,7 @@
           ${spread(row)}${encounterSummary(row)}
           <p>${row.breakdown.map(unit=>`${esc(name(unit.id))} · ${number(unit.damage,0)} урона · ${number(unit.ults,1)} ульт`).join(' / ')}</p>
           ${row.aha ? `<p>Аха · ходов: ${row.aha.turns} · Юмор в конце боя: ${number(row.aha.punchline)}</p>` : ''}
-          <div class="plan-mini-lineup">${row.ids.map(portrait).join('')}</div>
+          <div class="plan-mini-lineup">${row.ids.map(characterIcon).join('')}</div>
           <div class="plan-actions">${button('Выбрать состав и подобрать билд →','use-team-'+i,true)}${button('Журнал боя','team-replay-'+i)}</div></article>`).join('')}</div>`);
     });
   }
@@ -481,7 +521,7 @@
     report={kind:'cones',rows,pack,boots};
     results('Конусы в выбранном составе', `<p class="plan-muted">Одинаковые реликвии и условия боя для всех конусов.</p>
       <div class="plan-results">${rows.map(({cone,total,encounter},i)=>`<article><div class="plan-panel-head">
-        <div class="plan-gear"><span><img src="${asset(D.light_cones[cone.id].icon)}" alt="">${coneLabel(cone)}</span></div>
+        <div class="plan-gear"><span>${coneBadge(cone)}</span></div>
         <strong>${number(total,0)} урона</strong></div>${encounterSummary({encounter})}${button('Выбрать конус','use-cone-'+i)}</article>`).join('')}</div>`);
   }
   function compareBuild(form) {
@@ -493,7 +533,7 @@
       if(!primary||!ornament)throw Error('Выбери пещерный и планарный наборы.');
       const cavern=first||second?[primary,primary,second||primary,second||primary]:pack.cavern;
       pack={cavern,planar:ornament};
-      if(!G.planar.includes(ornament)||(cavern.every(set=>set===primary)&&!G.supportsFour(primary,id)))pack.partial=true;
+      if(!G.planar.includes(ornament)||(cavern.every(set=>set===primary)&&!G.supportsFour(primary)))pack.partial=true;
     }
     const selection=form.get('cone');
     const cone=selection==='reference'?null:selection?chosenCone(selection,Number(form.get('rank'))):saved?.cone||null;
@@ -544,8 +584,8 @@
       : comparisons.map(encounterSummary).join('');
     report={kind:'compare-build',pack,cone,boots,replays,optimized};
     results('Сравнение билдов', `<div class="plan-stat-cards">
-      <div><strong>Текущий · ${number(base,0)} урона</strong>${packLabel(saved?.pack)}<small>${coneLabel(saved?.cone)}</small></div>
-      <div><strong>Вариант · ${number(other,0)} урона</strong>${packLabel(pack)}<small>${coneLabel(cone)}</small></div></div>
+      <div><strong>Текущий · ${number(base,0)} урона</strong>${packLabel(saved?.pack)}<small>${coneBadge(saved?.cone)}</small></div>
+      <div><strong>Вариант · ${number(other,0)} урона</strong>${packLabel(pack)}<small>${coneBadge(cone)}</small></div></div>
       <p><strong>${change}</strong></p>
       <p class="plan-muted">${precision}</p>
       ${optimized?`<p>Ротации подобраны на той же серии прогонов. Для независимой проверки можно сменить seed.</p>
@@ -579,7 +619,7 @@
       const after=T.evaluate(ids,context,scenario(),D).total;
       results('Реликвии для всей команды', `<p>Подбор по очереди в порядке состава. Каждый следующий герой сравнивается с уже подобранными сетами союзников.</p>
         <p>Командный урон · <strong>${number(before,0)} → ${number(after,0)}</strong></p>
-        <div class="plan-results">${pending.map(row=>`<article><strong>${esc(name(row.id))}</strong>${packLabel(row.pack)}<small>${coneLabel(row.cone)}</small></article>`).join('')}</div>
+        <div class="plan-results">${pending.map(row=>`<article><strong>${esc(name(row.id))}</strong>${packLabel(row.pack,row.id)}<small>${coneBadge(row.cone)}</small></article>`).join('')}</div>
         <div class="plan-actions">${button('Сохранить сеты всей команды','use-team-build',true)}</div>`);
     });
   }
@@ -596,7 +636,7 @@
         const cavern=alternateCavern?Array(4).fill(alternateCavern):pack?.cavern;
         const planar=alternatePlanar||pack?.planar;
         if(!cavern||!planar)throw Error('Выбери оба набора, если у первого героя ещё нет полного комплекта.');
-        if(alternateCavern&&!G.supportsFour(alternateCavern,id))throw Error('Для этого героя бонус четырёх частей выбранного набора пока недоступен.');
+        if(alternateCavern&&!G.supportsFour(alternateCavern))throw Error('Бонус четырёх частей выбранного набора пока недоступен.');
         if(JSON.stringify([cavern,planar])!==JSON.stringify([pack?.cavern,pack?.planar]))packs.push({cavern,planar});
       }
       const cones=[saved?.cone||null];
@@ -638,7 +678,7 @@
         <p><strong>Ходы в первом прогоне</strong><br>Текущий · ${opening(logs[0])||'—'}<br>Новый · ${opening(logs[1])||'—'}</p>
         <div class="plan-results">${chosen.map(row=>`<article><strong>${esc(name(row.id))} · ${number(baseline[row.id].speed)} → ${number(row.profile.speed)} SPD до бонусов сетов</strong>
           <p>${row.boots==='speed'?'Обувь на скорость':'Обувь на основной стат'} · средних роллов скорости ${row.speedBudget}</p>
-          ${packLabel(row.pack)}<small>${coneLabel(row.cone)}</small></article>`).join('')}</div>
+          ${packLabel(row.pack,row.id)}<small>${coneBadge(row.cone)}</small></article>`).join('')}</div>
         <div class="plan-actions">${button('Журнал текущего состава','tune-replay-0')}${button('Журнал нового состава','tune-replay-1')}
         ${chosen.length?button('Сохранить сборки и цели SPD','use-tuning',true):'Улучшений в проверенной области не найдено.'}</div>`);
     });
@@ -659,8 +699,11 @@
       results('Кандидаты для этого состава', `<p class="plan-muted">Средний командный урон за ${input.scenario.cycles} ц. · прогонов на вариант: ${input.scenario.trials}. Для выбранного героя используются эталонные статы, чтобы сравнить бонусы сетов на равных.</p>
         <div class="plan-results">${rows.map((row,i) => {
           const gap = top&&!row.encounter ? 100*(1-row.score/top) : 0;
-          return `<article><div class="plan-panel-head"><strong>${i+1}. ${number(row.score,0)} урона</strong>${row.encounter?'':`<span>${gap>0 && gap<.01 ? 'Отставание < 0,01%' : gap>0 ? 'Отставание '+number(gap)+'%' : 'Лучший результат'}</span>`}</div>
-            ${packLabel(row.pack)}<p>${coneLabel(row.cone)}</p>
+          const personal=row.breakdown.find(unit=>unit.id===id)?.damage;
+          const tied=rows.filter(other=>Math.abs(other.score-row.score)<1e-7&&(!row.encounter||T.compareResults(row,other)===0)).length>1;
+          return `<article><div class="plan-panel-head"><strong>${i+1}. ${number(row.score,0)} урона команды</strong>${row.encounter?'':`<span>${tied?'Равный результат в этой серии':gap>0 && gap<.01 ? 'Отставание < 0,01%' : gap>0 ? 'Отставание '+number(gap)+'%' : 'Лучший результат'}</span>`}</div>
+            ${personal===undefined?'':`<small>${esc(name(id))} · ${number(personal,0)} личного урона</small>`}
+            ${packLabel(row.pack)}<p>${coneBadge(row.cone)}</p>
             ${spread(row)}${encounterSummary(row)}
             ${row.checkpoints ? `<small>${row.checkpoints.map(sample => sample.cycles+' ц. · '+number(sample.total,0)).join(' / ')}</small>` : ''}
             ${button('Сохранить билд и перейти к статам →','use-build-'+i,true)}</article>`;
@@ -717,16 +760,19 @@
       <p>${settings.encounter==='gepard'?'Гепард':settings.targets+' цел.'} · ${settings.cycles} ц. · ур. цели ${settings.enemyLevel} · стойкость ${settings.toughness} · начальные SP ${settings.initialSP}</p>
       <details><summary>Статы и эйдолоны участников</summary><ul>${row.ids.map(id=>{
         const p=row.profiles[id];
-        return `<li>${esc(name(id))} · E${p.eidolon||0}${p.exEidolon?' + EX':''} · ATK ${number(p.atk,0)} · SPD ${number(p.speed,1)}
-          · крит. шанс ${number(p.crit*100,1)}% · крит. урон ${number(p.critDamage*100,1)}%</li>`;
+        return `<li>${characterIcon(id)} ${esc(name(id))} · E${p.eidolon||0}${p.exEidolon?' + EX':''} · ${mark('atk','ATK '+number(p.atk,0))} · ${mark('speed','SPD '+number(p.speed,1))}
+          · ${mark('crit','Крит. шанс '+number(p.crit*100,1)+'%')} · ${mark('critDamage','Крит. урон '+number(p.critDamage*100,1)+'%')}</li>`;
       }).join('')}</ul></details>
-      <ol>${battle.events.map(event=>`<li>${number(event.time,1)} AV · ${event.actor==='dummy'?'Противник':esc(name(event.actor))} · ${esc(event.label)}
+      <ol class="plan-battle-log">${battle.events.map(event=>`<li>${mark(...eventTag(event))} · ${number(event.time,1)} AV · ${event.actor==='dummy'?'Противник':esc(name(event.actor))} · ${esc(event.label)}
         ${event.targets?.length?` · цели ${event.targets.map(i=>i+1).join(', ')}`:''}
         ${event.before!==undefined?` · ${event.before} → ${event.after}`:''}
         ${event.reason?` · ${esc(event.reason)}`:''}
+        ${Object.entries(event.values||{}).filter(([key,value])=>typeof value==='number'&&(statFields[key]||key==='speedPct')).map(([key,value])=>
+          ' · '+mark(key==='speedPct'?'speed':key,(key==='speedPct'?'Скорость':statFields[key][0])+' '+(value>0?'+':'')+(key==='speedPct'?number(value*100)+'%':fieldValue(key,value)))).join('')}
         ${event.waitAV!==undefined?` · ожидание ${number(event.waitAV,1)} AV`:''}
-        ${event.hpLoss!==undefined?` · −${number(event.hpLoss,0)} HP`:''}
-        ${event.damage? ` · ${number(event.damage,0)} урона` : ''}${event.crits?.length? ` · криты ${event.crits.filter(Boolean).length}/${event.crits.length}` : ''} · SP ${event.sp}</li>`).join('')}</ol>`);
+        ${event.punchlineUsed!==undefined?` · ${mark('humor','Юмор '+number(event.punchlineUsed,0))}`:''}
+        ${event.hpLoss!==undefined?` · ${mark('hp','−'+number(event.hpLoss,0)+' HP')}`:''}
+        ${event.damage? ` · ${number(event.damage,0)} урона` : ''}${event.crits?.length? ` · ${mark('crit','Криты '+event.crits.filter(Boolean).length+'/'+event.crits.length)}` : ''} · ${mark('sp','SP '+event.sp)}</li>`).join('')}</ol>`);
   }
   function picker(index) {
     const pool = index===null;
@@ -755,9 +801,9 @@
           (!rarity||String(c.rarity)===rarity)&&(!selected||draft.has(id));
       }).map(id=>{
         const c=D.characters[id], pathName=D.paths[c.path]?.name, elementName=D.elements[c.element]?.name;
-        return `<button type="button" data-pick="${id}" ${pool ? `aria-pressed="${draft.has(id)}"` : ''}><span class="plan-picker-art">${portrait(id)}
-          <span class="plan-picker-badge" title="${esc(pathName)}">${icon('path',c.path)}</span><span class="plan-picker-badge" title="${esc(elementName)}">${icon('element',c.element)}</span></span>
-          <strong>${esc(name(id))}</strong><small>${esc(pathName)} · ${esc(elementName)}</small></button>`;
+        return `<div class="plan-member-card">${characterIcon(id)}<button type="button" class="plan-member" data-pick="${id}" ${pool ? `aria-pressed="${draft.has(id)}"` : ''}>
+          <span class="plan-picker-art"><span class="plan-picker-badge" title="${esc(pathName)}">${icon('path',c.path)}</span><span class="plan-picker-badge" title="${esc(elementName)}">${icon('element',c.element)}</span></span>
+          <strong>${esc(name(id))}</strong><small>${esc(pathName)} · ${esc(elementName)}</small></button></div>`;
       }).join('') || '<p>Персонажи не найдены.</p>';
     }
     grid.onclick = event => {
@@ -808,9 +854,6 @@
     const setIds = items.map(item => item.setId);
     result.equipment = {cavern:setIds.slice(0,4),planars:setIds.slice(4)};
     G.validate(result.equipment,D);
-    for (const [set,count] of Object.entries(G.counts(result.equipment))) {
-      if (count===4 && !G.supportsFour(set,id)) throw Error('Бонус четырёх предметов этого сета пока не моделируется для героя.');
-    }
     return result;
   }
   function editor(item) {
@@ -871,7 +914,7 @@
     const id = hero(), a = state.inventory.find(item => item.id===form.get('a'));
     const b = state.inventory.find(item => item.id===form.get('b'));
     if (!a || (b && a.id===b.id)) throw Error('Для сравнения выбери две разные реликвии.');
-    const weights = R.defaultWeights(id,D), max = R.ceiling(a,weights,D), current = R.score(a,weights,D);
+    const weights = R.defaultWeights(id,D), max = R.ceiling(a,weights,D,a.initial||4), current = R.score(a,weights,D);
     let reroll = '';
     if (a.level===15 && a.subs.length===4) {
       try {
@@ -899,7 +942,7 @@
       } else comparison += '<p class="plan-muted">Для сравнения урона нужны полный состав и остальные пять предметов героя.</p>';
     }
     report = {kind:'items',rows:b?[a,b]:[a],replays};
-    results('Оценка реликвии', `<p>${itemLabel(a)}</p><p><strong>${number(current)} из ${number(max.score)}</strong> взвешенных роллов. Потолок рассчитан для того же основного стата и сета по весам роли.</p>
+    results('Оценка реликвии', `<p>${relicIcon(a.setId)} ${itemLabel(a)}</p>${b?`<p>${relicIcon(b.setId)} ${itemLabel(b)}</p>`:''}<p><strong>${number(current)} из ${number(max.score)}</strong> взвешенных роллов. Потолок рассчитан для того же основного стата и сета по весам роли.</p>
       ${reroll}${comparison}<div class="plan-actions">${button('Надеть A','use-item-0')}${b ? button('Надеть B','use-item-1',true) : ''}
       ${replays.length?button('Журнал A','item-replay-0')+button('Журнал B','item-replay-1'):''}</div>`);
   }
@@ -958,8 +1001,9 @@
         <p>Порядок по основному сценарию. Проверено ${variants.length} сборок в ${result.checked} сравнениях${second?', включая одиночные замены и пары':''}.</p>
         <p>${tierTargets(id).speed===undefined?'':`Цель SPD ${fieldValue('speed',tierTargets(id).speed)} · `}текущий SPD ${fieldValue('speed',baselineBuild.speed)} до сетовых бонусов.</p>
         ${state.actual[id]?'<p>В этой проверке статы героя рассчитаны по надетым предметам.</p>':''}
-        <div class="plan-results">${rows.map((row,i)=>`<article><strong>${row.changes.map(item=>slots[O.slots.indexOf(item.slot)]+' · '+itemLabel(item)).join(' + ')}</strong>
-          <p>SPD до сетовых бонусов · ${fieldValue('speed',row.profiles[id].speed)}</p>
+        <div class="plan-results">${rows.map((row,i)=>`<article><strong>${row.changes.map(item=>relicIcon(item.setId)+' '+slots[O.slots.indexOf(item.slot)]+' · '+itemLabel(item)).join(' + ')}</strong>
+        <p>${mark('speed','SPD до сетовых бонусов · '+fieldValue('speed',row.profiles[id].speed))}</p>
+          ${dukeNote(row.profiles[id].equipment,id)}
           ${row.fights.map((fight,j)=>farmFight(fight,scenarios[j])+ `<div class="plan-actions">
           ${button('Журнал текущего','farm-log-'+i+'-'+j+'-0')}${button('Журнал замены','farm-log-'+i+'-'+j+'-1')}</div>`).join('')}
           ${button(row.changes.length===2?'Надеть обе реликвии':'Надеть замену','use-farm-'+i)}</article>`).join('')}</div>
@@ -1030,6 +1074,8 @@
   }
 
   root.addEventListener('click', event => {
+    const record=event.target.closest('[data-open-catalog]');
+    if(record){window.openCatalogDetail(record.dataset.openCatalog,record.dataset.record);return;}
     const target = event.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;

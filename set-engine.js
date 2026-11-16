@@ -4,7 +4,7 @@
     if(!Array.isArray(caverns)||!Array.isArray(planars)||!caverns.length||!planars.length)throw Error('Выбери пещерные и планарные наборы.');
     if(new Set(caverns).size!==caverns.length||new Set(planars).size!==planars.length)throw Error('Наборы в списках не должны повторяться.');
     if(caverns.some(id=>!/^1\d\d$/.test(id)||!data.relic_sets[id])||planars.some(id=>!G.planar.includes(id)))throw Error('В список попал неподдержанный набор.');
-    const patterns=caverns.filter(id=>G.supportsFour(id,characterId)).map(id=>[id,id,id,id]);
+    const patterns=caverns.filter(G.supportsFour).map(id=>[id,id,id,id]);
     if(mixed)for(let i=0;i<caverns.length;i++)for(let j=i+1;j<caverns.length;j++)patterns.push([caverns[i],caverns[i],caverns[j],caverns[j]]);
     const result=[];for(const cavern of patterns)for(const planar of planars)result.push({cavern,planar});return result;
   }
