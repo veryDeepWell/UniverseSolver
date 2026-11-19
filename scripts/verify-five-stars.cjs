@@ -7,9 +7,10 @@ function fight(ids,extra={},s={}){const profiles=Object.fromEntries(ids.map(id=>
 function close(a,b){assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);}
 assert.equal(Object.keys(E.models).length,98);assert.ok(newIds.every(id=>D.characters[id].rarity===5));
 // Original Welt: 3 skill hits, each 72% ATK; Slow guaranteed with EHR.
-// Every hit also triggers 60% ATK talent, all with the broken-target trace.
+// Every hit also triggers 60% ATK talent. This fixture has no toughness
+// system, so it cannot assert the additional broken-target trace bonus.
 const welt=fight(['1004'],{'1004':{effectHit:1}},{targets:1,cycles:1});
-close(welt.total,3*(720+600)*1.2);assert.equal(welt.events.filter(e=>e.label==='Талант Вельта').length,3);
+close(welt.total,3*(720+600));assert.equal(welt.events.filter(e=>e.label==='Талант Вельта').length,3);
 const prison=fight(['1004'],{'1004':{effectHit:1,speed:1}},{targets:1,cycles:1,energyPercent:100});
 assert.ok(!prison.events.some(e=>e.actor==='dummy'),'40% delay + 10% Slow delays first turn past 150 AV');
 // Full Argenti ultimate: AoE + exactly six random bounces; no invented
@@ -61,7 +62,10 @@ assert.ok(sparkAdvance.events.find(e=>e.actor==='1002'&&e.label==='Навык Д
 assert.ok(sparkAdvance.events.every(e=>e.sp>=0&&e.sp<=7));
 const stackFight=fight(['1013','1306'],{'1306':{speed:1}},{cycles:3,initialSP:3});
 const hertaSkills=stackFight.events.filter(e=>e.label==='Навык Герты');
-for(let i=0;i<3;i++)close(hertaSkills[i].damage,D.character_skills['101302'].params[9][0]*1075*(1.45+.06*(i+1))*3);
+// Separate hit packets now share an action ID. Compare complete casts,
+// not the first target packet against an old aggregated AoE total.
+const hertaCasts=[...hertaSkills.reduce((casts,event)=>casts.set(event.action,(casts.get(event.action)||0)+event.damage),new Map()).values()];
+for(let i=0;i<3;i++)close(hertaCasts[i],D.character_skills['101302'].params[9][0]*1075*(1.45+.06*(i+1))*3);
 const sparkCrit=fight(['1013','1306'],{'1013':{speed:50,policy:'basic',crit:1,critDamage:1},'1306':{speed:200,critDamage:2}},{cycles:1});
 close(sparkCrit.events.find(e=>e.actor==='1013'&&e.label==='Базовая атака').damage,1075*1.06*2.93);
 // Luocha automatically heals HP consumption, spends no SP for the

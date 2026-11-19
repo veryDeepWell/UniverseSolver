@@ -1,0 +1,709 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-11-19",
+  "scope": "Independent foundation, action-clock and packet/provenance controls. Individual skill coverage is tracked separately; these controls do not certify all kits.",
+  "recordContract": {
+    "required": [
+      "id",
+      "status",
+      "debts",
+      "sources",
+      "implementation",
+      "test",
+      "assumptions",
+      "derivation",
+      "expected"
+    ],
+    "statuses": [
+      "verified-control",
+      "needs-verification",
+      "conflicting-sources"
+    ],
+    "rule": "Expected values must be derived independently of simulator output. A positive example does not certify untested boundary cases. Record source branch/version and reviewed date."
+  },
+  "sources": {
+    "kqm-action-gauge": {
+      "url": "https://hsr.keqingmains.com/wp-content/uploads/2024/01/KQM_Bronya_Guide_SPD_Formula_Proofs.pdf",
+      "section": "1.1 Action Gauge, Action Value, and SPD",
+      "branch": "Published January 2024; basic action gauge identity",
+      "fact": "Default action gauge is 10000; AV equals action gauge divided by SPD."
+    },
+    "kqm-pela": {
+      "url": "https://hsr.keqingmains.com/pela/",
+      "section": "Basic ATK / Frost Shot",
+      "branch": "Guide marked Version 2.0; original basic attack, level 6",
+      "fact": "Level 6 basic attack coefficient is 100% ATK."
+    },
+    "prydwen-pela": {
+      "url": "https://www.prydwen.gg/star-rail/characters/pela",
+      "section": "Kit / Basic ATK",
+      "branch": "Profile updated 2026-05-31",
+      "fact": "Single-target Ice basic attack, ATK scaling, 20 energy. Numeric coefficient is taken from KQM because the fetched Prydwen text contains parameter placeholders."
+    },
+    "kqm-speed": {
+      "url": "https://hsr.keqingmains.com/misc/speed-guide/",
+      "section": "Action Gauge Modifiers / Speed Buffs and Debuffs",
+      "branch": "Published speed guide, accessed 2026-11-18",
+      "fact": "Advance/delay act on a full 10000-unit gauge; speed changes alter AV without resetting existing gauge progress."
+    },
+    "gachabase-pearl": {
+      "url": "https://hsr.gachabase.net/characters/1503/pearl/release?lang=en",
+      "section": "Ultimate Appraise Souls Ground / E2",
+      "branch": "Release branch accessed 2026-11-18; live URL, not a pinned immutable revision",
+      "fact": "At four Elation characters the target gains an extra turn with temporary 30 Certified Banger and 60 Punchline; E2 doubles these temporary resources."
+    },
+    "prydwen-pearl": {
+      "url": "https://www.prydwen.gg/star-rail/characters/pearl",
+      "section": "Kit / Ultimate",
+      "branch": "Profile updated 2026-11-11, patch 4.6",
+      "fact": "Distinguishes action advance at one to three Elation characters from a genuine extra turn at four, with temporary Banger and Punchline."
+    },
+    "kqm-sr-damage": {
+      "url": "https://srl.keqingmains.com/combat-mechanics/damage/damage-formula",
+      "section": "General Formula / Critical Hits / Toughness Multiplier",
+      "branch": "Star Rail Library, accessed 2026-11-18",
+      "fact": "Damage factors include independent critical and toughness factors; unbroken toughness multiplier is 0.9."
+    },
+    "kqm-tingyun-ownership": {
+      "url": "https://srl.keqingmains.com/evidence/characters/lightning/tingyun",
+      "section": "Tingyun Skill Talent Info",
+      "branch": "Experimental evidence added 2023-06-01, last tested 2023-05-01, original kit",
+      "fact": "The blessed ally owns Benediction additional damage; Tingyun is the supplying effect source. Recorded experiments also attribute on-kill energy to the ally."
+    },
+    "kqm-attack-types": {
+      "url": "https://srl.keqingmains.com/evidence/equipment/relics",
+      "section": "Champion Set Stacks",
+      "branch": "Experimental evidence 2023-06-05, original mechanics",
+      "fact": "An attack and an additional damage instance are not interchangeable trigger types. DoT and break effects are not independent attacks."
+    },
+    "prydwen-cone-targets": {
+      "url": "https://www.prydwen.gg/star-rail/guides/nameless-honor",
+      "section": "We Will Meet Again",
+      "branch": "Guide accessed 2026-11-18; only the listed target restriction is used",
+      "fact": "The cone additional hit targets a random enemy attacked by the triggering basic or skill; this does not authorize a hit on an untouched enemy."
+    },
+    "prydwen-dan-total": {
+      "url": "https://www.prydwen.gg/star-rail/characters/dan-heng",
+      "section": "Kit / Basic ATK and Skill",
+      "branch": "Profile updated 2026-05-31, original kit",
+      "fact": "The displayed total toughness reduction is 10 for basic and 20 for skill; per-hit toughness is not provided in fetched text."
+    },
+    "kqm-seele-lifecycle": {
+      "url": "https://hsr.keqingmains.com/seele/",
+      "section": "Playstyle / Resurgence",
+      "branch": "Guide updated for version 1.6; accessed 2026-11-19; does not certify Novaflare-specific exceptions",
+      "fact": "Resurgence preserves turn-based external buffs. It does not generate another Resurgence from a kill during that extra turn. The legacy amplification gained on the current own turn survives to the next turn."
+    },
+    "prydwen-ultimate-window": {
+      "url": "https://www.prydwen.gg/star-rail/guides/combat-and-exploration",
+      "section": "Player Actions",
+      "branch": "Live guide accessed 2026-11-19; general description, not a full event priority specification",
+      "fact": "An Ultimate does not consume the ordinary action, can be used out of turn, and can be chained with other Ultimates."
+    },
+    "wiki-followup-actions": {
+      "url": "https://honkai-star-rail.fandom.com/wiki/Follow-Up_Attack",
+      "section": "Follow-Up Actions",
+      "branch": "Indexed full section retrieved with targeted search 2026-11-19; direct page previously returned 402",
+      "fact": "Follow-up actions precede Ultimates and extra actions. Some non-attacking abilities are follow-up actions too; damage type alone is not sufficient classification."
+    },
+    "kqm-misha-windows": {
+      "url": "https://hsr.keqingmains.com/misha/",
+      "section": "How to play Pseudo-Sustain Misha",
+      "branch": "Version 2.0 guide, accessed 2026-11-19",
+      "fact": "An Ultimate can Freeze an enemy between its first and second actions, denying the remaining actions of that turn."
+    },
+    "wiki-start-order": {
+      "url": "https://honkai-star-rail.fandom.com/wiki/Speed",
+      "section": "Beginning of battle SPD/AV effects",
+      "branch": "Targeted indexed text accessed 2026-11-19; exact character-internal event priorities not independently established",
+      "fact": "Entry SPD/AV-modifying effects are triggered in character lineup order from left to right. This is not a guarantee that every untargeted aura combination is position-independent."
+    }
+  },
+  "controls": [
+    {
+      "id": "FOUNDATION-PELA-BASIC-AV",
+      "status": "verified-control",
+      "debts": [
+        "Q01",
+        "Q02",
+        "Q04",
+        "Q05"
+      ],
+      "sources": [
+        "kqm-action-gauge",
+        "kqm-pela",
+        "prydwen-pela"
+      ],
+      "implementation": [
+        "team-engine.js:battleSimulate",
+        "team-engine.js:regular",
+        "team-engine.js:hit"
+      ],
+      "test": "scripts/verify-foundations.cjs",
+      "assumptions": [
+        "Synthetic isolated scenario, not a recorded in-game battle",
+        "Solo E0 Pela, basic attacks only, no equipment, no techniques, no external debuffs",
+        "Fixed ATK 1000 and SPD 125",
+        "Infinite-HP target; DEF multiplier disabled with enemyLevel 0, RES 0, no toughness",
+        "Three cycles use the project's explicit 350 AV horizon",
+        "No crits, no damage bonuses"
+      ],
+      "derivation": "10000 / 125 = 80 AV per turn. In 350 AV there are four turns at 80,160,240,320. Each basic deals 1000 * 1 = 1000. Four attacks generate four SP from zero and 80 base energy, below 110 required for ultimate.",
+      "expected": {
+        "turnAV": [
+          80,
+          160,
+          240,
+          320
+        ],
+        "attackDamage": [
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "total": 4000,
+        "finalSP": 4,
+        "energy": 80,
+        "ults": 0
+      }
+    },
+    {
+      "id": "FOUNDATION-EXPECTED-CRIT",
+      "status": "verified-control",
+      "debts": [
+        "Q04",
+        "Q05"
+      ],
+      "sources": [
+        "kqm-pela"
+      ],
+      "implementation": [
+        "team-engine.js:hit"
+      ],
+      "test": "scripts/verify-foundations.cjs",
+      "assumptions": [
+        "Same isolated scenario as FOUNDATION-PELA-BASIC-AV",
+        "Expected damage mode, crit damage 100%, no downstream state depending on crit"
+      ],
+      "derivation": "A noncrit is 1000 and a crit is 2000. At crit chance 0, 0.5, and 1 the four-hit expectations are respectively 4000, 6000, and 8000. This is elementary probability applied to a synthetic fixture, not an independent audit of every damage multiplier.",
+      "expected": {
+        "critChance": [
+          0,
+          0.5,
+          1
+        ],
+        "totals": [
+          4000,
+          6000,
+          8000
+        ]
+      }
+    },
+    {
+      "id": "CLOCK-ADVANCE-DELAY",
+      "status": "verified-control",
+      "debts": [
+        "B01",
+        "B10"
+      ],
+      "sources": [
+        "kqm-action-gauge",
+        "kqm-speed"
+      ],
+      "implementation": [
+        "team-engine.js:timeline",
+        "team-engine.js:battleSimulate"
+      ],
+      "test": "scripts/verify-action-clock.cjs",
+      "assumptions": [
+        "Fixed gauge 10000; no character-specific exceptions"
+      ],
+      "derivation": "From remaining gauge 6000, a 20% advance removes 2000, not 20% of 6000. A 30% delay adds 3000. Advance cannot produce negative gauge.",
+      "expected": {
+        "advance": 4000,
+        "delay": 9000,
+        "advanceFloor": 0
+      }
+    },
+    {
+      "id": "CLOCK-SPEED-EXPIRY",
+      "status": "verified-control",
+      "debts": [
+        "B10"
+      ],
+      "sources": [
+        "kqm-action-gauge",
+        "kqm-speed"
+      ],
+      "implementation": [
+        "team-engine.js:timeline",
+        "team-engine.js:battleSimulate"
+      ],
+      "test": "scripts/verify-action-clock.cjs",
+      "assumptions": [
+        "Synthetic basic-only Pela with base SPD 100",
+        "Asta ultimate grants 50 flat SPD for two recipient turns; other actors do not advance Pela"
+      ],
+      "derivation": "The first two turns occur at 10000/150 and 20000/150 AV. Once the recipient speed bonus expires, subsequent turns add 10000/100 AV.",
+      "expected": {
+        "turnAV": [
+          66.66666666666667,
+          133.33333333333334,
+          233.33333333333334,
+          333.3333333333333
+        ]
+      }
+    },
+    {
+      "id": "CLOCK-COMPETING-TIMERS",
+      "status": "verified-control",
+      "debts": [
+        "B01",
+        "B10"
+      ],
+      "sources": [
+        "kqm-action-gauge"
+      ],
+      "implementation": [
+        "team-engine.js:timeline",
+        "team-engine.js:battleSimulate"
+      ],
+      "test": "scripts/verify-action-clock.cjs",
+      "assumptions": [
+        "Two independent countdowns start at time zero",
+        "The scenario uses Robin SPD-90 and Firefly SPD-70 countdowns",
+        "This verifies event selection, not every effect of those character states"
+      ],
+      "derivation": "The smaller countdown is 10000/90; it must fire before 10000/70. Selecting a later candidate must not leave an older dispatch flag active.",
+      "expected": {
+        "concertEnd": 111.11111111111111,
+        "combustionEnd": 142.85714285714286
+      }
+    },
+    {
+      "id": "CLOCK-HORIZON-TIES",
+      "status": "verified-control",
+      "debts": [
+        "B01",
+        "B10"
+      ],
+      "sources": [
+        "kqm-action-gauge"
+      ],
+      "implementation": [
+        "team-engine.js:timeline",
+        "team-engine.js:battleSimulate"
+      ],
+      "test": "scripts/verify-action-clock.cjs",
+      "assumptions": [
+        "Project horizon includes events exactly at its endpoint",
+        "Stable candidate order is an explicit deterministic tie policy, not a source-confirmed universal game rule for simultaneous effects"
+      ],
+      "derivation": "At SPD 200, each actor takes ordinary turns at 50,100,150 AV. Both actions at the horizon 150 must execute; stopping after only the first makes the result depend incorrectly on iteration termination.",
+      "expected": {
+        "perActorTurns": [
+          50,
+          100,
+          150
+        ],
+        "actorsAtHorizon": 2
+      }
+    },
+    {
+      "id": "CLOCK-PEARL-EXTRA",
+      "status": "verified-control",
+      "debts": [
+        "B05"
+      ],
+      "sources": [
+        "gachabase-pearl",
+        "prydwen-pearl"
+      ],
+      "implementation": [
+        "team-engine.js:timeline",
+        "team-engine.js:battleSimulate"
+      ],
+      "test": "scripts/verify-action-clock.cjs",
+      "assumptions": [
+        "Four Elation characters; E0 Pearl",
+        "Yao Guang acts at time zero through the extra-turn grant",
+        "All profiles use SPD 1 so no ordinary turn is due",
+        "No Aeon ascension active in this control"
+      ],
+      "derivation": "The granted action advances no time, consumes no ordinary turn and does not reset the remaining 10000 gauge. Temporary +30 Banger and +60 Punchline leave afterward; the basic action retains its own newly earned 3 Punchline.",
+      "expected": {
+        "time": 0,
+        "remainingGauge": 10000,
+        "ordinaryTurns": 0,
+        "removedBanger": 30,
+        "removedPunchline": 60,
+        "permanentPunchlineEarned": 3
+      }
+    },
+    {
+      "id": "HITS-INDEPENDENT-TOUGHNESS",
+      "status": "verified-control",
+      "debts": [
+        "B02",
+        "B03"
+      ],
+      "sources": [
+        "kqm-sr-damage"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Synthetic two-packet skill; damage shares 80/20%, toughness reduction 2/8 independently supplied",
+        "ATK 1000, no crit/DEF/RES modifiers, target starts at toughness 5"
+      ],
+      "derivation": "The first hit deals 800 * 0.9 = 720 and leaves 3 toughness. The second deals 200 * 0.9 = 180, then breaks. Break damage is a separate event and not part of these two normal hits.",
+      "expected": {
+        "damage": [
+          720,
+          180
+        ],
+        "toughnessAfter": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "id": "HITS-SEPARATE-CRITS",
+      "status": "verified-control",
+      "debts": [
+        "B02"
+      ],
+      "sources": [
+        "kqm-sr-damage"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Synthetic 80/20% packets, ATK 1000, crit chance 50%, crit damage 100%",
+        "No HP cap or other downstream state affecting the two packets"
+      ],
+      "derivation": "Independent Bernoulli outcomes 00,10,01,11 each have probability 1/4. Damage is 1000,1800,1200,2000. Their weighted mean is 1500; no single shared crit roll is allowed for the entire action.",
+      "expected": {
+        "branches": [
+          1000,
+          1800,
+          1200,
+          2000
+        ],
+        "probabilities": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "mean": 1500
+      }
+    },
+    {
+      "id": "HITS-LOCKED-AND-BOUNCE",
+      "status": "verified-control",
+      "debts": [
+        "B08"
+      ],
+      "sources": [
+        "prydwen-cone-targets"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Synthetic fixed-target and explicitly bouncing sequences",
+        "A locked target dies after packet one; other enemies remain alive"
+      ],
+      "derivation": "The locked series stops without spilling remaining damage to another enemy. A series declaring bounce may select a different living target. The cone filters surviving members of the original hit set; an untouched enemy is never a fallback.",
+      "expected": {
+        "lockedPackets": 1,
+        "explicitBouncePackets": 2,
+        "coneUntouchedTargetHits": 0
+      }
+    },
+    {
+      "id": "HITS-EXPLICIT-SNAPSHOT",
+      "status": "verified-control",
+      "debts": [
+        "B09"
+      ],
+      "sources": [
+        "kqm-sr-damage"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Synthetic two equal packets, ATK 1000, base ATK 500",
+        "A +100% base-ATK buff is injected after packet one",
+        "These are API semantics, not a claim that every game skill uses the same snapshot rule"
+      ],
+      "derivation": "With per-packet reads, damage is 500 and 750. With an explicit action snapshot, damage is 500 and 500. The caller must select the game-verified rule for each skill.",
+      "expected": {
+        "packet": [
+          500,
+          750
+        ],
+        "action": [
+          500,
+          500
+        ]
+      }
+    },
+    {
+      "id": "HITS-DAMAGE-OWNERSHIP",
+      "status": "verified-control",
+      "debts": [
+        "F13"
+      ],
+      "sources": [
+        "kqm-tingyun-ownership",
+        "kqm-attack-types"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Checks provenance fields independently from which on-kill triggers are currently modeled",
+        "Benediction ownership uses the blessed ally; a detonation retains the original DoT owner"
+      ],
+      "derivation": "Kill records distinguish damageOwner, triggerSource, damageKind and attackKillCredit. In the controls, Benediction belongs to Pela but comes from Tingyun; Gui Burn belongs to Guinaifen while Kafka detonates it. Break and true damage also retain an explicit owner.",
+      "expected": {
+        "benediction": {
+          "owner": "1106",
+          "source": "1202"
+        },
+        "detonation": {
+          "owner": "1210",
+          "source": "1005"
+        }
+      }
+    },
+    {
+      "id": "HITS-LEGACY-TOUGHNESS-PENDING",
+      "status": "needs-verification",
+      "debts": [
+        "B03"
+      ],
+      "sources": [
+        "prydwen-dan-total"
+      ],
+      "implementation": [
+        "team-engine.js:splitHit",
+        "team-engine.js:hit",
+        "team-engine.js:enemyDamage"
+      ],
+      "test": "scripts/verify-hit-packets.cjs",
+      "assumptions": [
+        "Current explicit allocations preserve prior numerical behavior",
+        "No authoritative per-hit toughness distribution has been obtained for the four legacy plans"
+      ],
+      "derivation": "The engine no longer derives toughness automatically from damage shares. However, preserving an allocation does not verify it. The four skills stay in the packet-review inventory and generate coverage warnings until independently checked.",
+      "expected": {
+        "pendingAbilityIds": [
+          "100201",
+          "100202",
+          "120901",
+          "120902"
+        ]
+      }
+    },
+    {
+      "id": "REACTIONS-CONTEXT",
+      "status": "verified-control",
+      "debts": [
+        "B04"
+      ],
+      "sources": [
+        "prydwen-ultimate-window"
+      ],
+      "implementation": [
+        "team-engine.js:withActionContext",
+        "team-engine.js:afterAttack",
+        "team-engine.js:settleFinal",
+        "team-engine.js:isolatedAction"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "Synthetic action map values 2 and 7 test isolation, not game multipliers",
+        "This does not prove the relative priority of simultaneous different reactions"
+      ],
+      "derivation": "A nested action is a distinct event, so it must not replace the interrupted action ID or its once-per-action counters. A thrown nested callback must still restore its caller. Damage and SP gained by the callback remain committed. Real Feixiao FUA, queued Acheron EX and Asta Ultimate handlers exercise the same production scope.",
+      "expected": {
+        "parentActionRestored": true,
+        "parentOwnerRestored": true,
+        "arcanaCounter": 2,
+        "breakCounter": 7,
+        "SPAfterThrow": 1
+      }
+    },
+    {
+      "id": "REACTIONS-FUA-HOOK",
+      "status": "verified-control",
+      "debts": [
+        "B04"
+      ],
+      "sources": [
+        "kqm-attack-types"
+      ],
+      "implementation": [
+        "equipment-effects.js:followupStart",
+        "team-engine.js:hit"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "The control counts actions, not individual hits",
+        "Per-character FUA categorization remains section 13"
+      ],
+      "derivation": "Calling the equipment hook from both the ability handler and hit does not create two attacks. Duran therefore gains one stack for one action. A nested FUA of the same actor is a second action; resuming the original action must not create a third stack.",
+      "expected": {
+        "oneActionDuranStacks": 1,
+        "twoNestedActionsDuranStacks": 2
+      }
+    },
+    {
+      "id": "REACTIONS-DURATION-CONTROLS",
+      "status": "verified-control",
+      "debts": [
+        "B06"
+      ],
+      "sources": [
+        "kqm-speed",
+        "kqm-seele-lifecycle"
+      ],
+      "implementation": [
+        "team-engine.js:buff",
+        "team-engine.js:finishTurn",
+        "team-engine.js:seeleExtraTurn",
+        "equipment-effects.js:endTurn"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "Generic duration controls do not certify all individual buff timing exceptions",
+        "Equipment control uses a synthetic expiring timed buff to exercise shared lifetime cleanup"
+      ],
+      "derivation": "For the generic recipient clock, an off-turn one-turn buff covers the next normal action and is then removed. A buff applied after own-turn start survives that end and is removed after the next normal action. The last-turn buff is available for an inserted Ultimate before cleanup. Resurgence does not increment the ordinary turn counter and must retain both external and equipment buffs until that extra action completes.",
+      "expected": {
+        "lastTurnDamageBoost": 1.5,
+        "resurgenceTurnCounter": 1,
+        "equipmentPresentDuringExtra": true,
+        "equipmentRemovedAfterExtra": true
+      }
+    },
+    {
+      "id": "REACTIONS-PRIORITY-PENDING",
+      "status": "needs-verification",
+      "debts": [
+        "B04",
+        "B07",
+        "B11"
+      ],
+      "sources": [
+        "kqm-seele-lifecycle",
+        "prydwen-ultimate-window",
+        "wiki-start-order"
+      ],
+      "implementation": [
+        "team-engine.js:settleFinal",
+        "team-engine.js:runUlts",
+        "team-engine.js:trainingAttack",
+        "team-engine.js:applyOpeningTechniques"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "Some deferred kinds still lack independently established action type/priority",
+        "Opening phase order is not fully verified",
+        "The enemy sequence framework is verified with synthetic controls; real enemy patterns remain section 10",
+        "Lineup order is relevant at entry according to Wiki; the current global initialization blocks have not yet been fully converted and independently verified"
+      ],
+      "derivation": "Classified follow-up actions now bypass pending Resurgence and atomic enemy-action windows have independent controls. This does not establish a complete live-game scheduler: the other deferred kinds, depth-first direct reactions, and battle-entry aura/technique ordering remain open.",
+      "expected": {
+        "sectionClosed": false,
+        "remaining": [
+          "remaining reaction-kind classification and direct-call ordering",
+          "start-of-battle phase ordering",
+          "real enemy multi-action patterns in section 10"
+        ]
+      }
+    },
+    {
+      "id": "REACTIONS-QUEUE-PRIORITY-CONTROL",
+      "status": "verified-control",
+      "debts": [
+        "B04"
+      ],
+      "sources": [
+        "wiki-followup-actions",
+        "kqm-seele-lifecycle"
+      ],
+      "implementation": [
+        "team-engine.js:queueFinal",
+        "team-engine.js:settleFinal",
+        "team-engine.js:runUlts"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "Only acheronEX, imbibitorEX and fox are classified as followup-action here",
+        "The remaining deferred kinds and direct handlers are not certified as a universal queue"
+      ],
+      "derivation": "A pending Resurgence prevents ordinary Ultimate insertion, but is lower priority than a ready follow-up action. A lower-priority deferred record at the head of the array cannot block a later classified follow-up. The synthetic queue contains deferred nova followed by Acheron EX; only the follow-up executes, and the ready Seele Ultimate waits.",
+      "expected": {
+        "deferredRemaining": [
+          "nova"
+        ],
+        "ultimateCountBeforeExtra": 0,
+        "followupExecuted": true
+      }
+    },
+    {
+      "id": "REACTIONS-ENEMY-ACTION-WINDOW",
+      "status": "verified-control",
+      "debts": [
+        "B11"
+      ],
+      "sources": [
+        "kqm-misha-windows",
+        "prydwen-ultimate-window"
+      ],
+      "implementation": [
+        "team-engine.js:enemyActionSequence",
+        "team-engine.js:trainingAttack",
+        "team-engine.js:runUlts",
+        "team-engine.js:bossTurn"
+      ],
+      "test": "scripts/verify-reaction-context.cjs",
+      "assumptions": [
+        "The two synthetic attacks are a framework control, not an invented Gepard attack pattern",
+        "The existing Gepard profile continues to contain one action until section 10 validates its real pattern"
+      ],
+      "derivation": "Three incoming hits belong to one atomic action. Even if an Ultimate becomes ready after its first hit, all three incoming events must precede the Ultimate. Between two distinct actions Misha can Freeze and cancel the second. Pela without Break allows the second, while Pela breaking toughness cancels it. Replacing the enemy slot also invalidates the old continuation.",
+      "expected": {
+        "incomingHitsBeforeUltimate": 3,
+        "secondActionOnFreeze": false,
+        "secondActionWithoutControl": true,
+        "secondActionOnBreak": false,
+        "newSlotContinuation": false
+      }
+    }
+  ]
+}

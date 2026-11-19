@@ -123,12 +123,13 @@
     const add=list=>{for(const prop of list||[])p[prop.type]=(p[prop.type]||0)+prop.value;};
     if(config.coneId){const values=baseStats(data.light_cone_promotions[config.coneId],config.coneLevel);for(const key of ['hp','atk','def'])base[key]+=values[key];add(data.light_cone_ranks[config.coneId].properties[config.rank-1]);}
     items.forEach(item=>add(properties(item,data)));
-    if(config.traces)for(const id of c.skill_trees.filter(id=>id.startsWith(c.id)))for(const node of data.character_skill_trees[id].levels)if(node.promotion<=minPromotion(config.level)&&node.level<=config.level)add(node.properties);
+    const tracePrefix=config.novaflare&&root.HSR_TEAM?.catalogNovaflare.has(c.id)?'1'+c.id:c.id;
+    if(config.traces)for(const id of c.skill_trees.filter(id=>id.startsWith(tracePrefix)))for(const node of data.character_skill_trees[id].levels)if(node.promotion<=minPromotion(config.level)&&node.level<=config.level)add(node.properties);
     if(referenceRatios)Object.assign(referenceRatios,{hp:p.HPAddedRatio||0,atk:p.AttackAddedRatio||0,def:p.DefenceAddedRatio||0,speed:p.SpeedAddedRatio||0});
     return {hp:base.hp*(1+(p.HPAddedRatio||0))+(p.HPDelta||0),baseHP:base.hp,atk:base.atk*(1+(p.AttackAddedRatio||0))+(p.AttackDelta||0),baseAtk:base.atk,def:base.def*(1+(p.DefenceAddedRatio||0))+(p.DefenceDelta||0),baseDef:base.def,speed:base.spd*(1+(p.SpeedAddedRatio||0))+(p.SpeedDelta||0),baseSpeed:base.spd,crit:base.crit_rate+(p.CriticalChanceBase||0),critDamage:base.crit_dmg+(p.CriticalDamageBase||0),damageBonus:p.AllDamageTypeAddedRatio||0,elementBonus:p[c.element+'AddedRatio']||0,healingBonus:p.HealRatioBase||0,effectHit:p.StatusProbabilityBase||0,effectRes:p.StatusResistanceBase||0,breakEffect:p.BreakDamageAddedRatioBase||0,elation:p.ElationDamageAddedRatioBase||0,energyRegen:1+(p.SPRatioBase||0),policy:'auto'};
   }
   function level80Config(id){
-    return {characterId:id,coneId:'',level:80,coneLevel:80,rank:1,actionId:'custom',
+    return {characterId:id,novaflare:root.HSR_TEAM?.catalogNovaflare.has(id)??false,coneId:'',level:80,coneLevel:80,rank:1,actionId:'custom',
       skillLevel:10,scaling:'atk',kind:'skill',coefficient:1,enemyLevel:95,targets:1,
       debuffs:0,dots:0,resistance:0,resPen:0,defReduction:0,vulnerability:0,damageBonus:0,
       atkBonus:0,hpBonus:0,defBonus:0,critBonus:0,critDamageBonus:0,speedFlat:0,minSpeed:0,

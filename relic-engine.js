@@ -49,7 +49,7 @@
     dot:{AttackAddedRatio:1,AttackDelta:.25,SpeedDelta:1,StatusProbabilityBase:.75},
     support:{SpeedDelta:1,HPAddedRatio:.5,DefenceAddedRatio:.5,StatusResistanceBase:.5}
   };
-  function archetype(id,data){const key=root.HSR_TEAM?.canonical(id)||id;if(['1310','1315','1225','1321','8005','8006','1301','1222'].includes(key))return 'break';if(['1005','1111','1205','1404','1407','1403','1413','1507'].includes(key))return 'hp';if(['1304','1503','8003','8004'].includes(key))return 'def';if(['1009','1110','1117','1307','1218'].includes(key))return 'dot';return root.HSR_TEAM?.models[id]?.role!=='dps'?'support':'atk';}
+  function archetype(id,data){const key=root.HSR_TEAM?.canonical(id)||id;if(['1310','1315','1225','1321','8005','8006','1301','1222'].includes(key))return 'break';if(['1005','1111','1205','1212','1404','1407','1403','1413','1507'].includes(key))return 'hp';if(['1304','1503','8003','8004'].includes(key))return 'def';if(['1009','1110','1117','1307','1218'].includes(key))return 'dot';return root.HSR_TEAM?.models[id]?.role!=='dps'?'support':'atk';}
   function defaultWeights(id,data){const result={...profiles[archetype(id,data)]};if(['1101','1313'].includes(root.HSR_TEAM?.canonical(id)||id))result.CriticalDamageBase=1;return result;}
   root.HSR_RELIC={maxima,score,ceiling,rollCounts,validateRolls,reroll,compare,profiles,archetype,defaultWeights};
 })(typeof window==='undefined'?globalThis:window);

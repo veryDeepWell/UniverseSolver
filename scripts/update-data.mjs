@@ -3,12 +3,16 @@ import { fileURLToPath } from 'node:url';
 
 // Pin a reviewed revision. Updating this argument produces a new reproducible snapshot.
 const revision = process.argv[2] || 'dbe8cdfcfb0bf657b9fe1cf92d5537f118ccb487';
+const equipmentRevision = process.argv[3] || '03907e798b46f9eb109a1f882055cdf49ce3d374';
 if (!/^[a-f0-9]{40}$/.test(revision)) throw new Error('Expected a full Git commit SHA');
+if (!/^[a-f0-9]{40}$/.test(equipmentRevision)) throw new Error('Expected a full equipment commit SHA');
 const root = new URL('../data/', import.meta.url);
 const base = `https://raw.githubusercontent.com/Mar-7th/StarRailRes/${revision}/`;
+const equipmentBase = `https://raw.githubusercontent.com/Mar-7th/StarRailRes/${equipmentRevision}/`;
 const names = ['characters','character_skills','character_skill_trees','character_ranks','character_promotions','light_cones','light_cone_ranks','light_cone_promotions','relics','relic_sets','relic_main_affixes','relic_sub_affixes','paths','elements','properties'];
 const entries = await Promise.all(names.map(async name => {
-  const response = await fetch(`${base}index_new/ru/${name}.json`);
+  const source = /^(light_cone|relic)/.test(name) ? equipmentBase : base;
+  const response = await fetch(`${source}index_new/ru/${name}.json`);
   if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`);
   return [name, await response.json()];
 }));
@@ -16,13 +20,22 @@ const englishResponse = await fetch(`${base}index_new/en/characters.json`);
 if (!englishResponse.ok) throw new Error(`English names: HTTP ${englishResponse.status}`);
 const english = await englishResponse.json();
 const data = Object.fromEntries(entries);
+// The Russian technique template swaps the chance and damage parameter indices.
+// See https://hsr.gachabase.net/characters/1109/hook/release
+const hookTechnique = data.character_skills['110907'];
+if (hookTechnique?.desc.includes('урон, равный #1[i]%') && hookTechnique.desc.includes('базовый шанс #2[i]%')) {
+  hookTechnique.desc = hookTechnique.desc
+    .replace('урон, равный #1[i]%', 'урон, равный #4[i]%')
+    .replace('базовый шанс #2[i]%', 'базовый шанс #1[i]%')
+    .replace('периодический огненный урон, равный #4[i]%', 'периодический огненный урон, равный #2[i]%');
+}
 data.relics = Object.fromEntries(Object.entries(data.relics).filter(([,piece]) => piece.rarity === 5));
 for (const [table, field] of [['relic_main_affixes','main_affix_id'],['relic_sub_affixes','sub_affix_id']]) {
   const used = new Set(Object.values(data.relics).map(piece => piece[field]));
   data[table] = Object.fromEntries(Object.entries(data[table]).filter(([id]) => used.has(id)));
 }
 data.english_names = Object.fromEntries(Object.values(english).map(c => [c.id, c.name]));
-data.meta = {source:'https://github.com/Mar-7th/StarRailRes',revision,generated_at:new Date().toISOString(),language:'ru',asset_base:base};
+data.meta = {source:'https://github.com/Mar-7th/StarRailRes',revision,equipment_revision:equipmentRevision,generated_at:new Date().toISOString(),language:'ru',asset_base:equipmentBase};
 await mkdir(root, {recursive:true});
 const destination = new URL('game-data.js', root);
 const temporary = new URL('game-data.js.tmp', root);

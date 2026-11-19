@@ -33,6 +33,35 @@ const gear = HSR_SETS.createSearch({
 assert.equal(gear.checked,2);
 assert.ok(gear.top.every(row=>Number.isFinite(row.total)));
 
+const equipment = HSR_EQUIPMENT;
+const bareReference = HSR_OPT.farmReference(id,HSR_RELIC.archetype(id,data),data,false).profile;
+const withCone = (coneId,rank) => equipment.coneProfile(id, bareReference, {id:coneId,rank}, {}, data);
+const audit = {...scenario, audit:true, allowPartial:true};
+const travelCone = team.simulate(lineup,{...profiles,[id]:withCone('22009',5)},audit,data,true);
+const noConditional = team.simulate(lineup,{...profiles,[id]:{...withCone('22009',5),cone:undefined}},audit,data,true);
+assert.ok(Math.abs(travelCone.initialStats[id].critDamage-noConditional.initialStats[id].critDamage-.6)<1e-9);
+const signature = withCone('23065',5);
+const tour = team.simulate(lineup,{...profiles,[id]:signature},audit,data,true);
+assert.equal(signature.baseSpeed,bareReference.baseSpeed+20);
+assert.ok(tour.events.some(event=>event.label==='Юмор +18'));
+assert.equal(tour.events.find(event=>event.label==='Импровизированное турне').defenseIgnore,.24);
+const solo = team.simulate([id],{[id]:signature},audit,data,true);
+assert.ok(!solo.events.some(event=>event.label==='Импровизированное турне'));
+
+const ornament = planar=>({cavern:['101','101','102','102'],planar});
+const start = (heroes,stats)=>team.simulate(heroes,stats,audit,data,true);
+const march = '1001';
+const joy = 'Миг радости бога · продвижение действия на 40%';
+const center = 'Подпространственный центр · эффект пробития команды +18%';
+for(const [elation,active] of [[.399,false],[.4,true]]){
+  const result=start([march],{[march]:{...team.defaults(march,data),elation,equipment:ornament('329')}});
+  assert.equal(result.events.some(event=>event.label===joy),active);
+}
+const subspace = hero=>{const base=team.defaults(hero,data);return {...base,speed:145-.06*base.baseSpeed,equipment:ornament('330')};};
+const subspaceOwner=subspace(march);
+assert.equal(start([march],{[march]:{...subspaceOwner,speed:subspaceOwner.speed-.01}}).events.filter(event=>event.label===center).length,0);
+assert.equal(start([march,'1002'],{[march]:subspaceOwner,'1002':subspace('1002')}).events.filter(event=>event.label===center).length,1);
+
 for (const hero of ['1220','1309','1313','1218','1204','1213']) {
   const ids = [hero,...['1220','1309','1204','1218','1203'].filter(member=>member!==hero).slice(0,3)];
   const original = Object.fromEntries(ids.map(member=>[member,reference(member)]));

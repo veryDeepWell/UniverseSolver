@@ -27,7 +27,7 @@
     1218:'23029',1221:'23030',1220:'23031',1222:'23032',1317:'23033',1313:'23034',1225:'23035',
     1402:'23036',1401:'23037',1403:'23038',1404:'23039',1407:'23040',1405:'23041',1409:'23042',
     1406:'23043',1408:'23044',1014:'23045',1015:'23046',1410:'23047',1412:'23048',1413:'23049',1321:'23050',
-    1414:'23051',1415:'23052',1502:'23053',1501:'23054',1505:'23055',1504:'23056'
+    1414:'23051',1415:'23052',1502:'23053',1501:'23054',1505:'23055',1504:'23056',1511:'23065'
   };
   const tiers = [
     ['early', 'Ранний · сюжет и мир'],
@@ -41,19 +41,7 @@
     effectHit: ['Шанс попадания эффектов', 100], breakEffect: ['Эффект пробития', 100],
     energyRegen: ['Восстановление энергии', 100]
   };
-  const symbols = {
-    hp:['♥','health'], atk:['⚔','attack'], def:['⬟','defense'], speed:['»','speed'],
-    crit:['◎','crit'], critDamage:['✷','crit-damage'], effectHit:['⊙','debuff'],
-    effectRes:['◈','defense'], breakEffect:['ϟ','break'], energyRegen:['◆','energy'],
-    humor:['✦','humor'], banger:['★','humor'], sp:['◇','energy'], resource:['❖','resource'],
-    buff:['↑','buff'], debuff:['↓','debuff'], zone:['◉','zone'], state:['◈','resource'],
-    shield:['⬟','defense'], break:['ϟ','break'], attack:['⚔','attack'],
-    followup:['↪','attack'], dot:['◌','debuff'], turn:['»','speed'], expire:['⌛','muted']
-  };
-  function mark(key,content){
-    const [symbol,tone]=symbols[key]||symbols.state;
-    return `<span class="plan-mark mark-${tone}"><span aria-hidden="true">${symbol}</span> ${content}</span>`;
-  }
+  const mark = (key,content) => window.HSR_PHENOMENA.mark(key,content,true);
   function eventTag({label,kind}){
     if(kind==='buff-expired'||/ист[ёе]к|рассеял/i.test(label))return ['expire','Окончание'];
     if(kind==='shield-break'||/щит|барьер/i.test(label))return ['shield','Щит'];
@@ -64,7 +52,12 @@
     if(/миг ахи|^аха ·/.test(label.toLowerCase()))return ['humor','Миг Ахи'];
     if(/замороз|замедлен|ослаблен|уязвим/i.test(label))return ['debuff','Ослабление'];
     return ({buff:['buff','Усиление'], debuff:['debuff','Ослабление'],resource:['resource','Ресурс'],
-      attack:['attack','Атака'],incoming:['attack','Атака врага'],followup:['followup','Бонус-атака'],
+      attack:['attack','Атака'],basic:['attack','Базовая атака'],skill:['attack','Навык'],
+      ultimate:['attack','Сверхспособность'],elation:['humor','Навык Радости'],
+      incoming:['attack','Атака врага'],followup:['followup','Бонус-атака'],
+      'enemy-action-start':['attack','Действие врага'],'enemy-action-end':['turn','Конец действия'],
+      'enemy-actions-cancelled':['debuff','Действия отменены'],
+      'reaction-start':['followup','Реакция'],'reaction-skipped':['expire','Реакция пропущена'],
       dot:['dot','Периодический урон'],true:['attack','Истинный урон'],turn:['turn','Ход'],
       decision:['turn','Решение'],'ally-defeated':['hp','Выбыл'],'enemy-defeated':['hp','Побеждён'],
       sp:['sp','Очки навыков']})[kind]||['state','Состояние'];
@@ -82,7 +75,7 @@
     return references.get(key);
   }
   const scenarioDefaults = {
-    targets:1, cycles:3, enemyLevel:95, toughness:120, initialSP:3, energyPercent:50,
+    targets:1, cycles:3, enemyLevel:95, enemyEffectRes:.4, toughness:120, initialSP:3, energyPercent:50,
     seed:42, trials:3, externalDebuffs:0, enemyAttacks:'training', requireSustain:true, encounter:'dummy', enemyHP:100000, incomingHits:1
   };
   function read(key) {
@@ -157,7 +150,7 @@
     if (items.every(Boolean)) return itemProfile(id,items);
     return planned;
   }
-  const withRanks = (id,profile) => ({...profile,eidolon:state.eidolons[id]||0,exEidolon:Boolean(state.ex[id])});
+  const withRanks = (id,profile) => ({...profile,eidolon:state.eidolons[id]||0,exEidolon:Boolean(state.ex[id]),novaflare:T.novaflareModels.has(id)});
   const profiles = (ids, useActual = true) => Object.fromEntries(ids.map(id => [id, withRanks(id,profile(id, useActual))]));
   const teamProfiles = ids => Object.fromEntries(ids.map(id => [id,withRanks(id,O.level80TraceProfile(id,D))]));
   const spread = row => row.trials?.count>1 ? `<small>Мин. и макс. урон · ${number(row.trials.min,0)}–${number(row.trials.max,0)}</small>` : '';
@@ -200,8 +193,24 @@
             ['energyPercent','Начальная энергия, %',0,100],['seed','Seed',1,2147483647],['trials','Прогонов на вариант',1,32]].map(([key,label,min,max]) =>
               `<label>${label}<input name="${key}" type="number" min="${min}" max="${max}" value="${state.scenario[key]}" required></label>`).join('')}
           <label>Атаки целей<select name="enemyAttacks"><option value="training" ${state.scenario.enemyAttacks==='training'?'selected':''}>Тренировочные</option><option value="off" ${state.scenario.enemyAttacks==='off'?'selected':''}>Отключены</option></select></label>
+          <label>Сопротивление эффектам цели, %<input name="enemyEffectRes" type="number" min="0" max="100" step="1" value="${Math.round((state.scenario.enemyEffectRes??.4)*100)}" required></label>
+          <label>Ослабление тренировочной атаки<select name="enemyDebuff"><option value="off">Отключено</option><option value="freeze" ${state.scenario.enemyDebuff==='freeze'?'selected':''}>Заморозка · базовый шанс 100%</option></select></label>
           <button type="submit">Сохранить условия</button>
         </form><p class="plan-muted">${encounterNotes(state.scenario)}</p>
+        <form data-form="prebattle">
+          <h3>Подготовка к бою</h3>
+          <label>Кто начинает бой обычной атакой<select name="entryId">${members().map(id=>`<option value="${id}" ${state.scenario.entryId===id?'selected':''}>${esc(name(id))}</option>`).join('')}</select></label>
+          <div class="plan-fields">${members().filter(id=>id!=='1511').map(id=>{
+            const saved=state.scenario.prebattle?.find(step=>step.id===id);
+            const type=T.techniqueType(id);
+            return `<div><label class="plan-check"><input type="checkbox" name="technique" value="${id}" ${saved?'checked':''}>${esc(name(id))} · ${{attack:'начинает бой',domain:'пространство',prepare:'подготовка'}[type]}</label>
+              ${['1412','1414','1503'].includes(id)?`<label>Получатель<select name="ally-${id}">${members().filter(ally=>id!=='1503'||ally!==id).map(ally=>`<option value="${ally}" ${saved?.ally===ally?'selected':''}>${esc(name(ally))}</option>`).join('')}</select></label>`:''}
+              ${id==='1202'?`<label>Использований<input name="uses-${id}" type="number" min="1" max="5" value="${saved?.uses||1}"></label>`:''}
+              ${['1304','8009','8010'].includes(id)?`<label>Полученный результат<select name="outcome-${id}">${(id==='1304'?['24% DEF','36% DEF','60% DEF']:['20% Радости','30% Радости']).map((label,value)=>`<option value="${value}" ${(saved?.outcome||0)===value?'selected':''}>${label}</option>`).join('')}</select></label>`:''}</div>`;
+          }).join('')}</div>
+          <p class="plan-muted">Можно совместить подготовку, одно пространство и одну атакующую технику. Очки техники учитываются. Для случайного усиления укажи выпавший результат.</p>
+          <button type="submit">Сохранить подготовку</button>
+        </form>
       </details>
     </section>`;
   }
@@ -222,7 +231,7 @@
         <p class="plan-muted">Счётчик учитывает формы с отдельной моделью эффектов. Повышения уровней применяются к умениям, коэффициенты которых симулятор берёт из каталога. Эффекты убийств, контроля и смертельного урона зависят от условий боя.</p>
         <div class="plan-fields">${members().map(id=>`<div><label>${esc(name(id))}<select data-eidolon="${id}">
           ${Array.from({length:7},(_,rank)=>`<option value="${rank}" ${(state.eidolons[id]||0)===rank?'selected':''}>E${rank}</option>`).join('')}
-        </select></label>${window.HSR_SUPPLEMENTS.ex_eidolons[id]?`<label class="plan-check"><input type="checkbox" data-ex="${id}" ${state.ex[id]?'checked':''}> EX-эйдолон</label>`:''}
+        </select></label>${T.novaflareModels.has(id)?'<small>Novaflare в расчёте</small>':''}${window.HSR_SUPPLEMENTS.ex_eidolons[id]?`<label class="plan-check"><input type="checkbox" data-ex="${id}" ${state.ex[id]?'checked':''}> EX-эйдолон</label>`:''}
         ${complete()&&eidolonModels.has(T.canonical(id))?button('Сравнить E0–E6','rank-estimate-'+id):''}</div>`).join('')}</div></details>`:''}
       <div class="plan-actions">${complete() ? button('Подобрать билд в этом составе →','to-build',true) : button('Найти команды','search-team',true)}
       ${button('Открыть запись боя','open-replay')}
@@ -250,7 +259,7 @@
       </div>
       ${saved ? `<div class="plan-saved"><strong>Выбранный билд</strong>${packLabel(saved.pack)}<small>${coneBadge(saved.cone)}</small>
         ${saved.speedBudget!==undefined?`<small>${number(saved.profile.speed)} SPD до бонусов сетов · ${saved.boots==='speed'?'обувь на скорость':'обувь на основной стат'} · ${saved.speedBudget} средних роллов скорости</small>`:''}
-        ${saved.signature !== buildSignature(id) ? '<small>Состав, условия или экипировка союзников изменились. Перепроверь выбор.</small>' : ''}</div>` : ''}
+        ${saved.signature !== buildSignature(id) ? '<small>Этот билд рассчитан с другими условиями. Пересчитай подбор.</small>' : ''}</div>` : ''}
       ${buildTab==='cones' ? conePage(id) : setForm(id,saved)}
       ${comparisonForm(id,saved)}
       </section>`;
@@ -332,7 +341,7 @@
       <p class="data-meta">Один сценарий для всех строк. В таблицу входят эффекты, которые работают против тренировочных целей и подключены к симуляции.</p>`;
   }
   function buildSignature(id) {
-    return JSON.stringify([members(), state.scenario, state.eidolons[id]||0, Boolean(state.ex[id]),
+    return JSON.stringify([members(), state.scenario, state.eidolons[id]||0, Boolean(state.ex[id]), T.novaflareModels.has(id),
       members().filter(other => other !== id).map(other => withRanks(other,profile(other)))]);
   }
   function tierTargets(id) {
@@ -755,7 +764,8 @@
     const battle=T.replayBattle(input,D),settings=input.scenario,row=input;
     dialog('Журнал боя', `<p>Прогон 1 из ${settings.trials??1} · seed ${settings.seed} · ${number(battle.total,0)} урона.</p>
       ${encounterSummary(battle)}
-      <p class="plan-muted">Движок ${esc(input.battleVersion)} · данные ${esc(input.dataVersion)}. ${encounterNotes(settings)}</p>
+      ${battle.hitCoverage?.unverifiedToughness?.length?`<p class="plan-muted">Распределение стойкости по попаданиям пока не подтверждено: ${battle.hitCoverage.unverifiedToughness.map(id=>esc(D.character_skills[id]?.name||id)).join(', ')}. Результат зависит от этого допущения.</p>`:''}
+      <p class="plan-muted">Движок ${esc(input.battleVersion)} · данные ${esc(input.dataVersion)} · отпечаток ${esc(input.identity.catalog)}. ${encounterNotes(settings)}</p>
       <details><summary>Запись для повторного прогона</summary><textarea readonly rows="6" aria-label="Запись боя в JSON">${esc(JSON.stringify(input,null,2))}</textarea></details>
       <p>${settings.encounter==='gepard'?'Гепард':settings.targets+' цел.'} · ${settings.cycles} ц. · ур. цели ${settings.enemyLevel} · стойкость ${settings.toughness} · начальные SP ${settings.initialSP}</p>
       <details><summary>Статы и эйдолоны участников</summary><ul>${row.ids.map(id=>{
@@ -764,15 +774,18 @@
           · ${mark('crit','Крит. шанс '+number(p.crit*100,1)+'%')} · ${mark('critDamage','Крит. урон '+number(p.critDamage*100,1)+'%')}</li>`;
       }).join('')}</ul></details>
       <ol class="plan-battle-log">${battle.events.map(event=>`<li>${mark(...eventTag(event))} · ${number(event.time,1)} AV · ${event.actor==='dummy'?'Противник':esc(name(event.actor))} · ${esc(event.label)}
+        ${event.packet?` · попадание ${event.packet.index}/${event.packet.count}`:''}
         ${event.targets?.length?` · цели ${event.targets.map(i=>i+1).join(', ')}`:''}
         ${event.before!==undefined?` · ${event.before} → ${event.after}`:''}
+        ${event.kind==='damage-calculation'?`<details><summary>Расчёт попадания</summary><pre>${esc(JSON.stringify({packet:event.packet,statPolicy:event.statPolicy,coefficient:event.coefficient,baseDamage:event.baseDamage,stats:event.stats,equipment:event.equipment,factors:event.factors,criticalMultiplier:event.criticalMultiplier,calculated:event.calculated,effectiveDamage:event.effectiveDamage},null,2))}</pre></details>`:''}
+        ${event.kind==='random'?` · вероятность ${number(event.probability*100,2)}% · ${event.outcome?'сработало':'не сработало'}`:''}
         ${event.reason?` · ${esc(event.reason)}`:''}
         ${Object.entries(event.values||{}).filter(([key,value])=>typeof value==='number'&&(statFields[key]||key==='speedPct')).map(([key,value])=>
           ' · '+mark(key==='speedPct'?'speed':key,(key==='speedPct'?'Скорость':statFields[key][0])+' '+(value>0?'+':'')+(key==='speedPct'?number(value*100)+'%':fieldValue(key,value)))).join('')}
         ${event.waitAV!==undefined?` · ожидание ${number(event.waitAV,1)} AV`:''}
         ${event.punchlineUsed!==undefined?` · ${mark('humor','Юмор '+number(event.punchlineUsed,0))}`:''}
         ${event.hpLoss!==undefined?` · ${mark('hp','−'+number(event.hpLoss,0)+' HP')}`:''}
-        ${event.damage? ` · ${number(event.damage,0)} урона` : ''}${event.crits?.length? ` · ${mark('crit','Криты '+event.crits.filter(Boolean).length+'/'+event.crits.length)}` : ''} · ${mark('sp','SP '+event.sp)}</li>`).join('')}</ol>`);
+        ${event.damage? ` · ${mark('attack',number(event.damage,0)+' урона')}` : ''}${event.crits?.length? ` · ${mark('crit','Криты '+event.crits.filter(Boolean).length+'/'+event.crits.length)}` : ''} · ${mark('sp','SP '+event.sp)}</li>`).join('')}</ol>`);
   }
   function picker(index) {
     const pool = index===null;
@@ -1207,11 +1220,20 @@
     try {
       if (form.dataset.form==='scenario') {
         const next = {...state.scenario};
-        for (const [key,value] of values) next[key] = ['enemyAttacks','encounter'].includes(key) ? value : Number(value);
+        for (const [key,value] of values) next[key] = ['enemyAttacks','encounter','enemyDebuff'].includes(key) ? value : Number(value);
+        next.enemyEffectRes/=100;
         T.validateScenario(next);
         state.scenario = next;
         save();
         show(step);
+      } else if(form.dataset.form==='prebattle'){
+        const prebattle=values.getAll('technique').map(id=>({id,
+          ...(values.has('ally-'+id)?{ally:String(values.get('ally-'+id))}:{}),
+          ...(values.has('uses-'+id)?{uses:Number(values.get('uses-'+id))}:{}),
+          ...(values.has('outcome-'+id)?{outcome:Number(values.get('outcome-'+id))}:{})}));
+        T.validatePrebattle(prebattle);
+        state.scenario={...state.scenario,prebattle,entryId:String(values.get('entryId')||members()[0])};
+        save();show(step);
       } else if (form.dataset.form==='replay') showReplay(JSON.parse(values.get('replay')));
       else if (form.dataset.form==='build') searchBuild(values,event.submitter?.value==='team');
       else if (form.dataset.form==='cones') searchCones(Number(values.get('rank')));

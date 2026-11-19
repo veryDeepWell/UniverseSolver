@@ -1,5 +1,5 @@
 /* Discrete-event training-dummy simulation. No team tier lists. */
-(function(root){
+(function installTeam(root){
   const G=root.HSR_EQUIPMENT;
   const models={
     '1415':{role:'support',notes:'Кирена E0: Воспоминания, Будущее, зона истинного урона, первая активация ульт команды, Демиург SPD 0 и оды. Политика Демиурга: сначала ода основному кору, затем неполученные оды союзников; иначе атака. Подробные границы — FINAL_ROSTER.md.'},
@@ -12,7 +12,7 @@
     '8007':{role:'support',notes:'Первопроходец Памяти E0: Мемо SPD 130, заряд от энергии команды, продвижение и истинный урон основного кора, Эпос и совместная базовая. Поддержка владельца не переносится на духа: это эффект E1.'},
     '1501':{role:'dps',notes:'Искра E0: стрим до 20 расходов SP, подарки по seed, Взрыв вместо SP, Юмор, ход Ахи и отдельный урон Радости. Авто расходует доступные SP/Взрыв до лимита. Шанс подарка задаётся в условиях боя (по умолчанию 20%, предположение: распределения в снимке нет).'},
     '1502':{role:'support',notes:'Яо Гуан E0: Радость от SPD, зона, Юмор, дополнительный ход Ахи за 20 Юмора, RES PEN и Великая удача после атак. Настоящий хит хранит независимые длительности.'},
-    '1503':{role:'sustain',notes:'Жемчуг E0: DEF-атаки и лечение, бессрочный Настоящий хит, Глубокое обучение кора, продвижение и усиленные базовые. Болванки не атакуют: поглощение урона не расходуется. В команде из четырёх Радостей дополнительный ход приближён продвижением 100%.'},
+    '1503':{role:'sustain',notes:'Жемчуг E0: DEF-атаки и лечение, бессрочный Настоящий хит, Глубокое обучение кора, продвижение и усиленные базовые. Болванки не атакуют: поглощение урона не расходуется. В команде из четырёх Радостей выдаёт отдельный ход с временным Хитом и Юмором.'},
     '8009':{role:'support',notes:'Первопроходец Радости E0: Юмор после атак, Настоящий хит, командное восстановление энергии, продвижение кора или немедленный навык Радости. Дополнительный урон навыка учитывает максимальный Настоящий хит команды.'},
     '1504':{role:'dps',notes:'Эшвейл E0: Приманка, три заряда, бонус-атаки после атак союзников, Прожорливость и усиленная бонус-атака ульты. Нет добиваний и переходов на новую Приманку при бесконечном HP.'},
     '1507':{role:'dps',notes:'Мортенакс Блэйд E0: HP-урон, Безмерная ярость с отсчётом SPD 70, бесплатный навык, бонус-атака за 9 атак и энергия с переполнением 80. Без входящих атак нет зарядов за полученные удары.'},
@@ -28,7 +28,7 @@
     '1008':{role:'dps',notes:'Арлан E0: навык без SP за 15% максимального HP, рост урона от потерянного HP и взрывная ульта. HP не опускается ниже 1; лечение после убийств и защита от входящего урона здесь не активируются.'},
     '1110':{role:'sustain',notes:'Рысь E0: HP-базовая, Реакция выживания с прибавкой HP, лечение навыком/ультой и периодическое лечение на 3 хода с добавкой по цели навыка. Без атак противников нет энергии от получения удара.'},
     '1312':{role:'dps',notes:'Миша E0: количество ударов ульты от SP команды, энергия таланта, навык и отскакивающая ульта до 10 ударов с Заморозкой, EHR и крит. уроном по замороженным целям.'},
-    '1014':{role:'dps',notes:'Сэйбер E0: Резонанс ядра, энергия до 480, Вспышка маны, навык с конвертацией зарядов, ульта с 10 отскоками и обязательная усиленная базовая. Техники отключены.'},
+    '1014':{role:'dps',notes:'Сэйбер E0: Резонанс ядра, энергия до 480, Вспышка маны, навык с конвертацией зарядов, ульта с 10 отскоками и обязательная усиленная базовая. Подготовка техникой даёт ATK и Резонанс ядра.'},
     '1015':{role:'dps',notes:'Арчер E0: навык за 2 SP до пяти раз в ход, рост урона цепи, лимит SP +2, заряды ульты и бонус-атака с возвратом SP. Авто использует максимально доступную цепь, без перебора ротаций.'},
     '1404':{role:'dps',notes:'Мидей E0: HP-масштабирование, заряд от фактической потери HP, Кровная месть, бесплатный автоматический навык и дополнительный ход за 150 заряда. Без атак противников заряд зависит от расхода HP и лечения команды.'},
     '1412':{role:'support',notes:'Керидра E0: Боевые заслуги, заряд, Воинский титул, копия атакующего навыка перед оригиналом, ATK, SPD, CD навыка и RES PEN. Копия не тратит SP/HP/особые ресурсы и не даёт базовую энергию умения; некоторые атаки сохраняют пакетное приближение.'},
@@ -38,7 +38,7 @@
     '1215':{role:'support',notes:'Ханья E0: Ноша на первой цели, один возврат SP за две подходящие атаки, два возврата на наложение, DMG и ATK следа, адресные ATK/SPD ульты. Ноша не считается ослаблением.'},
     '1223':{role:'dps',notes:'Моцзэ E0: Жертва, Отсутствие со снятием собственной шкалы, девять зарядов, дополнительный урон и FUA раз за три расхода, возврат SP с перезарядкой, ульта как FUA. Соло не использует навык.'},
     '1224':{role:'dps',notes:'Март 7 Охоты E0: Учитель — адресат бафов, заряды от его атак/ульт, усиленная базовая с seed-проками, эффекты Пути Учителя, криты и BE после усиленной базовой. E2/E6 не включены.'},
-    '1310':{role:'dps',notes:'Светлячок, исходный кит: Полное сгорание с отсчётом SPD 70, усиленные атаки, эффективность, ATK → BE и собственное суперпробитие. Техника не моделируется.'},
+    '1310':{role:'dps',notes:'Светлячок: Полное сгорание с отсчётом SPD 70, усиленные атаки, ATK → BE и собственное суперпробитие. Novaflare усиливает суперпробитие и продлевает состояние от пробитий. Техника добавляет огненную уязвимость перед уроном.'},
     '1315':{role:'dps',notes:'Бутхилл E0: Дуэль без завершения хода, Карманное преимущество от пробитий, усиленная базовая и повторный физический брейк. Начинает без сохранённых зарядов; основная цель — первая болванка.'},
     '1317':{role:'dps',notes:'Раппа E0: три усиленные базовые, эффективность, заряды от пробитий, дополнительный брейк и суперпробитие. Болванки считаются обычными: без дополнительного заряда/энергии за элитных врагов.'},
     '1321':{role:'support',notes:'Георгина E0: зона эффективности и суперпробития до слома, партнёр — первый кор, пятиударная FUA, SP и BE от лечения/щитов. Все цели уже имеют уязвимости; добавление уязвимости всё равно активирует её след.'},
@@ -58,22 +58,22 @@
     '1405':{role:'dps',notes:'Анакса E0: пять попаданий с приоритетом разных целей, бесплатный дополнительный навык, бонус количества Эрудиций. У болванок все семь уязвимостей: Проявление качеств активно постоянно, новые уязвимости не добавляются.'},
     '1406':{role:'dps',notes:'Цифер E0: постоянная уязвимость, ATK навыка, FUA раз за собственный ход, запись фактически нанесённого неистинного урона, пороги SPD и истинный урон ульты без повторных множителей. Разбивка попаданий для Герцога требует сверки.'},
     '1410':{role:'dps',notes:'Гисиленса E0: четыре разных DoT, стартовая зона и SP, уязвимость навыка, дополнительные DoT зоны с лимитом 8 на цель за ход/атаку, подрыв ультой и урон от EHR. Кровотечение ограничено ATK при бесконечном HP цели.'},
-    '1006':{role:'support',notes:'Серебряный Волк E0: навык с понижением RES, ульта DEF, случайные Баги и их длительности. У болванок все уязвимости: имплант не добавляет отдельное понижение RES, DEF-эффекты не усиливают урон при DEF 0.'},
+    '1006':{role:'support',notes:'Серебряный Волк: имплант уязвимости, срез сопротивления и Баги. Novaflare учитывает первый слот, перенос импланта и массовую ульту.'},
     '1107':{role:'dps',notes:'Клара E0: базовая, AoE-навык, ульта и заряды усиленной контратаки. Тренировочные попадания включают метки Сварога, обычные и усиленные контратаки.'},
     '1112':{role:'dps',notes:'Топаз E0: Справка о задолженности, базовая и навык как бонус-атаки, Счетовод с SPD 80, продвижение от бонус-атак и два усиленных действия после ульты. Разбивка попаданий для Герцога требует сверки.'},
     '1209':{role:'dps',notes:'Яньцин E0: Эмпатическая связь, криты ульты, вероятностная бонус-атака и Заморозка, дополнительный ледяной урон и скорость следа. Расход HP союзником не снимает связь. Разбивка попаданий для Герцога требует сверки.'},
     '1213':{role:'dps',notes:'Пожиратель Луны E0: четыре уровня базовой, отдельные удары, Праведное сердце, Громкий рёв, Чешуя дракона вместо SP. Авто выбирает максимальное доступное усиление; политика базовых отключает усиление. Перебор ротаций не выполняется.'},
-    '1217':{role:'sustain',notes:'Хохо E0: лечение навыка и таланта, энергия от лечения, командные энергия и ATK ульты. Авто поддерживает талант. Без входящих ослаблений очищение не требуется; энергия Фэйсяо особая и не восстанавливается ультой.'},
+    '1217':{role:'sustain',notes:"Хохо Novaflare: стартовые энергия и талант, лечение, продление таланта ультой, ATK для высокоэнергетических союзников и спасение E2. Снятие ослаблений ждёт модели ослаблений союзников."},
     '1218':{role:'dps',notes:'Цзяоцю E0: Жаркий пепел до 5 уровней, Горение, уязвимость и зона урона ульт с шестью активациями на ходах противников, ATK от EHR, начальная энергия. Эйдолоны не используются.'},
     '1304':{role:'sustain',notes:'Авантюрин E0: базовая и урон от DEF, начальные и суммируемые щиты, КШ от DEF, Паника, случайные заряды ульты, заряды от бонус-атак союзников и семиударная бонус-атака. Болванки не дают заряды входящими атаками.'},
     '1313':{role:'support',notes:'Воскресенье E0: продвижение кора и поддержанных призывов/духов, урон и КШ навыка, Блаженный с CD и энергией не менее 40, возврат SP и начальная энергия. Гармония не продвигается навыком.'},
     '1314':{role:'dps',notes:'Яшма E0: взрывная базовая, Сборщик долгов с SPD и расходом HP, дополнительный урон от ATK Яшмы, заряды за поражённые цели, бонус-атаки, Залог до 50 и усиление двух бонус-атак ультой. Разбивка попаданий для Герцога требует сверки.'},
-    '1004':{role:'dps',notes:'Исходный Вельт E0: три попадания навыка, Замедление, Заключение, задержка действия, уязвимость ульты, энергия и дополнительный урон таланта. Усиленный кит не используется.'},
+    '1004':{role:'dps',notes:"Вельт Novaflare: пять попаданий навыка, Невесомость, снижение DEF и SPD, задержки, командные стаки урона и конвертация ШПЭ."},
     '1302':{role:'dps',notes:'Аргенти E0: AoE, энергия за каждую поражённую цель, Апофеоз и шесть отскоков полной ульты. Авто ждёт 180 энергии; убийств и низкого HP у болванок нет.'},
-    '1212':{role:'dps',notes:'Исходная Цзинлю E0: Сизигия, трансмиграция с продвижением и крит. шансом, бесплатный усиленный навык, расход HP союзников и временная ATK от поглощённого HP. Усиленный HP-кит не используется.'},
+    '1212':{role:'dps',notes:'Цзинлю: Сизигия, трансмиграция с продвижением и крит. шансом. Novaflare рассчитывает урон от HP и учитывает Лунный свет.'},
     '1303':{role:'support',notes:'Жуань Мэй E0: скорость союзников, урон навыка с масштабированием от эффекта пробития, зона RES PEN, энергия следа. Эффективность 50%, брейк таланта и задержка восстановления Цветением; BE задаётся в статах.'},
     '1309':{role:'support',notes:'Зарянка E0: бафы команды, начальное продвижение, Концерт с отдельным отсчётом SPD 90 и продвижением союзников, энергия за атаки и дополнительный физический урон с фиксированными критами.'},
-    '1306':{role:'support',notes:'Исходная Искорка E0: лимит SP 7, восстановление 4 SP, три уровня таланта, Шифр, крит. урон и продвижение кора на 50%, квантовый след. Усиленный кит не используется.'},
+    '1306':{role:'support',notes:'Искорка Novaflare: Шифр, Иллюзия, крит. урон и продвижение союзника, 6 SP от ульты с запасом переполнения. Подготовка техникой даёт 3 SP и 20 энергии.'},
     '1203':{role:'sustain',notes:'Лоча E0: лечение от ATK, автоматический навык без SP с перезарядкой, Цветок Бездны, поле лечения атакующего и остальных союзников, AoE-ульт. У болванок нет усилений для снятия.'},
     '1211':{role:'sustain',notes:'Байлу E0: лечение от HP, два случайных отскока с ослаблением, командная ульта и повышение максимального HP при избыточном лечении. Бодрость и воскрешение не срабатывают без атак и смертей.'},
     '1104':{role:'sustain',notes:'Гепард E0: ATK от DEF, щит команды, навык с Заморозкой, дополнительный урон и продвижение цели после разморозки. Авто использует базовые; навык можно включить политикой. Без входящих атак щит не расходуется.'},
@@ -81,7 +81,7 @@
     '1002':{role:'dps',notes:'Дань Хэн E0: замедление от критических попаданий навыка, усиление ульты по замедленной цели, скорость следа и пробитие RES следующей атаки от умений союзников. Четыре удара навыка используют свои броски крита и замедления.'},
     '1109':{role:'dps',notes:'Хук E0: Горение, дополнительный урон и энергия таланта, усиленный взрывной навык после ульты, лечение и продвижение действия следов.'},
     '1210':{role:'dps',notes:'Гуйнайфэнь E0: Горение навыком и базовой, подрыв всех Горений ультой, Огненный поцелуй до трёх уровней, начальное продвижение. Авто: навык при отсутствии собственного Горения, иначе базовая.'},
-    '1102':{role:'dps',notes:'Исходная Зеле E0: навык, усиление от ульты, скорость и пробивание сопротивления. Убийств на бесконечном HP нет.'},
+    '1102':{role:'dps',notes:"Зеле Novaflare: бесплатный навык по порогу HP, добивания и дополнительные ходы, усиление и истинный урон E6. Пороговые эффекты требуют конечного HP."},
     '1220':{role:'dps',notes:'Фэйсяо E0: заряды от атак команды, бонус-атаки, усиление навыка и ульта. Удары ульты учитывают наличие стойкости цели.'},
     '1101':{role:'support',notes:'Броня E0: продвижение кора, баф урона, командная ульта, продвижение после базовой и основные следы.'},
     '1202':{role:'support',notes:'Тинъюнь E0: Благословение со снимком ATK на применении, дополнительный урон, энергия и баф урона ульты.'},
@@ -91,28 +91,123 @@
     '1013':{role:'dps',notes:'Герта E0: AoE-навык с бонусом по высокому HP и ульта. Порог HP не пересекается: бонус-атаки не запускаются.'},
     '1105':{role:'sustain',notes:'Наташа E0: базовые атаки и генерация SP, лечение навыком и ультой при потере HP союзниками, периодическое исцеление и следы.'},
     '1003':{role:'dps',notes:'Химеко E0: навык, AoE-ульт, Горение, крит. шанс при высоком HP. При пробитии набирает заряды и запускает бонус-атаку; болванки обычного ранга.'},
-    '1005':{role:'dps',notes:'Исходная Кафка E0: отдельный Шок, подрыв DoT навыком и ультой, бонус-атака после базовых союзников.'},
+    '1005':{role:'dps',notes:"Кафка Novaflare: заряды бонус-атак, подрывы DoT основной и соседних целей, командный ATK от ШПЭ и усиленные эйдолоны."},
     '1204':{role:'dps',notes:'Цзин Юань E0: Повелитель молний с собственной шкалой, скоростью и количеством ударов; навык и ульта AoE.'},
     '1305':{role:'dps',notes:'Рацио E0: собственное ослабление, шанс бонус-атаки от числа ослаблений, усиления следов и две активации метки ульты.'},
-    '1205':{role:'dps',notes:'Исходный Блэйд E0: HP и ATK-масштабирование, расход и восстановление HP, усиленная базовая, накопление заряда, бонус-атака и ульта. Усиленная версия кита не моделируется.'}
+    '1205':{role:'dps',notes:'Блэйд: расход и восстановление HP, усиленная базовая, заряды и бонус-атака. В Novaflare урон масштабируется от HP, а Адский пейзаж повышает агрессию.'}
   };
   for(const id of ['1504','1507','1508','1509','8009'])models[id].notes+=' Копия навыка Керидры для этой модели пока не подключена.';
   for(const id of ['1505','1506','1510','1513'])models[id].notes+=' Копия нового навыка Керидрой пока не подключена.';
   const aliases={'8002':'8001','8004':'8003','8006':'8005','8008':'8007','8010':'8009'};
   for(const [id,base] of Object.entries(aliases))models[id]={...models[base],notes:models[base].notes.replace('мужская форма','женская форма').replace('Мужская форма','Женская форма')+' Общая боевая механика с мужской формой, отдельный профиль характеристик.'};
   const canonical=id=>aliases[id]||id;
+  const catalogNovaflare=new Set(['1004','1005','1006','1102','1205','1212','1217','1306','1307','1310']);
+  const novaflareModels=new Set(catalogNovaflare);
   const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+  const attackTechniques=new Set('1001 1005 1006 1008 1009 1015 1103 1105 1106 1107 1109 1111 1205 1206 1210 1213 1214 1215 1220 1301 1308 1310 1317 1402 1408 1505 1507 1510 1513'.split(' '));
+  const domainTechniques=new Set('1003 1004 1212 1218 1305 1309 1312 1321 1410 1415 1509 8007'.split(' '));
+  const techniqueType=id=>attackTechniques.has(canonical(id))?'attack':domainTechniques.has(canonical(id))?'domain':'prepare';
+  function validatePrebattle(steps){
+    if(steps===undefined)return;
+    if(!Array.isArray(steps)||steps.length>11||steps.some(step=>
+      !step||!models[step.id]||step.id==='1511'||
+      step.ally!==undefined&&!models[step.ally]||
+      step.uses!==undefined&&(!Number.isInteger(step.uses)||step.uses<1||step.uses>5)||
+      step.outcome!==undefined&&![0,1,2].includes(step.outcome)))
+      throw Error('Некорректная подготовка к бою.');
+    if(steps.filter(step=>techniqueType(step.id)==='attack').length>1)
+      throw Error('Бой может начать одна атакующая техника.');
+    if(steps.filter(step=>techniqueType(step.id)==='domain').length>1)
+      throw Error('Одновременно может действовать одно пространство техники.');
+  }
   function compatible(ids){return ids.filter(id=>/^80(?:0[1-9]|10)$/.test(id)).length<=1&&!(ids.includes('1001')&&ids.includes('1224'));}
   if(root.HSR_DATA?.characters['1511'])models['1511']={role:'support',notes:'Эон Аха: Эманатор, заряды, Миг Ахи и его истинный урон. Долг Радости и отдельные усиления кита союзников пока вне модели.'};
   function defaults(id,data){const v=data.character_promotions[id].values[6],get=key=>v[key].base+79*v[key].step;return {hp:get('hp'),atk:get('atk'),def:get('def'),baseHP:get('hp'),baseDef:get('def'),baseAtk:get('atk'),baseSpeed:get('spd'),speed:get('spd'),crit:get('crit_rate'),critDamage:get('crit_dmg'),damageBonus:0,elementBonus:0,effectHit:0,effectRes:0,breakEffect:0,elation:0,energyRegen:1,policy:'auto'};}
   function validateStats(stats){
+    if(!stats||typeof stats!=='object'||Array.isArray(stats))throw Error('Некорректный профиль персонажа.');
+    if(stats.eidolon!==undefined&&(!Number.isInteger(stats.eidolon)||stats.eidolon<0||stats.eidolon>6))throw Error('Эйдолоны: целое число E0–E6.');
+    for(const key of ['novaflare','exEidolon'])if(stats[key]!==undefined&&typeof stats[key]!=='boolean')throw Error('Некорректный флаг '+key+'.');
+    for(const [key,min,max] of [['baseHP',1,1000000],['baseDef',0,100000],['effectRes',0,10],['elementBonus',0,20],['healingBonus',0,20],['healingTaken',0,20]])if(stats[key]!==undefined&&(!Number.isFinite(stats[key])||stats[key]<min||stats[key]>max))throw Error('Некорректная характеристика '+key+'.');
     if(stats.elation!==undefined&&(!Number.isFinite(stats.elation)||stats.elation<0||stats.elation>20))throw Error('Некорректная Радость.');
     if(stats.breakEffect!==undefined&&(!Number.isFinite(stats.breakEffect)||stats.breakEffect<0||stats.breakEffect>20))throw Error('Некорректный эффект пробития.');
     for(const [key,min,max] of [['hp',1,1000000],['atk',1,100000],['def',0,100000],['baseAtk',1,100000],['baseSpeed',1,500],['speed',1,1000],['crit',0,3],['critDamage',0,20],['damageBonus',0,20],['effectHit',0,10],['energyRegen',.1,10]])if(!Number.isFinite(stats[key])||stats[key]<min||stats[key]>max)throw Error(`Некорректная характеристика ${key}.`);
     if(!['auto','basic','skill'].includes(stats.policy))throw Error('Неизвестная политика действий.');return stats;
   }
-  function validateScenario(s){if(s.encounter!==undefined&&!['dummy','gepard'].includes(s.encounter))throw Error('Неизвестный противник.');if(s.encounter==='gepard'&&s.enemyHP!==undefined&&(!Number.isInteger(s.enemyHP)||s.enemyHP<1||s.enemyHP>10000000))throw Error('HP фазы должно быть от 1 до 10 000 000.');if(s.trials!==undefined&&(!Number.isInteger(s.trials)||s.trials<1||s.trials>32))throw Error('Число прогонов должно быть от 1 до 32.');if(s.enemyLevel!==undefined&&(!Number.isInteger(s.enemyLevel)||s.enemyLevel<0||s.enemyLevel>100))throw Error('Уровень противника должен быть от 0 до 100.');if(s.enemyAttacks!==undefined&&!['off','training'].includes(s.enemyAttacks))throw Error('Неизвестный режим атак болванок.');if(s.incomingHits!==undefined&&(!Number.isInteger(s.incomingHits)||s.incomingHits<1||s.incomingHits>10))throw Error('Число попаданий должно быть от 1 до 10.');if(s.requireSustain!==undefined&&typeof s.requireSustain!=='boolean')throw Error('Некорректное условие састейна.');if(s.wolfBoxGift!==undefined&&!['cycle','sword','sp','punchline'].includes(s.wolfBoxGift))throw Error('Неизвестная политика коробочек.');if(s.novaAssistPolicy!==undefined&&!['crew','all','off'].includes(s.novaAssistPolicy))throw Error('Неизвестная политика поддержки.');if(s.sparxieRefundPercent!==undefined&&(!Number.isFinite(s.sparxieRefundPercent)||s.sparxieRefundPercent<0||s.sparxieRefundPercent>100))throw Error('Шанс подарка Искры должен быть от 0 до 100%.');for(const [key,min,max] of [['targets',1,5],['cycles',1,20],['initialSP',0,5],['energyPercent',0,100],['seed',1,2147483647]])if(!Number.isInteger(s[key])||s[key]<min||s[key]>max)throw Error(`Некорректное поле боя: ${key}.`);if(s.toughness!==undefined&&(!Number.isFinite(s.toughness)||s.toughness<0||s.toughness>1000))throw Error('Стойкость должна быть от 0 до 1000.');}
-  const battleVersion='22', dataVersion='universesolver-catalog-2026-11-12';
+  function validateScenario(s){validatePrebattle(s.prebattle);if(s.entryId!==undefined&&!models[s.entryId])throw Error('Неизвестный инициатор боя.');if(s.enemyEffectRes!==undefined&&(!Number.isFinite(s.enemyEffectRes)||s.enemyEffectRes<0||s.enemyEffectRes>1))throw Error('Сопротивление эффектам должно быть от 0 до 1.');if(s.enemyDebuff!==undefined&&!['off','freeze'].includes(s.enemyDebuff))throw Error('Неизвестное ослабление тренировочной атаки.');if(s.encounter!==undefined&&!['dummy','gepard'].includes(s.encounter))throw Error('Неизвестный противник.');if(s.encounter==='gepard'&&s.enemyHP!==undefined&&(!Number.isInteger(s.enemyHP)||s.enemyHP<1||s.enemyHP>10000000))throw Error('HP фазы должно быть от 1 до 10 000 000.');if(s.trials!==undefined&&(!Number.isInteger(s.trials)||s.trials<1||s.trials>32))throw Error('Число прогонов должно быть от 1 до 32.');if(s.enemyLevel!==undefined&&(!Number.isInteger(s.enemyLevel)||s.enemyLevel<0||s.enemyLevel>100))throw Error('Уровень противника должен быть от 0 до 100.');if(s.enemyAttacks!==undefined&&!['off','training'].includes(s.enemyAttacks))throw Error('Неизвестный режим атак болванок.');if(s.incomingHits!==undefined&&(!Number.isInteger(s.incomingHits)||s.incomingHits<1||s.incomingHits>10))throw Error('Число попаданий должно быть от 1 до 10.');if(s.requireSustain!==undefined&&typeof s.requireSustain!=='boolean')throw Error('Некорректное условие састейна.');if(s.wolfBoxGift!==undefined&&!['cycle','sword','sp','punchline'].includes(s.wolfBoxGift))throw Error('Неизвестная политика коробочек.');if(s.novaAssistPolicy!==undefined&&!['crew','all','off'].includes(s.novaAssistPolicy))throw Error('Неизвестная политика поддержки.');if(s.sparxieRefundPercent!==undefined&&(!Number.isFinite(s.sparxieRefundPercent)||s.sparxieRefundPercent<0||s.sparxieRefundPercent>100))throw Error('Шанс подарка Искры должен быть от 0 до 100%.');for(const [key,min,max] of [['targets',1,5],['cycles',1,20],['initialSP',0,5],['energyPercent',0,100],['seed',1,2147483647]])if(!Number.isInteger(s[key])||s[key]<min||s[key]>max)throw Error(`Некорректное поле боя: ${key}.`);if(s.toughness!==undefined&&(!Number.isFinite(s.toughness)||s.toughness<0||s.toughness>1000))throw Error('Стойкость должна быть от 0 до 1000.');}
+  const battleVersion='42', dataVersion='universesolver-catalog-4.7-equipment';
+  // Damage and toughness are separate inputs. These legacy allocations keep
+  // previous results until the per-hit toughness is independently verified.
+  const packetPlans={
+    '100201':{abilityId:'100201',coverage:'toughness-unverified',packets:[{damageShare:.45,toughness:4.5},{damageShare:.55,toughness:5.5}]},
+    '100202':{abilityId:'100202',coverage:'toughness-unverified',packets:[{damageShare:.3,toughness:6},{damageShare:.15,toughness:3},{damageShare:.15,toughness:3},{damageShare:.4,toughness:8}]},
+    '120901':{abilityId:'120901',coverage:'toughness-unverified',packets:[{damageShare:.5,toughness:5},{damageShare:.25,toughness:2.5},{damageShare:.25,toughness:2.5}]},
+    '120902':{abilityId:'120902',coverage:'toughness-unverified',packets:[{damageShare:.25,toughness:5},{damageShare:.25,toughness:5},{damageShare:.25,toughness:5},{damageShare:.25,toughness:5}]}
+  };
+  const packetRules={
+    validate(plan){
+      if(!plan||!Array.isArray(plan.packets)||!plan.packets.length||plan.packets.some(p=>!p||!Number.isFinite(p.damageShare)||p.damageShare<0||!Number.isFinite(p.toughness)||p.toughness<0)||Math.abs(plan.packets.reduce((sum,p)=>sum+p.damageShare,0)-1)>1e-8)throw Error('Пакеты требуют независимые доли урона и величины стойкости.');
+      return plan;
+    },
+    targets(requested,living,policy='locked',choose=()=>0){
+      if(!['locked','random-living'].includes(policy))throw Error('Неизвестное правило смены цели.');
+      const valid=[...new Set(requested)].filter(i=>Number.isInteger(i)&&living.includes(i));
+      if(valid.length||policy==='locked'||!living.length)return valid;
+      return [living[choose(living.length)]];
+    }
+  };
+  const timeline={
+    advance(distance,ratio){if(!Number.isFinite(distance)||distance<0||!Number.isFinite(ratio)||ratio<0)throw Error('Некорректное продвижение шкалы.');return Math.max(0,distance-10000*ratio);},
+    delay(distance,ratio){if(!Number.isFinite(distance)||distance<0||!Number.isFinite(ratio)||ratio<0)throw Error('Некорректная задержка шкалы.');return distance+10000*ratio;},
+    select(candidates){
+      let next=null;
+      for(const candidate of candidates){
+        if(candidate.delta===Infinity)continue;
+        if(!Number.isFinite(candidate.delta)||candidate.delta<0)throw Error('Некорректное время события.');
+        if(!next||candidate.delta<next.delta-1e-9)next=candidate;
+      }
+      return next;
+    },
+    limit(stage,maximum){const error=Error('Расчёт не завершён: достигнут лимит '+stage+' ('+maximum+').');error.code='BATTLE_WORK_LIMIT';error.calculationStatus='incomplete';error.stage=stage;error.maximum=maximum;throw error;}
+  };
+  // Compatibility checksum, not a security signature. Sort keys so equivalent
+  // parsed catalogues have the same identity. Recompute data to detect mutations.
+  function stableJSON(value){
+    if(value===null||typeof value!=='object')return JSON.stringify(value);
+    if(Array.isArray(value))return '['+value.map(stableJSON).join(',')+']';
+    return '{'+Object.keys(value).sort().filter(key=>value[key]!==undefined).map(key=>JSON.stringify(key)+':'+stableJSON(value[key])).join(',')+'}';
+  }
+  function checksum(value){let a=2166136261,b=5381;for(let i=0;i<value.length;i++){const c=value.charCodeAt(i);a=Math.imul(a^c,16777619);b=Math.imul(b,33)^c;}return (a>>>0).toString(16).padStart(8,'0')+(b>>>0).toString(16).padStart(8,'0');}
+  function battleIdentity(data){
+    const sourceText=text=>text.replace(/\r\n?/g,'\n');
+    const equipment=Object.fromEntries(Object.entries(G||{}).map(([key,value])=>[key,typeof value==='function'?sourceText(value.toString()):value]));
+    const methods=object=>Object.fromEntries(Object.entries(object).map(([key,value])=>[key,typeof value==='function'?sourceText(value.toString()):value]));
+    const runtimeRules={models,aliases,packetPlans,timeline:methods(timeline),packetRules:methods(packetRules),novaflare:[...novaflareModels],catalogNovaflare:[...catalogNovaflare]};
+    return {algorithm:'compatibility-checksum-v1',catalog:checksum(stableJSON(data)),supplements:checksum(stableJSON(root.HSR_SUPPLEMENTS||null)),rules:checksum(sourceText(installTeam.toString())+'\n'+sourceText(G?.rulesSource?.()||'')+'\n'+stableJSON(equipment)+'|'+stableJSON(runtimeRules))};
+  }
+  function validateBattleRequest(ids,profiles,scenario,data){
+    if(!Array.isArray(ids)||ids.length<1||ids.length>4||ids.some(id=>typeof id!=='string'||!Object.hasOwn(models,id)||!Object.hasOwn(data.characters,id)))throw Error('Некорректный состав боя.');
+    if(new Set(ids.map(canonical)).size!==ids.length||!compatible(ids))throw Error('В команде доступен один Путь Первопроходца и одна форма Март 7.');
+    if(!profiles||typeof profiles!=='object'||Array.isArray(profiles)||!scenario||typeof scenario!=='object'||Array.isArray(scenario))throw Error('Некорректные входные данные боя.');
+    const ancestors=new Set();
+    function portable(value,depth=0){
+      if(depth>100||typeof value==='number'&&!Number.isFinite(value)||['function','symbol','bigint'].includes(typeof value))throw Error('Вход боя содержит непереносимое значение.');
+      if(value&&typeof value==='object'){
+        if(ancestors.has(value))throw Error('Вход боя содержит циклическую ссылку.');
+        ancestors.add(value);for(const child of Object.values(value))portable(child,depth+1);ancestors.delete(value);
+      }
+    }
+    portable({profiles,scenario});
+    validateScenario(scenario);validateRotation(scenario.rotation);
+    for(const key of ['allowPartial','audit','rollCrits'])if(scenario[key]!==undefined&&typeof scenario[key]!=='boolean')throw Error('Некорректный флаг боя '+key+'.');
+    if(scenario.externalDebuffs!==undefined&&(!Number.isInteger(scenario.externalDebuffs)||scenario.externalDebuffs<0||scenario.externalDebuffs>100))throw Error('Некорректное число внешних ослаблений.');
+    for(const id of ids){
+      if(profiles[id]!==undefined&&(!profiles[id]||typeof profiles[id]!=='object'||Array.isArray(profiles[id])))throw Error('Некорректный профиль персонажа.');
+      const profile={...defaults(canonical(id),data),...profiles[id]};validateStats(profile);
+      if(profile.novaflare&&!novaflareModels.has(canonical(id)))throw Error('У формы нет ветки Novaflare.');
+      if(profile.exEidolon&&!['1308','1204','1213'].includes(canonical(id)))throw Error('У формы нет поддержанного EX-эйдолона.');
+    }
+    if(scenario.rotation&&(!ids.includes(scenario.rotation.actor)||scenario.rotation.ally!==undefined&&!ids.includes(scenario.rotation.ally)))throw Error('Участник ротации отсутствует в составе.');
+  }
   function validateRotation(rotation){
     if(rotation===undefined)return;
     if(!rotation||!models[rotation.actor]||
@@ -124,21 +219,36 @@
       throw Error('Некорректные настройки ротации.');
   }
   function battleInput(ids,profiles,scenario,data){
-    return JSON.parse(JSON.stringify({format:1,battleVersion,dataVersion,ids,
+    validateBattleRequest(ids,profiles,scenario,data);
+    return JSON.parse(JSON.stringify({format:2,battleVersion,dataVersion,identity:battleIdentity(data),ids,
       profiles:Object.fromEntries(ids.map(id=>[id,{...defaults(canonical(id),data),...profiles[id]}])),
       scenario}));
   }
   function replayBattle(input,data){
-    if(input?.format!==1||input.battleVersion!==battleVersion||input.dataVersion!==dataVersion)
+    if(input?.format!==2||input.battleVersion!==battleVersion||input.dataVersion!==dataVersion)
       throw Error('Версия записи боя не поддерживается.');
+    if(stableJSON(input.identity)!==stableJSON(battleIdentity(data)))throw Error('Данные или правила боя изменились: точный повтор этой записи невозможен.');
     if(!Array.isArray(input.ids)||input.ids.some(id=>!models[id])||!input.profiles||!input.scenario)
       throw Error('Некорректная запись боя.');
     return simulate(input.ids,input.profiles,{...input.scenario,audit:true},data,true);
   }
   function simulate(rawIds,rawProfiles,rawScenario,data,keepLog=false,chooseBranch){
+    validateBattleRequest(rawIds,rawProfiles,rawScenario,data);
     validateRotation(rawScenario.rotation);
+    validatePrebattle(rawScenario.prebattle);
+    if(rawScenario.initialDebuffs!==undefined){
+      if(!Array.isArray(rawScenario.initialDebuffs)||rawScenario.initialDebuffs.some(d=>
+        !rawIds.includes(d.id)||!['freeze','atkDown','defDown','slow'].includes(d.kind)||
+        !Number.isInteger(d.turns)||d.turns<1||d.turns>10||
+        !Number.isFinite(d.value)||d.value<0||d.value>1))
+        throw Error('Некорректные начальные ослабления союзников.');
+    }
     const ids=rawIds.map(canonical);if(new Set(ids).size!==ids.length||!compatible(rawIds))throw Error('В команде доступен один Путь Первопроходца и одна форма Март 7.');
     const profiles=Object.fromEntries(rawIds.map(id=>[canonical(id),rawProfiles[id]||defaults(id,data)])),scenario={...rawScenario,focus:canonical(rawScenario.focus)};
+    if(rawScenario.initialDebuffs)scenario.initialDebuffs=rawScenario.initialDebuffs.map(d=>({...d,id:canonical(d.id)}));
+    if(rawScenario.entryId)scenario.entryId=canonical(rawScenario.entryId);
+    if(rawScenario.prebattle)scenario.prebattle=rawScenario.prebattle.filter(step=>rawIds.includes(step.id))
+      .map(step=>({...step,id:canonical(step.id),ally:step.ally?canonical(step.ally):undefined}));
     if(rawScenario.rotation)scenario.rotation={...rawScenario.rotation,actor:canonical(rawScenario.rotation.actor),ally:canonical(rawScenario.rotation.ally)};
     const result=battleSimulate(ids,profiles,scenario,data,keepLog,chooseBranch),out=Object.fromEntries(rawIds.map(id=>[canonical(id),id]));
     result.ids=[...rawIds];result.initialStats=Object.fromEntries(Object.entries(result.initialStats).map(([id,s])=>[out[id]||id,s]));
@@ -160,7 +270,7 @@
     const first=runs[0],mean=values=>values.reduce((sum,value)=>sum+value,0)/count;
     const average=values=>weights?values.reduce((sum,value,i)=>sum+value*weights[i],0):mean(values);
     const total=average(runs.map(run=>run.total));
-    return {...first,total,per100AV:total/first.horizon*100,
+    return {...first,hitCoverage:{unverifiedToughness:[...new Set(runs.flatMap(run=>run.hitCoverage?.unverifiedToughness||[]))]},total,per100AV:total/first.horizon*100,
       ...(first.encounter?{encounter:{...first.encounter,wins:weights?average(runs.map(run=>Number(run.encounter.result==='victory'))):runs.filter(run=>run.encounter.result==='victory').length,count:weights?1:count,meanPhases:average(runs.map(run=>run.encounter.phasesCleared)),meanFinishAV:average(runs.map(run=>run.encounter.finishAV))}}:{}),
       damageByTarget:first.damageByTarget.map((_,i)=>average(runs.map(run=>run.damageByTarget[i]))),
       breakdown:first.breakdown.map((row,i)=>({...row,
@@ -246,17 +356,19 @@
     validateScenario(scenario);if((!scenario.allowPartial&&ids.length!==4)||ids.length<1||ids.length>4||new Set(ids).size!==ids.length)throw Error('В команде должны быть четыре разных персонажа.');
     for(const id of ids){if(!models[id])throw Error('Нет модели боя для '+(data.characters[id]?.name||id));validateStats(profiles[id]||defaults(id,data));}
     const dotKeys=['shock','kafkaShock','burn','himekoBurn','hookBurn','guiBurn','ashenBurn','arcana','hysiWind','hysiBleed','hysiBurn','hysiShock','hysiWindE1','hysiBleedE1','hysiBurnE1','hysiShockE1','lukaBleed','sampoWind'],burnKeys=['burn','himekoBurn','hookBurn','guiBurn','ashenBurn','hysiBurn','hysiBurnE1'];
+    const shockKeys=['shock','kafkaShock','hysiShock','hysiShockE1'];
     const boss=scenario.encounter==='gepard'?{phase:1,shield:0,hp:scenario.enemyHP??100000,result:'timeout',cleared:0}:null;
     const targetCount=boss?3:scenario.targets;
     const horizon=150+100*(scenario.cycles-1),events=[],damageByTarget=Array(targetCount).fill(0);
     function enemySlot(index){
       return {turn:0,distance:10000,slowUntil:0,firekiss:0,firekissUntil:0,shock:null,kafkaShock:null,burn:null,himekoBurn:null,ratioDebuff:0,exposed:0,
-        ...(boss?{hp:index===0?boss.hp:boss.hp*.2,name:index===0?'Гепард':'Страж Среброгривых',speed:index===0?100:90,
+        ...(boss?{hp:index===0?boss.hp:boss.hp*.2,maxHP:index===0?boss.hp:boss.hp*.2,name:index===0?'Гепард':'Страж Среброгривых',speed:index===0?100:90,
           weaknesses:index===0?['Physical','Thunder','Imaginary']:['Fire','Ice','Quantum']}:{}),toughness:scenario.toughness||0,exo:0,breaks:0};
     }
     const dummies=Array.from({length:targetCount},(_,index)=>enemySlot(index));
     const maxSP=5+(ids.includes('1306')?2+(profiles['1306']?.eidolon>=4?1:0):0)+(ids.includes('1015')?2:0)+(ids.includes('1508')?2:0);
-    let copying=null,turnOwner=null;
+    let copying=null,turnOwner=null,packetSerial=0;
+    const packetWarnings=new Set();
     let now=0,sp=scenario.initialSP,steps=0,attacks=0,turnSPSpent=0,activeActor=null,enemySerial=0,enemyPhase=false,enemyIndex=-1,actionSerial=0,eventSerial=0,hpLossSerial=0;
     const creditedDebuffs=new Set(),maxToughness=scenario.toughness||0,breakBase=3767.5533;
     for(const d of dummies){d.toughness=maxToughness;d.exo=0;d.breaks=0;}
@@ -279,7 +391,9 @@
     function chanceOf(key,probability){
       if(!(probability>0))return false;
       if(probability>=1)return true;
-      return chooseBranch?chooseBranch([1-probability,probability])===1:roll(key)<probability;
+      const result=chooseBranch?chooseBranch([1-probability,probability])===1:roll(key)<probability;
+      if(scenario.audit&&keepLog)record(activeActor,'Бросок · '+key,0,'random',null,{mechanic:key,probability,outcome:result});
+      return result;
     }
     function pick(key,count){
       if(count<=1)return 0;
@@ -302,21 +416,21 @@
     const numby=ids.includes('1112')?{distance:10000,enhanced:0,acting:false}:null;
     const fuyuan=ids.includes('1222')?{distance:10000,actions:0,acting:false}:null;
     const dragon=ids.includes('1414')?{distance:10000,active:false,enhanced:0,acting:false}:null;
-    const finalQueue=[],aha={distance:10000,punchline:0,acting:false,count:0},elationActors=actors.filter(a=>data.characters[a.id].path==='Elation');
+    const finalQueue=[],extraTurns=[],aha={distance:10000,punchline:0,acting:false,count:0},elationActors=actors.filter(a=>data.characters[a.id].path==='Elation');
     const memories=[],memo=id=>memories.find(m=>m.owner.id===id),form={active:false,distance:0,turns:0,scourge:0};
-    const find=id=>actors.find(a=>a.id===id),core=find(scenario.focus)||actors[0],skill=(id,suffix)=>data.character_skills[id+suffix];
+    const find=id=>actors.find(a=>a.id===id),core=find(scenario.focus)||actors[0],kitId=id=>catalogNovaflare.has(id)&&find(id)?.s.novaflare?'1'+id:id,skill=(id,suffix)=>data.character_skills[kitId(id)+suffix];
     const aeon=find('1511');
+    let improvDefenseIgnore=0, subspaceBreakEffect=0;
     const skillLevels={};
     for(const actor of actors){
       for(const rankId of data.characters[actor.id].ranks.slice(0,actor.s.eidolon||0)){
-        for(const {id,num} of data.character_ranks[rankId]?.level_up_skills||[])skillLevels[id]=(skillLevels[id]||0)+num;
+        for(const {id,num} of data.character_ranks[kitId(actor.id)===actor.id?rankId:'1'+rankId]?.level_up_skills||[])skillLevels[id]=(skillLevels[id]||0)+num;
       }
     }
-    function params(id,suffix){
+    function params(id,suffix,base=suffix==='01'?5:9){
       const levels=skill(id,suffix)?.params;
       if(!levels?.length)return [];
-      const base=suffix==='01'?5:9;
-      const bonus=skillLevels[id+suffix]||0;
+      const bonus=skillLevels[kitId(id)+suffix]||0;
       return levels[bonus?Math.min(levels.length-1,base+bonus):base]||[];
     }
     function availableAlly(actor){
@@ -325,7 +439,7 @@
       const ally=find(rule.ally);
       return ally&&!ally.departed&&!ally.defeated?ally:null;
     }
-    const focusFor=actor=>availableAlly(actor)||(core!==actor&&!core.departed&&!core.defeated?core:actors.filter(a=>a!==actor&&!a.departed&&!a.defeated).sort((a,b)=>(models[b.id].role==='dps')-(models[a.id].role==='dps')||b.s.atk-a.s.atk)[0]||actor);
+    const focusFor=actor=>actor.openingTarget||availableAlly(actor)||(core!==actor&&!core.departed&&!core.defeated?core:actors.filter(a=>a!==actor&&!a.departed&&!a.defeated).sort((a,b)=>(models[b.id].role==='dps')-(models[a.id].role==='dps')||b.s.atk-a.s.atk)[0]||actor);
     for(const [id,name] of [['1402','Швея'],['1407','Крылья Смерти'],['1409','Ика'],['1413','Тьмуша'],['8007','Мемо'],['1415','Демиург'],['1512','Музыканты ясного неба']]){const owner=find(id);if(owner){const m={owner,name,active:false,distance:10000,baseHP:0,baseSpeed:0,stacks:0,turn:0,acting:false};m.unit={id,s:owner.s,turn:0,buffs:[],currentHP:0,hpLost:0,bladeCharges:0,_memo:m};memories.push(m);}}
     function buff(target,source,key,values,duration){if(target.defeated)return;target.buffs=target.buffs.filter(b=>!(b.source===source&&b.key===key));const expires=target.turn+duration;target.buffs.push({source,key,values,expires});if(G&&(values.elation||values.atk||values.flatAtk||values.def||values.speed||values.speedPct))for(const actor of actors)refreshPunklorde(actor);if(scenario.audit)record(target,'Эффект · '+key,0,'buff',null,{source,expires,values,...(target._memo?{recipientType:'memosprite'}:{})});}
     function sundayCrit(target,source){
@@ -346,27 +460,43 @@
       if(actor._memo)return memoStat(actor._memo);
       const shared=new Set(['bronyaUlt','astaUlt','ruanSpeed','huohuoUlt','cipher','watchmaker','dahliaBE','fugueBreak','sundaySkill','sundayCrit','netherRoar','saverAura']);
       const bonus={atk:0,hp:0,def:0,flatHP:0,flatAtk:0,speed:0,speedPct:0,crit:0,critDamage:0,damage:0,resPen:0};for(const b of actor.buffs)if(b.expires>=actor.turn&&(!forMemo||shared.has(b.key)))for(const [k,v] of Object.entries(b.values))bonus[k]=(bonus[k]||0)+v;
+      for(const status of allyDebuffs(actor)){
+        if(status.kind==='atkDown')bonus.atk-=status.value;
+        if(status.kind==='defDown')bonus.def-=status.value;
+        if(status.kind==='slow')bonus.speedPct-=status.value;
+      }
       const eq=G?G.modifiers(actor,actors,data,G.has(actor,'321')?(form.active?1:actors.filter(a=>!a.defeated&&!a.departed).length+memories.filter(m=>m.active&&!m.owner.defeated&&!m.owner.departed).length):undefined,forMemo):{};for(const key of ['atk','hp','def','speed','speedPct','crit','critDamage','damage'])bonus[key]+=(eq[key]||0);
       if(G&&!readingThresholdStats){
         const threshold=G.thresholdModifiers(actor,actors,thresholdStats);
         bonus.atk+=threshold.atk;
         bonus.critDamage+=threshold.critDamage;
       }
-      const asta=find('1009');if(asta)bonus.atk+=asta.charges*params('1009','04')[0];
-      if(find('1101'))bonus.damage+=.1;if(asta&&data.characters[actor.id].element==='Fire')bonus.damage+=.18;
+      const asta=find('1009');
+      if(asta&&!asta.defeated){bonus.atk+=asta.charges*params('1009','04')[0];if(data.characters[actor.id].element==='Fire')bonus.damage+=.18;}
+      if(actor===asta)bonus.def+=asta.charges*.06;
+      const bronya=find('1101');if(bronya&&!bronya.defeated)bonus.damage+=.1;
       const ruan=find('1303'),robin=find('1309'),sparkle=find('1306'),fu=find('1208');
       if(ruan){if(ruan.meiSkillUntil>ruan.turn)bonus.damage+=params('1303','02')[0]+Math.min(.36,Math.max(0,(readingThresholdStats?0:breakValue(ruan))-1.2)*.6);if(ruan.meiUltUntil>ruan.turn)bonus.resPen+=params('1303','03')[0];}
       if(robin){bonus.critDamage+=params('1309','04')[0];if(robin.robinSkillUntil>robin.turn)bonus.damage+=params('1309','02')[0];if(robin.concertoUntil>now){bonus.flatAtk+=robin.concertoATK;if(robin.s.eidolon>=1)bonus.resPen+=.24;if(robin.s.eidolon>=2)bonus.speedPct+=.16;}}
       const luochaAura=find('1203');if(luochaAura?.s.eidolon>=1&&luochaAura.fieldUntil>luochaAura.turn)bonus.atk+=.2;
-      if(sparkle){if(sparkle.s.eidolon>=1&&actor.buffs.some(b=>b.key==='cipher'&&b.expires>=actor.turn))bonus.atk+=.4;const n=actors.filter(a=>data.characters[a.id].element==='Quantum').length;bonus.atk+=.15;if(data.characters[actor.id].element==='Quantum')bonus.atk+=n>=3?.3:n===2?.15:.05;const stacks=actor.buffs.find(b=>b.source==='1306'&&b.key==='sparkleTalent')?.values.stacks||0;bonus.damage+=stacks*(params('1306','04')[1]+(actor.buffs.some(b=>b.source==='1306'&&b.key==='cipher')?params('1306','03')[2]:0));}
+      if(sparkle?.s.novaflare&&!sparkle.defeated){
+        bonus.atk+=.45;
+        if(actor.buffs.some(b=>b.key==='sparkleSkill'&&b.expires>=actor.turn))bonus.resPen+=.1;
+        if(sparkle.s.eidolon>=1&&actor.buffs.some(b=>b.key==='cipher'&&b.expires>=actor.turn))bonus.atk+=.4;
+      }else if(sparkle&&!sparkle.s.novaflare){if(sparkle.s.eidolon>=1&&actor.buffs.some(b=>b.key==='cipher'&&b.expires>=actor.turn))bonus.atk+=.4;const n=actors.filter(a=>data.characters[a.id].element==='Quantum').length;bonus.atk+=.15;if(data.characters[actor.id].element==='Quantum')bonus.atk+=n>=3?.3:n===2?.15:.05;const stacks=actor.buffs.find(b=>b.source==='1306'&&b.key==='sparkleTalent')?.values.stacks||0;bonus.damage+=stacks*(params('1306','04')[1]+(actor.buffs.some(b=>b.source==='1306'&&b.key==='cipher')?params('1306','03')[2]:0));}
       if(fu&&fu.matrixUntil>fu.turn){bonus.crit+=params('1208','02')[4];bonus.flatHP+=fu.matrixHP;if(fu.s.eidolon>=1)bonus.critDamage+=.3;}
-      const hh=find('1217');if(hh?.s.eidolon>=1&&hh.divineUntil>hh.turn)bonus.speedPct+=.12;
+      const hh=find('1217');if(hh?.s.eidolon>=1&&!hh.defeated&&hh.divineUntil>hh.turn)bonus.speedPct+=.12;
       const avent=find('1304');if(avent?.s.eidolon>=1&&actor.avenShield?.expires>=actor.turn)bonus.critDamage+=.2;
       if(actor.id==='1304'&&actor.s.eidolon>=6)bonus.damage+=.5*Math.min(3,actors.filter(a=>activeShields(a).length).length);
       const sanctifier=find('1403');if(sanctifier&&sanctifier.sanctifyUntil>sanctifier.turn)bonus.resPen+=params(sanctifier.id,'02')[0];
       let r={hp:actor.s.hp+actor.s.baseHP*bonus.hp+bonus.flatHP,def:actor.s.def+actor.s.baseDef*bonus.def,atk:actor.s.atk+actor.s.baseAtk*bonus.atk+bonus.flatAtk,speed:actor.s.speed+actor.s.baseSpeed*bonus.speedPct+bonus.speed,crit:actor.s.crit+bonus.crit,critDamage:actor.s.critDamage+bonus.critDamage,damage:actor.s.damageBonus+bonus.damage,resPen:bonus.resPen,energyRegen:actor.s.energyRegen+(eq.energyRegen||0)+(bonus.energyRegen||0),effectHit:actor.s.effectHit+(eq.effectHit||0)+(bonus.effectHit||0),effectRes:(actor.s.effectRes||0)+(eq.effectRes||0)+(bonus.effectRes||0)+(find('1104')?.s.eidolon>=4?.2:0)};
       if(actor.id==='1302'){r.crit+=(actor.apotheosis||0)*params(actor.id,'04')[1];if(actor.s.eidolon>=1)r.critDamage+=(actor.apotheosis||0)*.04;}
-      if(actor.id==='1212'&&actor.transmigration){r.crit+=params(actor.id,'04')[6];if(actor.s.eidolon>=6)r.critDamage+=.5;}
+      if(actor.id==='1212'&&actor.transmigration){
+        r.crit+=params(actor.id,'04')[6];r.effectRes+=.35;
+        if(actor.s.novaflare){r.critDamage+=(actor.moonlight||0)*(.44+(actor.s.eidolon>=4?.2:0));if(actor.s.eidolon>=6)r.resPen+=.3;}
+        else if(actor.s.eidolon>=6)r.critDamage+=.5;
+      }
+      if(actor.id==='1006'&&actor.s.novaflare)r.atk+=actor.s.baseAtk*Math.min(.5,r.effectHit);
       if(actor.id==='1002'&&actor.s.eidolon>=1)r.crit+=.12; // Training targets stay above 50% HP.
       if(actor.id==='1111'&&actor.s.eidolon>=4)r.atk+=actor.s.baseAtk*Math.min(4,actor.lukaE4||0)*.05;
       if(actor.id==='1207'&&actor.s.eidolon>=4&&actor.bow>0)r.damage+=.3;
@@ -378,10 +508,17 @@
       const herta=find('1401');if(herta?.s.eidolon>=4&&data.characters[actor.id].path==='Mage')r.speed+=actor.s.baseSpeed*.12;
       if(actor.id==='1401'&&actor.s.eidolon>=6)r.resPen+=.2;
       if(actor.id==='1314'){if(actor.s.eidolon>=2&&actor.pawn>=15)r.crit+=.18;if(actor.s.eidolon>=6&&actor.debtUntil>actor.turn)r.resPen+=.2;r.critDamage+=(actor.pawn||0)*.024;r.atk+=actor.s.baseAtk*(actor.pawn||0)*.005;}
-      if(actor.id==='1307')r.damage+=Math.min(.72,r.effectHit*.6);
+      const swan=find('1307');
+      if(swan?.s.novaflare&&!swan.defeated&&(swan===actor||!readingThresholdStats))
+        r.damage+=Math.min(.72,(swan===actor?r.effectHit:thresholdStats(swan).effectHit)*.6);
+      else if(actor.id==='1307'&&!actor.s.novaflare)r.damage+=Math.min(.72,r.effectHit*.6);
+      const kafka=find('1005');
+      if(kafka?.s.novaflare&&!kafka.defeated&&r.effectHit>=.75)r.atk+=actor.s.baseAtk;
+      if(actor.id==='1004'&&actor.s.novaflare)
+        r.atk+=actor.s.baseAtk*.2*clamp(Math.floor((r.effectHit-.4+1e-9)/.1),0,4);
       const hysi=find('1410');if(actor.id==='1410'||(!excludeConverted&&hysi?.s.eidolon>=2&&hysi.hysiUntil>hysi.turn))r.damage+=Math.min(.9,Math.max(0,(actor===hysi?r.effectHit:stat(hysi).effectHit)-.6)*1.5);
       if(actor.id==='1222')r.atk+=actor.s.baseAtk*Math.min(.5,breakValue(actor)*.25);
-      if(actor.id==='1310'&&actor.combustionUntil>now){r.speed+=params(actor.id,'03')[2];if(actor.s.eidolon>=4)r.effectRes+=.5;if(actor.s.eidolon>=6)r.resPen+=.2;}
+      if(actor.id==='1310'&&actor.combustionUntil>now){r.effectRes+=.3;r.speed+=params(actor.id,'03')[2];if(actor.s.eidolon>=4)r.effectRes+=.5;if(actor.s.eidolon>=6)r.resPen+=.2;}
       if(actor.id==='1205'){if(actor.s.eidolon>=2&&actor.bladeUntil>actor.turn)r.crit+=.15;r.hp+=actor.s.baseHP*(actor.bladeE4||0)*.2;}
       const yukong=find('1207'),cerydra=find('1412'),dhpt=find('1414');
       if(yukong?.bow>0){r.atk+=actor.s.baseAtk*params('1207','02')[1];if(yukong.bowCrit){const p=params('1207','03');r.crit+=p[1];r.critDamage+=p[2];}}
@@ -396,7 +533,7 @@
       if(memo('1409')?.active&&hyacine.s.eidolon>=6)r.resPen+=.2;
       if(find('1413')?.s.eidolon>=6)r.resPen+=.2;
       if(actor.id==='1413'&&actor.s.eidolon>=2)r.critDamage+=.4;
-      if(actor.id==='1409'){r.crit+=1;if(r.speed>200){r.hp+=actor.s.baseHP*.2;if(actor.s.eidolon>=4)r.critDamage+=(r.speed-200)*.02;}}
+      if(actor.id==='1409'){r.effectRes+=.5;r.crit+=1;if(r.speed>200){r.hp+=actor.s.baseHP*.2;if(actor.s.eidolon>=4)r.critDamage+=(r.speed-200)*.02;}}
       const gm=memo('1402');if(actor.id==='1402'&&actor.supremeUntil>now&&gm?.active){if(!forMemo)r.speed+=actor.s.baseSpeed*.15*gm.stacks;if(actor.s.eidolon>=6)r.resPen+=.2;const ownerSpeed=forMemo?stat(actor).speed:r.speed;r.atk+=7.2*ownerSpeed+3.6*memoSpeed(gm);}
       if(actor.id==='1408'){r.atk+=actor.s.baseAtk*((actor.phainonAtkStacks||0)*.5+(form.active?.8:0));if(form.active){r.hp+=actor.phainonFormHP||0;if(actor.s.eidolon>=2)r.resPen+=.2;if(actor.s.eidolon>=1&&form.actions<=3)r.critDamage+=.5;}}
       if(actor.id==='1015'&&actor.archerCritUntil>=actor.turn)r.critDamage+=1.2;
@@ -433,10 +570,30 @@
       sixthStats(actor,r,forMemo);finalStats(actor,r,forMemo);
       if(G){const extra=G.conditional(actor,r,forMemo);r.crit+=extra.crit;r.critDamage+=extra.critDamage;r.damage+=extra.damage;r.atk+=actor.s.baseAtk*extra.atk;}if(!Number.isFinite(r.speed)||r.speed<=0)throw Error('После бонусов наборов скорость должна оставаться положительной.');return r;
     }
-    function record(actor,label,damage=0,kind='effect',crits=null,details={}){if(keepLog)events.push({time:now,actor:actor?.id||'dummy',label,damage,kind,...details,...(boss?{enemyHP:dummies.map(d=>d.hp),phase:boss.phase}:{}),...(crits?.length?{crits}:{}),sp,energy:actor?.energy||0,resource:actor?.resource||0,special:actor?.mood??actor?.fervor??actor?.gems??actor?.resource??0,punchline:aha.punchline,banger:actor?banger(actor):0,memory:memories.filter(m=>m.active).map(m=>m.name+' '+Math.round(m.unit.currentHP)+'/'+Math.round(memoStat(m).hp)+' HP').join(' · ')+(form.active?' · Каослана '+form.turns+'/8':'')+(elationActors.length?' · Юмор '+aha.punchline+' · Хит '+(actor?banger(actor):0):''),toughness:dummies.map(d=>d.toughness),exo:dummies.map(d=>d.exo)});}
-    function beginAction(actor){if(!turnOwner)turnSPSpent=0;for(const ally of actors)refreshPunklorde(ally);actor.advanceSnapshot=Object.fromEntries(actors.map(a=>[a.id,a.distance]));activeActor=actor;actor.actionKey=++actionSerial;actor.actionSPSpent=0;const mydei=find('1404');if(mydei)mydei.healCharge=0;actor.tribAttackDamage=0;const aglaea=find('1402');if(aglaea?.s.eidolon>=2)aglaea.aglaeaChain=actor===aglaea?Math.min(3,(aglaea.aglaeaChain||0)+1):0;actor.arcanaProcs={};actor.toughnessUsed={};actor.breakHits={};actor.karmaTargets=new Set();const cast=find('1407');if(cast)cast.healCaps=new Map();for(const d of dummies)d.hysiCount=0;}
-    function acheronGain(amount,target=0,reason='Умение Ахерон'){const a=find('1308');if(!a||a.defeated||a.acheronUlting)return;const before=a.resource;a.resource=Math.min(12,a.resource+amount);dummies[target].knots=(dummies[target].knots||0)+amount;if(scenario.audit)record(a,'Рассечённый сон · '+reason,0,'resource',null,{targets:[target],before,after:a.resource});}
-    const mostKnots=()=>allTargets().reduce((a,b)=>(dummies[a].knots||0)>=(dummies[b].knots||0)?a:b,0);
+    function record(actor,label,damage=0,kind='effect',crits=null,details={}){if(keepLog)events.push({eventId:events.length+1,sourceAction:activeActor?.actionKey??null,time:now,actor:actor?.id||'dummy',label,damage,kind,...details,...(boss?{enemyHP:dummies.map(d=>d.hp),phase:boss.phase}:{}),...(crits?.length?{crits}:{}),sp,energy:actor?.energy||0,resource:actor?.resource||0,special:actor?.mood??actor?.fervor??actor?.gems??actor?.resource??0,punchline:aha.punchline,banger:actor?banger(actor):0,memory:memories.filter(m=>m.active).map(m=>m.name+' '+Math.round(m.unit.currentHP)+'/'+Math.round(memoStat(m).hp)+' HP').join(' · ')+(form.active?' · Каослана '+form.turns+'/8':'')+(elationActors.length?' · Юмор '+aha.punchline+' · Хит '+(actor?banger(actor):0):''),toughness:dummies.map(d=>d.toughness),exo:dummies.map(d=>d.exo)});}
+    function beginAction(actor){updateDebt();if(!turnOwner)turnSPSpent=0;for(const ally of actors)refreshPunklorde(ally);actor.advanceSnapshot=Object.fromEntries(actors.map(a=>[a.id,a.distance]));activeActor=actor;actor.actionKey=++actionSerial;actor.actionSPSpent=0;const mydei=find('1404');if(mydei)mydei.healCharge=0;actor.tribAttackDamage=0;const aglaea=find('1402');if(aglaea?.s.eidolon>=2)aglaea.aglaeaChain=actor===aglaea?Math.min(3,(aglaea.aglaeaChain||0)+1):0;actor.arcanaProcs={};actor.struckWeightless=false;actor.kafkaDebuffedTargets=null;actor.toughnessUsed={};actor.breakHits={};actor.karmaTargets=new Set();const cast=find('1407');if(cast)cast.healCaps=new Map();for(const d of dummies)d.hysiCount=0;}
+    function acheronGain(amount,target=0,reason='Умение Ахерон'){const a=find('1308');if(!a||a.defeated||a.acheronUlting)return;const before=a.resource;a.resource=Math.min(12,a.resource+amount);if(dummies[target])dummies[target].knots=(dummies[target].knots||0)+amount;if(scenario.audit)record(a,'Рассечённый сон · '+reason,0,'resource',null,{targets:[target],before,after:a.resource});}
+    // Only transient action bookkeeping is restored. Damage, resources, buffs,
+    // gauges and other combat outcomes of the nested action remain committed.
+    function withActionContext(callback){
+      const parent=activeActor,owner=turnOwner,spent=turnSPSpent;
+      const keys=['actionKey','actionKind','actionSPSpent','advanceSnapshot','tribAttackDamage','arcanaProcs','struckWeightless','kafkaDebuffedTargets','toughnessUsed','breakHits','karmaTargets','attackTargets','attackFollowup'];
+      const saved=parent?keys.map(key=>[key,Object.hasOwn(parent,key),parent[key]]):[];
+      const shared=parent?actors.flatMap(actor=>['healCharge','healCaps'].map(key=>[actor,key,Object.hasOwn(actor,key),actor[key]])):[];
+      const hysi=dummies.map(enemy=>[enemy,enemy.hysiCount]);
+      try{return callback();}
+      finally{
+        if(parent)for(const [key,exists,value]of saved){if(exists)parent[key]=value;else delete parent[key];}
+        for(const [actor,key,exists,value]of shared){if(exists)actor[key]=value;else delete actor[key];}
+        if(parent)for(const [enemy,count]of hysi)if(dummies.includes(enemy))enemy.hysiCount=count;
+        activeActor=parent;turnOwner=owner;turnSPSpent=spent;
+      }
+    }
+    function isolatedAction(handler){return function(...args){return withActionContext(()=>handler(...args));};}
+    function mostKnots(){
+      const targets=allTargets();
+      return targets.reduce((a,b)=>(dummies[a].knots||0)>=(dummies[b].knots||0)?a:b,targets[0]);
+    }
     function acheronEX(actor){
       beginAction(actor);
       actor.followups++;
@@ -464,7 +621,7 @@
       lord.hits=Math.min(actor.s.exEidolon?30:10,lord.hits+regular+extraHits);
       if(lord.hits>=30)lord.distance=0;
     }
-    const defenseDebuffs=['exposed','swUltUntil','swDefUntil','swanDefUntil','fugueDefUntil','anaxaDefUntil','mishaDefUntil'];
+    const defenseDebuffs=['exposed','swUltUntil','swDefUntil','swanDefUntil','fugueDefUntil','anaxaDefUntil','mishaDefUntil','wiltUntil','weightlessUntil','pelaTechniqueUntil'];
     function applyDefenseDebuff(actor,index,key,duration){
       const target=dummies[index];
       target[key]=target.turn+duration;
@@ -475,12 +632,55 @@
       debuffApplied(actor,index);
     }
     function debuffApplied(actor,target=0){if(G)G.debuff(actor);const key=activeActor?'a'+activeActor.actionKey:'e'+enemySerial+':'+actor.id;if(!creditedDebuffs.has(key)){creditedDebuffs.add(key);acheronGain(1,target,'Ослабление · '+data.characters[actor.id].name);}}
-    function arcanaAdd(index,chance=.65){const actor=find('1307');if(!actor||!chanceOf('arcana',effectChance(actor,chance,index)))return;const d=dummies[index];d.arcanaStacks=Math.min(50,(d.arcanaStacks||0)+1+(actor.s.eidolon>=6&&chanceOf('arcana-e6',.5)?1:0));d.arcana={owner:actor.id,expires:Infinity,coefficient:2.4};debuffApplied(actor,index);}
-    function dotTypes(index){const d=dummies[index],types=new Set();for(const k of dotKeys)if(d[k]){if(['shock','kafkaShock','hysiShock','hysiShockE1'].includes(k))types.add('shock');else if(burnKeys.includes(k))types.add('burn');else if(['hysiBleed','hysiBleedE1','lukaBleed'].includes(k))types.add('bleed');else if(k==='hysiWind'||k==='hysiWindE1'||k==='sampoWind'||k==='arcana')types.add('wind');}for(const [element,type] of [['Physical','bleed'],['Fire','burn'],['Wind','wind'],['Thunder','shock']])if(d.breakStatuses?.[element]&&find('1307')?.s.eidolon>=1)types.add(type);if(d.epiphanyUntil>d.turn&&d.arcana)for(const t of ['wind','bleed','burn','shock'])types.add(t);return types;}
+    function arcanaAdd(index,chance=.65,amount=1,guaranteed=false){
+      const actor=find('1307');
+      if(!actor||actor.defeated||(boss&&dummies[index].hp<=0)||!guaranteed&&!chanceOf('arcana',effectChance(actor,chance,index)))return;
+      const d=dummies[index];
+      if(actor.s.novaflare){
+        const extra=d.epiphanyUntil>d.turn?Array.from({length:amount},()=>Number(chanceOf('arcana-epiphany',.5))).reduce((sum,n)=>sum+n,0):0;
+        d.arcanaStacks=(d.arcanaStacks||0)+(amount+extra)*(actor.s.eidolon>=6?2:1);
+      }else d.arcanaStacks=Math.min(50,(d.arcanaStacks||0)+1+(actor.s.eidolon>=6&&chanceOf('arcana-e6',.5)?1:0));
+      d.arcana={owner:actor.id,expires:Infinity,coefficient:2.4};debuffApplied(actor,index);
+    }
+    function blackSwanDefense(actor,index){
+      if(chanceOf('black-swan-defense',effectChance(actor,1,index)))applyDefenseDebuff(actor,index,'swanDefUntil',3);
+    }
+    function blackSwanEntry(actor){
+      for(const index of allTargets()){
+        arcanaAdd(index);
+        if(actor.s.novaflare){blackSwanDefense(actor,index);if(actor.s.eidolon>=2)arcanaAdd(index,1,30);}
+      }
+    }
+    function swanEpiphanyEnergy(enemy){
+      const swan=find('1307');
+      if(!swan||swan.defeated||!(swan.s.eidolon>=4)||!(enemy.epiphanyUntil>enemy.turn))return;
+      if(!swan.s.novaflare&&enemy.swanEnergyUsed)return;
+      enemy.swanEnergyUsed=true;
+      energy(swan,8);
+      record(swan,'Чёрный Лебедь E4 · 8 энергии');
+    }
+    function dotTypes(index){const d=dummies[index],types=new Set();for(const k of dotKeys)if(d[k]){if(['shock','kafkaShock','hysiShock','hysiShockE1'].includes(k))types.add('shock');else if(burnKeys.includes(k))types.add('burn');else if(['hysiBleed','hysiBleedE1','lukaBleed'].includes(k))types.add('bleed');else if(k==='hysiWind'||k==='hysiWindE1'||k==='sampoWind'||k==='arcana')types.add('wind');}for(const [element,type] of [['Physical','bleed'],['Fire','burn'],['Wind','wind'],['Thunder','shock']])if(d.breakStatuses?.[element]&&find('1307')?.s.eidolon>=1)types.add(type);if(d.arcana&&(d.epiphanyUntil>d.turn||find('1307')?.s.novaflare))for(const t of ['wind','bleed','burn','shock'])types.add(t);return types;}
     function hysiApply(targets){const actor=find('1410');if(!actor)return;for(const i of targets){const d=dummies[i],have=dotTypes(i),missing=['wind','bleed','burn','shock'].filter(k=>!have.has(k)),type=(missing.length?missing:['wind','bleed','burn','shock'])[pick('hysilens-dot-type',(missing.length||4))];if(chanceOf('hysilens-dot',effectChance(actor,1,i))){const key={wind:'hysiWind',bleed:'hysiBleed',burn:'hysiBurn',shock:'hysiShock'}[type];const p=params(actor.id,'04');d[key]={owner:actor.id,expires:d.turn+p[4],coefficient:p[1]};debuffApplied(actor,i);if(actor.s.eidolon>=1&&chanceOf('hysilens-e1',effectChance(actor,1,i))){d[key+'E1']={...d[key]};debuffApplied(actor,i);}}}}
-    function hysiExtra(index){const h=find('1410'),d=dummies[index];if(!h||!(h.hysiUntil>h.turn)||(d.hysiCount||0)>=(h.s.eidolon>=6?12:8))return;d.hysiCount=(d.hysiCount||0)+1;hit(h,params(h.id,'03')[3]+(h.s.eidolon>=6?.2:0),[index],'Зона Гисиленсы · DoT',{dot:true,noHysi:true});if(find('1307')){if(enemyPhase)arcanaAdd(index);else{const owner=activeActor||h;owner.arcanaProcs??={};if((owner.arcanaProcs[index]||0)<3){owner.arcanaProcs[index]=(owner.arcanaProcs[index]||0)+1;arcanaAdd(index);}}}}
+    function hysiExtra(index){const h=find('1410'),d=dummies[index];if(!h||!(h.hysiUntil>h.turn)||(d.hysiCount||0)>=(h.s.eidolon>=6?12:8))return;d.hysiCount=(d.hysiCount||0)+1;hit(h,params(h.id,'03')[3]+(h.s.eidolon>=6?.2:0),[index],'Зона Гисиленсы · DoT',{dot:true,noHysi:true});if(find('1307')){if(enemyPhase)arcanaAdd(index);else{const owner=activeActor||h;owner.arcanaProcs??={};if(find('1307')?.s.novaflare||(owner.arcanaProcs[index]||0)<3){owner.arcanaProcs[index]=(owner.arcanaProcs[index]||0)+1;arcanaAdd(index);}}}}
     function interpret(index,count=1){const h=find('1401');if(!h)return;const d=dummies[index],before=d.interpret||0;d.interpret=Math.min(42,before+count);h.answers=Math.min(99,(h.answers||0)+d.interpret-before);}
-    function enemyDamage(index,amount){
+    const enemyHPFraction=index=>boss?dummies[index].hp/dummies[index].maxHP:1;
+    const elements=['Physical','Fire','Ice','Thunder','Wind','Quantum','Imaginary'];
+    const weaknessCount=index=>elements.filter(element=>hasWeakness(index,element)).length;
+    function hasWeakness(index,element){
+      const enemy=dummies[index];
+      return !boss||enemy.sublimationUntil>enemy.turn||enemy.weaknesses.includes(element)||enemy.swWeaknessUntil>enemy.turn&&enemy.swWeakness===element||
+        enemy.implantedWeaknesses?.[element]>enemy.turn;
+    }
+    function implantWeakness(index,element,duration){
+      const enemy=dummies[index];
+      enemy.implantedWeaknesses??={};
+      enemy.implantedWeaknesses[element]=Math.max(enemy.implantedWeaknesses[element]||0,enemy.turn+duration);
+    }
+    function astaCharge(actor,targets){
+      const [,cap]=params(actor.id,'04');
+      for(const i of targets)actor.charges=Math.min(cap,actor.charges+(hasWeakness(i,'Fire')?2:1));
+    }
+    function enemyDamage(index,amount,attacker=null,kind,attribution={}){
       if(!boss)return amount;
       const target=dummies[index];
       if(target.hp<=0)return 0;
@@ -489,28 +689,83 @@
         if(!boss.shield)record(null,'Гарнизонный барьер разрушен',0,'shield-break');
         return 0;
       }
+      const herta=attacker&&find('1013'),aboveHalf=herta&&enemyHPFraction(index)>.5;
       const effective=Math.min(amount,target.hp);
       target.hp-=effective;
+      if(aboveHalf&&enemyHPFraction(index)<=.5&&!herta.defeated)herta.hertaSpins=(herta.hertaSpins||0)+1;
       if(target.hp<=0){
+        swanEpiphanyEnergy(target);
+        const hanya=find('1215');
+        if(hanya&&!hanya.defeated&&hanya.burden===index){
+          if((hanya.burdenRefunds||0)<=1){gainSP();record(hanya,'Ноша · SP при гибели цели');}
+          hanya.burden=undefined;
+        }
+        silverTransfer(index);
+        if(attacker?.id==='1310'&&attacker.s.novaflare)fireflyExtraTurn(attacker);
+        const seele=find('1102');
+        if(seele?.s.novaflare&&!seele.defeated)
+          seeleDefeat(seele,target,attacker===seele,kind);
         if(G)G.enemyDefeated(actors);
-        record(null,target.name+' побеждён',0,'enemy-defeated',null,{targets:[index]});
+        const moze=find('1223');
+        if(moze?.departed&&moze.prey===index)leavePrey(moze);
+        const ratio=find('1305');
+        if(ratio?.ratioTarget===index)ratio.ratioMarks=0;
+        if(find('1308')&&!find('1308').defeated&&target.knots>0){
+          const next=mostKnots();
+          if(next!==undefined)dummies[next].knots=(dummies[next].knots||0)+target.knots;
+          target.knots=0;
+        }
+        if(attacker?.id==='1008'&&attacker.currentHP<=stat(attacker).hp*.3)heal(attacker,stat(attacker).hp*.2,attacker);
+        const kafka=find('1005');
+        const shocked=target.breakStatuses?.Thunder?.remaining>0||
+          [target.shock,target.kafkaShock,target.hysiShock,target.hysiShockE1].some(shock=>shock?.expires>target.turn);
+        if(kafka&&!kafka.defeated&&shocked)energy(kafka,5);
+        record(null,target.name+' побеждён',0,'enemy-defeated',null,{targets:[index],damageOwner:attribution.damageOwner??attacker?.id??null,triggerSource:attribution.triggerSource??attacker?.id??null,damageKind:kind||'unknown',attackKillCredit:attacker?.id??null,sourceAction:attribution.sourceAction??activeActor?.actionKey??null});
       }
       return effective;
     }
-    function trueHit(actor,amount,targets,label,kind='true'){
+    function trueHit(actor,amount,targets,label,kind='true',creditKill=false,triggerSource=actor.id){
       let total=0;
       for(const i of targets){
-        const value=enemyDamage(i,amount/targets.length);
+        const value=enemyDamage(i,amount/targets.length,creditKill?actor:null,kind,{damageOwner:actor.id,triggerSource});
         actor.total+=value;damageByTarget[i]+=value;total+=value;
       }
       record(actor,label,total,kind,null,{targets});
     }
-    function anaxaSkill(actor){beginAction(actor);if(actor.odeAnaxaReady){actor.odeAnaxaReady=false;const c=find('1415');actor.odeAnaxaUntil=actor.turn+1;for(const ally of actors)if(data.characters[ally.id].path==='Mage')buff(ally,'1415','odeKnowledge',{atk:.6},2);}actor.actionKind='skill';if(actor.s.eidolon>=1&&!actor.anaxaE1Used){actor.anaxaE1Used=true;gainSP();record(actor,'Анакса E1 · восстановлено 1 SP');}if(actor.s.eidolon>=4){actor.anaxaE4=Math.min(2,(actor.anaxaE4Until>=actor.turn?actor.anaxaE4:0)+1);actor.anaxaE4Until=actor.turn+2;buff(actor,actor.id,'anaxaE4',{atk:.3*actor.anaxaE4},2);}if(G)G.beforeSkill(actor);energy(actor,30);const available=allTargets(),targets=[];for(let n=0;n<5+(actor.odeAnaxaHits||0);n++){const i=n===0?0:available.length?available[pick('anaxa-bounce',available.length)]:randomTarget();targets.push(i);const at=available.indexOf(i);if(at>=0)available.splice(at,1);if(actor.s.eidolon>=1){applyDefenseDebuff(actor,i,'anaxaDefUntil',2);}hit(actor,params(actor.id,'02')[0],[i],'Анакса · попадание',{bonus:params(actor.id,'02')[2]*dummies.length+.3});}afterAttack(actor);if(G)G.afterSkill(actor);}
+    function cipherPatron(actor){
+      const living=allTargets();
+      if(!living.includes(actor.patron))actor.patron=living.reduce((best,i)=>dummies[i].maxHP>dummies[best].maxHP?i:best,living[0]);
+      return actor.patron;
+    }
+    function anaxaImplant(actor,index){
+      const missing=elements.filter(element=>!hasWeakness(index,element)),pool=missing.length?missing:elements;
+      implantWeakness(index,pool[pick('anaxa-weakness',pool.length)],params(actor.id,'04')[1]);
+    }
+    function anaxaSkill(actor,primary=enemyFor(actor)){beginAction(actor);if(actor.odeAnaxaReady){actor.odeAnaxaReady=false;const c=find('1415');actor.odeAnaxaUntil=actor.turn+1;for(const ally of actors)if(data.characters[ally.id].path==='Mage')buff(ally,'1415','odeKnowledge',{atk:.6},2);}actor.actionKind='skill';if(actor.s.eidolon>=1&&!actor.anaxaE1Used){actor.anaxaE1Used=true;gainSP();record(actor,'Анакса E1 · восстановлено 1 SP');}if(actor.s.eidolon>=4){actor.anaxaE4=Math.min(2,(actor.anaxaE4Until>=actor.turn?actor.anaxaE4:0)+1);actor.anaxaE4Until=actor.turn+2;buff(actor,actor.id,'anaxaE4',{atk:.3*actor.anaxaE4},2);}if(G)G.beforeSkill(actor);energy(actor,30);const visited=new Set(),p=params(actor.id,'02'),bonus=p[2]*allTargets().length;
+      for(let n=0;n<1+p[1]+(actor.odeAnaxaHits||0);n++){
+        const living=allTargets();if(!living.length)break;
+        const fresh=living.filter(i=>!visited.has(i)),pool=fresh.length?fresh:living;
+        const i=n===0&&living.includes(primary)?primary:pool[pick('anaxa-bounce',pool.length)];
+        visited.add(i);
+        if(actor.s.eidolon>=1)applyDefenseDebuff(actor,i,'anaxaDefUntil',2);
+        hit(actor,p[0],[i],'Анакса · попадание',{bonus,toughness:n===0?10:5});
+      }
+      afterAttack(actor);if(G)G.afterSkill(actor);
+      return weaknessCount(primary)>=5?primary:undefined;
+    }
     function hertaSkill(actor){const enhanced=(actor.inspiration||0)>0;if(enhanced&&!copying)actor.inspiration--;interpret(0);const stacks=(dummies[0].interpret||1)+(enhanced&&actor.s.eidolon>=1?.5*Math.max(...dummies.slice(0,3).map(d=>d.interpret||1)):0),double=actors.filter(a=>data.characters[a.id].path==='Mage').length>=2?2:1,boost=enhanced&&stacks>=42?.5:0;hit(actor,enhanced?params(actor.id,'09')[0]:params(actor.id,'02')[0],[0],'Герта · первый удар',{bonus:boost});for(let n=0;n<2;n++)hit(actor,enhanced?params(actor.id,'09')[0]:params(actor.id,'02')[0],allTargets().slice(0,n?5:3),'Герта · повтор навыка',{bonus:boost});if(enhanced){for(const i of allTargets())hit(actor,params(actor.id,'09')[2]+stacks*params(actor.id,'04')[i===0?0:1]*double,[i],'Герта · завершение усиленного навыка',{bonus:boost});if(!copying){dummies[0].interpret=actor.s.eidolon>=1?15:1;if(actor.s.eidolon>=2)actor.distance=Math.max(0,actor.distance-3500);}}afterAttack(actor);}
-    function fuyuanTurn(extra=false){const actor=find('1222');if(!actor||actor.defeated||fuyuan.acting||fuyuan.actions<=0)return;fuyuan.acting=true;beginAction(actor);if(!extra){fuyuan.actions--;fuyuan.distance=10000;}actor.followups++;if(G)G.followupStart(actor,actors);const p=params(actor.id,'04'),all=allTargets();hit(actor,p[1],all,'Фуюань · бонус-атака',{followup:true,group:true});hit(actor,p[7],[randomTarget()],'Фуюань · дополнительный удар',{followup:true,group:true});if(actor.s.eidolon>=6)for(let n=0;n<4;n++){const intact=all.filter(i=>dummies[i].toughness>0),pool=intact.length?intact:all;hit(actor,.5,[pool[pick('fuyuan-e6',pool.length)]],'Фуюань E6 · дополнительный удар',{followup:true,group:true,toughness:5});}if(G)G.followupEnd(actor);const allies=livingAllies();if(actor.s.eidolon>=4&&allies.length)heal([...allies].sort((a,b)=>a.currentHP-b.currentHP)[0],stat(actor).atk*.4,actor);for(const a of allies)heal(a,stat(actor).atk*p[2]+p[3],actor);afterAttack(actor,false,'followup');fuyuan.acting=false;actor.fuyuanActive=fuyuan.actions>0;}
-    function yunliCounter(actor,incoming=false,target=0){actor.parry=false;beginAction(actor);actor.followups++;actor.actionKind='ultimate';const c=incoming||actor.yunliCull;actor.yunliCull=!c;buff(actor,actor.id,'yunliAtk',{atk:.3},1);if(G)G.followupStart(actor,actors);const p=params(actor.id,'03'),options={followup:true,ultimate:true,extraCritDamage:p[1],group:true,bonus:actor.s.eidolon>=1?.2:0,extraCrit:actor.s.eidolon>=6?.15:0,extraResPen:actor.s.eidolon>=6?.2:0};hit(actor,p[0],[target],'Интуит · '+(c?'Истребление':'Вырубка'),options);if(dummies.length>1)hit(actor,p[5],[target-1,target+1].filter(i=>i>=0&&i<dummies.length),'Интуит · соседние цели',options);if(c)for(let n=0;n<p[3]+(actor.s.eidolon>=1?3:0);n++)hit(actor,p[6],[randomTarget()],'Интуит · дополнительный удар',options);if(actor.s.eidolon>=4)buff(actor,actor.id,'yunliE4',{effectRes:.5},1);if(G)G.followupEnd(actor);afterAttack(actor,true,'followup');}
-    function breakValue(actor){const hmc=find('8005'),dahlia=find('1321');const teamBonus=(hmc?.s.eidolon>=4&&actor!==hmc?breakValue(hmc)*.15:0)+(dahlia?.s.eidolon>=6&&actor.id===dahlia.partner?1.5:0);const eq=G?G.modifiers(actor,actors,data):{};return teamBonus+actor.s.breakEffect+(actor.eq?.p.BreakDamageAddedRatioBase||0)+(eq.breakEffect||0)+actor.buffs.reduce((n,b)=>n+(b.values.breakEffect||0),0)+(find('1303')?.2:0)+(actor.id==='1225'?.3:0)+(hasFoxPrayer(actor)?params('1225','02')[1]:0)+(actor.id==='1301'&&actor.s.eidolon>=6?.2:0)+(actor.id==='1206'&&actor.s.eidolon>=4?.4:0)+(hmc?.hmcUntil>hmc?.turn?params(hmc.id,'03')[2]:0)+(actor.id==='1317'&&actor.ink>0?.3:0)+(actor.id==='1310'?Math.max(0,stat(actor).atk-1800)*.0008:0)+(G?.has(actor,'307')&&thresholdStats(actor).speed>=145?.2:0);}
-    function slowed(index){const d=dummies[index];return d.slowUntil>d.turn||d.weltSlowUntil>d.turn||d.imprisonedUntil>d.turn;}
+    function fuyuanTurn(extra=false){const actor=find('1222');if(!actor||actor.defeated||fuyuan.acting||fuyuan.actions<=0)return;fuyuan.acting=true;beginAction(actor);if(!extra){fuyuan.actions--;fuyuan.distance=10000;}actor.followups++;if(G)G.followupStart(actor,actors);const p=params(actor.id,'04'),all=allTargets();hit(actor,p[1],all,'Фуюань · бонус-атака',{followup:true,group:true});const living=allTargets(),preferred=living.filter(i=>dummies[i].toughness>0&&hasWeakness(i,'Fire')),pool=preferred.length?preferred:living;if(pool.length)hit(actor,p[7],[pool[pick('fuyuan-extra',pool.length)]],'Фуюань · дополнительный удар',{followup:true,group:true,toughness:10});if(actor.s.eidolon>=6)for(let n=0;n<4;n++){const intact=all.filter(i=>dummies[i].toughness>0),pool=intact.length?intact:all;hit(actor,.5,[pool[pick('fuyuan-e6',pool.length)]],'Фуюань E6 · дополнительный удар',{followup:true,group:true,toughness:5});}if(G)G.followupEnd(actor);const allies=livingAllies();if(actor.s.eidolon>=4&&allies.length)heal([...allies].sort((a,b)=>a.currentHP-b.currentHP)[0],stat(actor).atk*.4,actor);for(const a of allies){cleanse(a,actor);heal(a,stat(actor).atk*p[2]+p[3],actor);}afterAttack(actor,false,'followup');fuyuan.acting=false;actor.fuyuanActive=fuyuan.actions>0;}
+    function yunliCounter(actor,incoming=false,target=0){actor.parry=false;beginAction(actor);actor.followups++;actor.actionKind='ultimate';const c=incoming||actor.yunliCull;if(!incoming)actor.yunliCull=!c;energy(actor,10);buff(actor,actor.id,'yunliAtk',{atk:.3},1);if(G)G.followupStart(actor,actors);const p=params(actor.id,'03'),options={followup:true,ultimate:true,extraCritDamage:p[1],group:true,toughness:10,bonus:actor.s.eidolon>=1?.2:0,extraCrit:actor.s.eidolon>=6?.15:0,extraResPen:actor.s.eidolon>=6?.2:0};hit(actor,p[0],[target],'Интуит · '+(c?'Истребление':'Вырубка'),options);if(dummies.length>1)hit(actor,p[5],[target-1,target+1].filter(i=>i>=0&&i<dummies.length),'Интуит · соседние цели',options);if(c)for(let n=0;n<p[3]+(actor.s.eidolon>=1?3:0);n++)hit(actor,p[6],[randomTarget()],'Интуит · дополнительный удар',{...options,toughness:2.5});if(actor.s.eidolon>=4)buff(actor,actor.id,'yunliE4',{effectRes:.5},1);if(G)G.followupEnd(actor);afterAttack(actor,true,'followup');}
+    function sparkleFigment(sparkle=find('1306')){
+      return sparkle?.s.novaflare&&!sparkle.defeated&&sparkle.figmentUntil>sparkle.turn?sparkle.figment:0;
+    }
+    function sparkleVulnerability(actor){
+      const sparkle=find('1306'),count=sparkleFigment(sparkle);
+      const cipher=actor.buffs.some(b=>b.source==='1306'&&b.key==='cipher'&&b.expires>=actor.turn);
+      return count*(params('1306','04')[1]+(cipher?params('1306','03')[2]:0));
+    }
+    function breakValue(actor){const hmc=find('8005'),dahlia=find('1321');const teamBonus=(hmc?.s.eidolon>=4&&actor!==hmc?breakValue(hmc)*.15:0)+(dahlia?.s.eidolon>=6&&actor.id===dahlia.partner?1.5:0);const eq=G?G.modifiers(actor,actors,data):{};return subspaceBreakEffect+teamBonus+actor.s.breakEffect+(actor.id==='1310'&&actor.s.novaflare&&actor.combustionUntil>now?.25:0)+(actor.eq?.p.BreakDamageAddedRatioBase||0)+(eq.breakEffect||0)+actor.buffs.reduce((n,b)=>n+(b.values.breakEffect||0),0)+(find('1303')?.2:0)+(actor.id==='1225'?.3:0)+(hasFoxPrayer(actor)?params('1225','02')[1]:0)+(actor.id==='1301'&&actor.s.eidolon>=6?.2:0)+(actor.id==='1206'&&actor.s.eidolon>=4?.4:0)+(hmc?.hmcUntil>hmc?.turn?params(hmc.id,'03')[2]:0)+(actor.id==='1317'&&actor.ink>0?.3:0)+(actor.id==='1310'?Math.max(0,stat(actor).atk-1800)*.0008:0)+(G?.has(actor,'307')&&thresholdStats(actor).speed>=145?.2:0);}
+    function slowed(index){const d=dummies[index];return d.ratioTechniqueSlowUntil>d.turn||d.weightlessUntil>d.turn||d.slowUntil>d.turn||d.weltSlowUntil>d.turn||d.imprisonedUntil>d.turn||d.breakSlowUntil>d.turn||d.swSpeedUntil>d.turn;}
     // Toughness uses the current in-game scale: a normal basic removes 10.
     // Older models aggregate damage packets: their per-target toughness budget is
     // consumed once per action. New break models explicitly split every packet.
@@ -518,7 +773,7 @@
       if(options.toughness!==undefined)return options.toughness;
       if(options.dot||kind==='additional'||kind==='dot')return 0;
       const adjacent=/соседние|взрыв/.test(label),id=actor.id;
-      if(/отскок|попадание/.test(label)&&['1009','1004','1304','1405'].includes(id))return id==='1304'?10/7:5;
+      if(/отскок|попадание/.test(label)&&['1009','1004','1304','1405'].includes(id))return id==='1304'?10/7:id==='1004'?10:5;
       if(/Повелитель молний/.test(label))return adjacent?0:5;
       const budgets={basic:10,skill:20,ultimate:20,followup:10};
       const overrides={'1009':{skill:10},'1013':{skill:10},'1107':{skill:10},'1204':{skill:10},'1302':{skill:10,ultimate:20},'1222':{skill:10,ultimate:20,followup:10},'1403':{basic:10,followup:5,ultimate:20},'1225':{basic:actor.fugueUntil>actor.turn?10:10},'1314':{basic:10,ultimate:20,followup:10},'1213':{basic:actor.s.policy==='basic'?10:40,ultimate:20}};
@@ -529,21 +784,22 @@
       return Boolean(fugue&&fugue.fugueUntil>fugue.turn&&(fugue.prayer===actor.id||(fugue.s.eidolon>=6&&actor!==fugue)));
     }
     function efficiency(actor){const fugue=find('1225');return 1+(actor.id==='1222'&&actor.s.eidolon>=1?.5:0)+(fugue?.s.eidolon>=1&&hasFoxPrayer(actor,fugue)?.5:0)+(actor.id==='1225'&&actor.s.eidolon>=6?.5:0)+(actor.id==='1301'&&actor.s.eidolon>=6?.2:0)+(find('1303')?.meiSkillUntil>find('1303')?.turn?.5:0)+(find('1321')?.dahliaUntil>find('1321')?.turn?.5:0)+(actor.id==='1310'&&actor.combustionUntil>now?.5+(actor.fireflyEnhanced&&actor.s.eidolon>=6?.5:0):0)+(actor.id==='1317'&&actor.ink>0?params(actor.id,'03')[0]:0);}
-    function defenseMultiplier(actor,index,kind,summon=false,elationDamage=false){
+    function defenseMultiplier(actor,index,kind,summon=false,elationDamage=false,extraIgnore=0){
       if(!scenario.enemyLevel)return 1;
       const enemy=dummies[index];
-      let reduction=actor===aeon&&facesActive()?(aeon.s.eidolon>=2?.6:.3):0;
+      let reduction=extraIgnore+improvDefenseIgnore+(actor===aeon&&facesActive()?(aeon.s.eidolon>=2?.6:.3):0);
       if(facesActive()&&find('1501'))reduction+=aeon.s.eidolon>=2?.2:.15;
       if(actor.id==='1302'&&actor.s.eidolon>=6&&kind==='ultimate')reduction+=.3;
       if(actor.id==='1310'&&actor.s.eidolon>=1&&actor.fireflySkill&&['skill','break','superbreak'].includes(kind))reduction+=.15;
       const recipient=actor._memo?.owner||actor;
       const sundayDef=recipient.buffs.find(b=>b.key==='sundayDef'&&b.expires>=recipient.turn);
       if(sundayDef)reduction+=summon?.4:.16;
-      if(find('1306')?.s.eidolon>=2)reduction+=(recipient.buffs.find(b=>b.key==='sparkleTalent'&&b.expires>=recipient.turn)?.values.stacks||0)*.08;
+      if(find('1306')?.s.novaflare&&find('1306').s.eidolon>=2)reduction+=sparkleFigment()*.1;
+      else if(find('1306')?.s.eidolon>=2)reduction+=(recipient.buffs.find(b=>b.key==='sparkleTalent'&&b.expires>=recipient.turn)?.values.stacks||0)*.08;
       const mei=find('1303');if(mei?.s.eidolon>=1&&mei.meiUltUntil>mei.turn)reduction+=.2;
       const cerydra=find('1412'),tribbie=find('1403'),dan=find('1414');
       if(find('1513')?.s.eidolon>=4&&actor.buffs.some(b=>b.key==='waveE4'))reduction+=.18;
-      const gil=find('1509');if(gil?.buffs.some(b=>b.key==='kingBurden')&&(actor===gil||gil.s.eidolon>=1))reduction+=params(gil.id,'04')[2];
+      const gil=find('1509');if(gil?.buffs.some(b=>b.key==='kingAcknowledgement'&&b.expires>=gil.turn)&&(actor===gil||gil.s.eidolon>=1))reduction+=params(gil.id,'02')[4];
       if(actor.id==='1505'&&actor.s.eidolon>=4)reduction+=.15;
       if(elationDamage&&find('1502')?.s.eidolon>=1)reduction+=.2;
       if(dan?.s.eidolon>=6&&dan.bondmate===actor.id)reduction+=.12;
@@ -556,6 +812,8 @@
       if(actor.id==='1315'&&actor.s.eidolon>=1)reduction+=.16;
       if(actor.id==='1317'&&actor.s.eidolon>=1&&actor.ink>0)reduction+=.15;
       if(enemy.anaxaDefUntil>enemy.turn)reduction+=.16;
+      if(enemy.pelaTechniqueUntil>enemy.turn)reduction+=.2;
+      if(enemy.weightlessUntil>enemy.turn)reduction+=params('1004','04')[1];
       if(actor.id==='1014'&&actor.s.eidolon>=2)reduction+=Math.min(15,actor.resonanceEarned||0)*.01;
       if(actor.id==='1015'&&actor.s.eidolon>=6&&kind==='skill')reduction+=.2;
       if(actor.id==='1221'&&actor.s.eidolon>=2&&(kind==='followup'||kind==='ultimate'))reduction+=.2;
@@ -565,9 +823,14 @@
       if(enemy.swUltUntil>enemy.turn)reduction+=params('1006','03')[2];
       if(enemy.swDefUntil>enemy.turn)reduction+=params('1006','04')[1];
       if(enemy.swanDefUntil>enemy.turn)reduction+=params('1307','02')[3];
+      if(actor.id==='1405')reduction+=.04*weaknessCount(index);
+      const ash=find('1504');
+      if(ash&&!ash.defeated&&ashBaitTarget(ash)!==undefined)reduction+=params(ash.id,'02')[3];
+      if(enemy.balefireUntil>enemy.turn)reduction+=params('1507','03')[6];
+      if(enemy.wiltUntil>enemy.turn)reduction+=params('1321','03')[2];
       if(enemy.fugueDefUntil>enemy.turn)reduction+=params('1225','02')[3];
       if(elationDamage&&G?.has(actor,'129',4))reduction+=.1+Math.min(10,Math.floor((aha.gainedPunchline||0)/5))*.01;
-      if(G?.has(actor,'108',4))reduction+=boss&&!enemy.weaknesses.includes('Quantum')?.1:.2;
+      if(G?.has(actor,'108',4))reduction+=!hasWeakness(index,'Quantum')?.1:.2;
       if(G?.has(actor,'116',4)){
         const dots=dotKeys.filter(key=>enemy[key]?.expires>=enemy.turn).length;
         const breakDots=['Physical','Fire','Thunder','Wind'].filter(element=>enemy.breakStatuses?.[element]).length;
@@ -580,24 +843,29 @@
       }
       return 100/(100+(scenario.enemyLevel+20)*Math.max(0,1-reduction));
     }
-    function eidolonVulnerability(index){const d=dummies[index],dan=find('1414');return (d.dahliaVulnUntil>d.turn?.12:0)+(d.stitch&&find('1402')?.s.eidolon>=1?.15:0)+(dan?.s.eidolon>=6&&dan.bondmate?.length?.2:0);}
+    function eidolonVulnerability(index){const d=dummies[index],dan=find('1414');return (d.swE2?.2:0)+(d.dahliaVulnUntil>d.turn?.12:0)+(d.stitch&&find('1402')?.s.eidolon>=1?.15:0)+(dan?.s.eidolon>=6&&dan.bondmate?.length?.2:0);}
     function eidolonEnemyRes(index,element){
       const d=dummies[index],swan=find('1307'),hysi=find('1410'),types={Wind:'wind',Fire:'burn',Physical:'bleed',Thunder:'shock'};
-      return (find('1405')?.s.eidolon>=2?.2:0)+(find('1321')?.s.eidolon>=2?.2:0)+(find('1506')?.s.eidolon>=6?.2:0)+(find('1504')?.s.eidolon>=6&&find('1504').ashBait?.length?.2:0)+(find('1507')?.s.eidolon>=1&&find('1507').rageUntil>now?.2:0)+(hysi?.s.eidolon>=4&&hysi.hysiUntil>hysi.turn?.2:0)
+      return (d.weightlessUntil>d.turn&&find('1004')?.s.eidolon>=4?.3:0)+(find('1405')?.s.eidolon>=2?.2:0)+(find('1321')?.s.eidolon>=2?.2:0)+(find('1506')?.s.eidolon>=6?.2:0)+(find('1504')?.s.eidolon>=6&&ashBaitTarget(find('1504'))!==undefined?.2:0)+(find('1507')?.s.eidolon>=1&&find('1507').rageUntil>now?.2:0)+(hysi?.s.eidolon>=4&&hysi.hysiUntil>hysi.turn?.2:0)
         +(swan?.s.eidolon>=1&&types[element]&&dotTypes(index).has(types[element])?.25:0);
     }
     function breakMultiplier(actor,index,dot=false){
       const d=dummies[index],s=stat(actor),ruan=find('1303'),trib=find('1403'),rappa=find('1317');
-      const generic=sixthVulnerability(index)+eidolonVulnerability(index)+(d.firekissUntil>d.turn?d.firekiss*params('1210','04')[3]:0)+(d.weltVulnUntil>d.turn?.12:0)+(d.ashenBurn?.expires>=d.turn?.15+Math.max(0,(d.ashStacks||0)-1)*.05:0)+(d.hysiVulnUntil>d.turn?params('1410','02')[2]:0)+(trib?.tribZoneUntil>trib?.turn?.3:0)+(find('1406')?.4:0)+(d.lukaVulnUntil>d.turn?params('1111','03')[2]:0);
+      const generic=sparkleVulnerability(actor)+sixthVulnerability(index)+eidolonVulnerability(index)+(d.firekissUntil>d.turn?d.firekiss*params('1210','04')[3]:0)+(d.weltVulnUntil>d.turn?.12:0)+(d.ashenBurn?.expires>=d.turn?.15+Math.max(0,(d.ashStacks||0)-1)*.05:0)+(d.hysiVulnUntil>d.turn?params('1410','02')[2]:0)+(trib?.tribZoneUntil>trib?.turn?.3:0)+(find('1406')?.4:0)+(d.lukaVulnUntil>d.turn?params('1111','03')[2]:0);
       const special=(d.befogUntil>d.turn?params('1222','03')[3]:0)+(d.besottedUntil>d.turn?params('1301','04')[0]:0)+(d.rappaVulnUntil>d.turn?(d.rappaVuln||0):0)+(actor.id==='1310'&&actor.combustionUntil>now?.2:0)+(actor.id==='1315'&&actor.duelUntil>actor.turn&&index===0?(actor.s.eidolon>=4?.42:.3):0)+(dot&&d.sampoVulnUntil>d.turn?params('1108','03')[1]:0)+(dot&&d.kafkaDotVulnUntil>d.turn?.3:0);
       const fugue=find('1225');
-      return (1+breakValue(actor))*(fugue?.s.eidolon>=4&&hasFoxPrayer(actor,fugue)?1.2:1)*(1+clamp(s.resPen+eidolonEnemyRes(index,data.characters[actor.id].element)+(d.archerQuantumUntil>d.turn&&data.characters[actor.id].element==='Quantum'?.2:0)+(d.luochaResUntil>d.turn?.2:0)+(d.avenResUntil>d.turn?.12:0)+(d.pelaIceUntil>d.turn&&data.characters[actor.id].element==='Ice'?.12:0)+(d.swResUntil>d.turn?d.swResAmount||.1:0)-(boss&&!d.weaknesses.includes(data.characters[actor.id].element)?.2:0),boss?-1:0,1))*(1+generic+special)*(d.toughness>0?.9:1);
+      return (1+breakValue(actor))*(fugue?.s.eidolon>=4&&hasFoxPrayer(actor,fugue)?1.2:1)*(1+clamp(s.resPen+eidolonEnemyRes(index,data.characters[actor.id].element)+(d.archerQuantumUntil>d.turn&&data.characters[actor.id].element==='Quantum'?.2:0)+(d.luochaResUntil>d.turn?.2:0)+(d.avenResUntil>d.turn?.12:0)+(d.pelaIceUntil>d.turn&&data.characters[actor.id].element==='Ice'?.12:0)+(d.swResUntil>d.turn?d.swResAmount||.1:0)+(find('1006')?.s.novaflare&&d.swWeaknessUntil>d.turn&&d.swWeakness===data.characters[actor.id].element?d.swWeaknessRes:0)-(boss&&!d.weaknesses.includes(data.characters[actor.id].element)?.2:0),boss?-1:0,1))*(1+generic+special)*(d.toughness>0?.9:1);
     }
     function breakDamage(actor,index,multiplier=1,element=data.characters[actor.id].element,label='Пробитие',cap=maxToughness){
       if(!maxToughness||boss&&dummies[index].hp<=0)return 0;const type={Physical:2,Fire:2,Wind:1.5,Thunder:1,Ice:1,Quantum:.5,Imaginary:.5}[element];
       return creditBreak(actor,index,breakBase*type*(.5+Math.min(maxToughness,cap)/40)*multiplier*breakMultiplier(actor,index),label,'break');
     }
-    function creditBreak(actor,index,damage,label,kind){damage=enemyDamage(index,damage*defenseMultiplier(actor,index,kind));if(aeon&&aha.acting)aha.instantDamage+=damage;actor.total+=damage;actor.breakDamage=(actor.breakDamage||0)+(kind==='superbreak'?0:damage);actor.superDamage=(actor.superDamage||0)+(kind==='superbreak'?damage:0);damageByTarget[index]+=damage;summerRecord(actor,damage);const cipher=find('1406');if(cipher&&!cipher.cipherUlting){const speed=stat(cipher).speed;cipher.bank=(cipher.bank||0)+damage*(index===0?params(cipher.id,'04')[1]:.08)*(speed>=170?2:speed>=140?1.5:1)*(cipher.s.eidolon>=1?1.5:1);}record(actor,label+' · цель '+(index+1),damage,kind);const cy=find('1415');if(cy&&(cy.ripple||cy.cyreneZoneUntil>cy.turn))trueHit(actor,damage*cyreneTrueRatio(cy),[index],'Кирена · истинный урон пробития');return damage;}
+    function creditBreak(actor,index,damage,label,kind){const cipher=find('1406'),patron=cipher?cipherPatron(cipher):undefined;damage=enemyDamage(index,damage*defenseMultiplier(actor,index,kind),null,kind,{damageOwner:actor.id,triggerSource:enemyPhase?actor.id:activeActor?.id||actor.id});if(aeon&&aha.acting)aha.instantDamage+=damage;actor.total+=damage;actor.breakDamage=(actor.breakDamage||0)+(kind==='superbreak'?0:damage);actor.superDamage=(actor.superDamage||0)+(kind==='superbreak'?damage:0);damageByTarget[index]+=damage;summerRecord(actor,damage);if(cipher&&!cipher.cipherUlting){const speed=stat(cipher).speed;cipher.bank=(cipher.bank||0)+damage*(index===patron?params(cipher.id,'04')[1]:.08)*(speed>=170?2:speed>=140?1.5:1)*(cipher.s.eidolon>=1?1.5:1);}record(actor,label+' · цель '+(index+1),damage,kind);const cy=find('1415');if(cy&&(cy.ripple||cy.cyreneZoneUntil>cy.turn))trueHit(actor,damage*cyreneTrueRatio(cy),[index],'Кирена · истинный урон пробития','true',false,cy.id);return damage;}
+    function fireflyExtraTurn(actor){
+      if(!actor.fireflyEnhanced||actor.s.eidolon<2||actor.turn<(actor.fireflyExtraReady||0))return;
+      actor.fireflyExtraReady=actor.turn+2;actor.distance=0;
+      record(actor,'Светлячок E2 · дополнительный ход');
+    }
     function onBreak(actor,index,exo=false){
       const d=dummies[index],element=data.characters[actor.id].element;d.breaks++;actor.breakCount=(actor.breakCount||0)+1;
       const hmc=find('8005'),fugue=find('1225'),rappa=find('1317'),mei=find('1303'),booth=find('1315'),himeko=find('1003');
@@ -612,16 +880,27 @@
       if(fugue){const extra=.06+(breakValue(fugue)>=2.2?.12:0);for(const a of actors)if(a!==fugue){const before=a.buffs.find(b=>b.key==='fugueBreak')?.values.breakStacks||0;buff(a,fugue.id,'fugueBreak',{breakStacks:Math.min(2,before+1),breakEffect:Math.min(2,before+1)*extra},2);}}
       if(actor.id==='8001')actor.destroyStacks=Math.min(2,(actor.destroyStacks||0)+1);if(booth?.duelUntil>booth?.turn&&index===0){booth.pocket=Math.min(3,(booth.pocket||0)+1);if(booth.s.eidolon>=2&&booth.pocketE2Turn!==booth.turn){booth.pocketE2Turn=booth.turn;gainSP();buff(booth,booth.id,'boothE2',{breakEffect:.3},2);}booth.duelUntil=0;energy(booth,10);record(booth,'Карманное преимущество · '+booth.pocket);}
       if(mei){if(mei.s.eidolon>=4)buff(mei,mei.id,'meiE4',{breakEffect:1},3);breakDamage(mei,index,params('1303','04')[1]+(mei.s.eidolon>=6?2:0),'Ice','Талант Жуань Мэй');if(mei.meiUltUntil>mei.turn&&!d.rebloom&&!d.rebloomLock)d.rebloom={owner:mei.id};}
-      if(himeko)himeko.himekoCharges=(himeko.himekoCharges||0)+1+(actor===himeko&&himeko.s.eidolon>=4&&actor.actionKind==='skill'?1:0);
+      if(himeko)himeko.himekoCharges=boss&&index===0?3:Math.min(3,(himeko.himekoCharges||0)+1+(actor===himeko&&himeko.s.eidolon>=4&&actor.actionKind==='skill'?1:0));
+      const wolf=find('1006');if(wolf&&!wolf.defeated)silverBug(wolf,index,wolf.s.novaflare?1:.65);
       if(G?.has(actor,'111',4))energy(actor,3);
       const su=find('1206');if(su)sushangSpeed(su);
-      if(actor.id==='1310'&&actor.fireflyEnhanced&&!exo&&actor.s.eidolon>=2&&actor.turn>=(actor.fireflyExtraReady||0)){actor.fireflyExtraReady=actor.turn+2;actor.distance=0;record(actor,'Светлячок E2 · дополнительный ход');}
+      if(actor.id==='1310'&&actor.s.novaflare&&actor.fireflyEnhanced&&(actor.combustionExtensions||0)<3){
+        actor.combustionExtensions=(actor.combustionExtensions||0)+1;
+        actor.combustionUntil+=1000/params(actor.id,'03')[3];
+        record(actor,'Полное сгорание · продление на 10%');
+      }
+      if(actor.id==='1310'&&!exo)fireflyExtraTurn(actor);
     }
     function reduceToughness(actor,index,base,options={}){
       if(!maxToughness||base<=0)return;
       const d=dummies[index],element=options.element||data.characters[actor.id].element;
-      if(boss&&(d.hp<=0||boss.shield>0||!d.weaknesses.includes(element)&&!actor.acheronUlting&&!(actor.id==='1308'&&options.ultimate)))return;
-      const amount=base*(efficiency(actor)+(options.memo&&find('1413')?.s.eidolon>=4?(actor.id==='1413'?.5:.25):0)),before=d.toughness;let actual=0,overflow=amount;
+      if(boss&&(d.hp<=0||boss.shield>0))return;
+      const master=actor.id==='1224'&&find(actor.master);
+      const full=hasWeakness(index,element)||options.ignoreWeakness||actor.acheronUlting||
+        actor.id==='1308'&&options.ultimate||master&&hasWeakness(index,data.characters[master.id].element);
+      const weaknessScale=full?1:Math.max(options.weaknessRatio||0,hasFoxPrayer(actor)?params('1225','02')[5]:0);
+      if(!weaknessScale)return;
+      const amount=base*weaknessScale*(efficiency(actor)+(options.memo&&find('1413')?.s.eidolon>=4?(actor.id==='1413'?.5:.25):0)),before=d.toughness;let actual=0,overflow=amount;
       if(before>0){actual=Math.min(before,amount);d.toughness=Math.max(0,before-amount);overflow=Math.max(0,amount-before);if(d.toughness<1e-8){d.toughness=0;d.exo=find('1225')?maxToughness*.4:0;onBreak(actor,index);}}
       if(d.toughness===0&&d.exo>0&&overflow>0){const spent=Math.min(d.exo,overflow);d.exo=Math.max(0,d.exo-overflow);actual+=spent;if(d.exo<1e-8){d.exo=0;onBreak(actor,index,true);}}
       actor.breakHits??={};const info=actor.breakHits[index]??={broken:0,all:0,rate:options.superRate};info.broken+=before===0?amount:overflow;info.all+=amount;if(options.superRate!==undefined)info.rate=options.superRate;
@@ -633,10 +912,10 @@
       const hits=actor.breakHits||{};actor.breakHits={};if(!maxToughness)return;
       const h=find('8005'),f=find('1225'),dahlia=find('1321'),pre=dahlia?.dahliaUntil>dahlia?.turn,partner=dahlia&&(actor===dahlia||actor.id===dahlia.partner);
       for(const [key,hitsForTarget] of Object.entries(hits)){const i=Number(key),eligible=pre?hitsForTarget.all:hitsForTarget.broken,rates=[];
-        if(h?.hmcUntil>h?.turn)rates.push(['Первопроходец',1+([.6,.5,.4,.3,.2][dummies.length-1])]);
+        if(h?.hmcUntil>h?.turn)rates.push(['Первопроходец',1+[.6,.5,.4,.3,.2][clamp(allTargets().length,1,5)-1]]);
         if(f)rates.push(['Фуга',1]);
         if(partner||dahlia?.s.eidolon>=1)rates.push(['Георгина',(hitsForTarget.rate||0)+.6+(partner&&dahlia.s.eidolon>=1?.4:0)]);
-        if(actor.id==='1310'&&actor.combustionUntil>now){const be=breakValue(actor);if(be>=2)rates.push(['Светлячок',be>=3.6?.5:.35]);}
+        if(actor.id==='1310'&&actor.combustionUntil>now){const be=breakValue(actor);if(actor.s.novaflare){if(be>=1.5)rates.push(['Светлячок',be>=3?1.5:1]);}else if(be>=2)rates.push(['Светлячок',be>=3.6?.5:.35]);}
         if(actor.id==='1317'&&actor.ink>0)rates.push(['Раппа',.6]);
         for(const [source,rate] of rates)if(eligible>0)creditBreak(actor,i,breakBase*eligible/10*rate*breakMultiplier(actor,i),'Суперпробитие · '+source,'superbreak');
       }
@@ -659,7 +938,7 @@
       cast();if(G&&!ownHooks&&!['1205','1405'].includes(actor.id))G.afterSkill(actor);
       for(const k of costs)actor[k]=snapshot[k];dummies.forEach((d,i)=>{d.interpret=interpret[i];});copying=null;c.coupActive=false;c.cCharge=Math.max(0,c.cCharge-6);if(c.ode==='cerydra')c.cCharge=Math.min(8,c.cCharge+1);c.resource=c.cCharge;actor.actionKind=old;beginAction(actor);
     }
-    function cCharge(actor,n){if(actor.coupActive)return;actor.cCharge=Math.min(8,(actor.cCharge||0)+n);actor.resource=actor.cCharge;}
+    function cCharge(actor,n){if(actor.coupActive)return;const before=actor.cCharge||0;actor.cCharge=Math.min(8,before+n);actor.resource=actor.cCharge;if(before<6&&actor.cCharge>=6){const ally=find(actor.merit);if(ally)cleanseControl(ally,actor);}}
     function cerydraAction(actor,kind=actor.actionKind){const c=find('1412');if(c?.merit===actor.id&&['basic','skill'].includes(kind)&&actor.cerydraCredit!==actor.actionKey){actor.cerydraCredit=actor.actionKey;cCharge(c,1);energy(c,5);}}
     function memoSpeed(m){
       const id=m.owner.id;
@@ -716,7 +995,7 @@
     function settleMemories(){if(form.active)return;const m=memo('1409');if(m?.active&&!m.acting&&(m.hurt?.size||0)){m.acting=true;const hurt=[...m.hurt];m.hurt.clear();const a=m.owner,p=data.character_skills['1140903'].params[a.s.eidolon>=5?6:5];for(const target of hurt){if(!m.active)break;if(target._memo&&!target._memo.active)continue;m.unit.currentHP=Math.max(0,m.unit.currentHP-memoStat(m).hp*.04);heal(target,stat(a).hp*p[1]+p[2],m.unit);if(a.rainUntil>a.turn)for(const ally of livingAllies())if(ally!==m.unit)heal(ally,stat(a).hp*p[3]+p[4],m.unit);if(m.unit.currentHP<=0){m.active=false;a.memoryActive=false;a.distance=Math.max(0,a.distance-3000);record(a,'Ика · исчезновение, продвижение 30%');}}m.acting=false;}}
     function icaTurn(){const m=memo('1409');if(!m?.active||m.acting||form.active)return;const a=m.owner;m.acting=true;beginAction(a);m.unit.turn++;m.turn++;memoHot(m);const amount=(m.tally||0)*data.character_skills['1140901'].params[a.s.eidolon>=3?6:5][0];memoHit(m,0,allTargets(),'Тучи прочь!',{baseDamage:amount,toughness:10});m.tally*=a.s.eidolon>=6?.88:.5;energy(a,5);afterAttack(a,false,'memo');if(m.icaBuffUntil<=m.unit.turn)m.icaStacks=0;expireMemoryRelics(m);m.acting=false;}
     function endNetherwing(){const m=memo('1407');if(!m?.active)return;const a=m.owner;const p=data.character_skills['1140706'].params[a.s.eidolon>=3?6:5];for(let n=0;n<6+(a.s.eidolon>=6?3:0);n++)hit(a,0,[randomTarget()],'Крылья Смерти · завершение',{kind:'memo',memo:m,baseDamage:stat(a).hp*(p[0]+(m.odeEndBonus||0)),toughness:5,bonus:(m.turnBreaths||0)*.3});m.active=false;a.memoryActive=false;for(const ally of livingAllies())heal(ally,stat(a).hp*p[2]+p[3],a);record(a,'Крылья Смерти · исчезновение');}
-    function memoryTurn(m){if(!m.active||form.active)return;const a=m.owner;beginAction(a);m.acting=true;m.turn++;m.unit.turn++;memoHot(m);m.distance=10000;
+    function memoryTurn(m){if(!m.active||form.active)return;const a=m.owner;beginAction(a);m.acting=true;m.turn++;m.unit.turn++;memoHot(m);huohuoHeal(m.unit);m.distance=10000;
       if(a.id==='1402'){const p=data.character_skills['1140201'].params[a.s.eidolon>=5?6:5];memoHit(m,p[0],[0],'Колючая ловушка',{toughness:10});if(dummies.length>1)memoHit(m,p[1],allTargets().slice(1,3),'соседние цели',{toughness:5});energy(a,10);if(dummies[0].stitch)m.stacks=Math.min(a.s.eidolon>=4?7:6,m.stacks+1);afterAttack(a,false,'memo');}
       if(a.id==='1407'){m.turnBreaths=0;const p=data.character_skills['1140702'].params[a.s.eidolon>=5?6:5];for(let n=0;n<4&&m.active;n++){m.turnBreaths++;const cost=m.burningWill>0?0:8500;if(m.burningWill>0)m.burningWill--;const finish=m.unit.currentHP<=cost+1e-8;m.unit.currentHP=Math.max(1,m.unit.currentHP-cost);const c=[p[1],p[2],p[3]][Math.min(2,m.breath++)];memoHit(m,0,allTargets(),'дыхание '+m.breath,{baseDamage:stat(a).hp*c,toughness:10,bonus:Math.min(6,m.turnBreaths)*.3});if(finish)endNetherwing();}if(m.active&&m.turn>=3)endNetherwing();afterAttack(a,false,'memo');}
       sixthMemoryTurn(m);finalMemoryTurn(m);expireMemoryRelics(m);m.acting=false;if(a.id==='1413'&&m.active&&a.resource>=16)m.distance=0;settleMemories();
@@ -745,9 +1024,44 @@
     }
     function finalVulnerability(){const r=find('1512'),e=find('1505');return (r?.birds>0?[0,.08,.12,.16][r.birds]:0)+(e?.foxVulnUntil>e?.turn?.12:0);}
     function finalElation(a,s){let v=0;if(a.id==='1505')v+=s.critDamage*.2;if(a.id==='1506'&&s.speed>=160)v+=.5+Math.min(100,s.speed-160)*.02;if(a.id==='1513'&&s.speed>=140)v+=.3+Math.min(200,s.speed-140)*.01;const av=find('1513');if(av&&elationActors.length>1)v+=.2+(a===av?.8:0);return v;}
-    function queueFinal(kind,a,extra={}){finalQueue.push({kind,a,...extra});}
+    function queueFinal(kind,a,extra={}){
+      const actionType=['acheronEX','imbibitorEX','fox'].includes(kind)?'followup-action':'deferred-action';
+      finalQueue.push({kind,a,actionType,...extra});
+    }
     let settlingFinal=false;
-    function settleFinal(){if(settlingFinal||form.active)return;settlingFinal=true;let guard=0;try{while(finalQueue.length&&guard++<500){const e=finalQueue.shift();if(e.a.defeated)continue;if(e.kind==='acheronEX')acheronEX(e.a);if(e.kind==='imbibitorEX')imbibitorEX(e.a);if(e.kind==='fox')foxAttack(e.a);if(e.kind==='wave')waveAttack(e.a,20,false);if(e.kind==='box')wolfBox(e.a,e.forced);if(e.kind==='demi')demiTurn(e.a,e.attack);if(e.kind==='nova')novaAssist(e.a,e.a,true);if(e.kind==='godslayer'){const a=e.a,before=a.mydeiCharge;a.mydeiActing=true;buff(a,a.id,'odeGodslayer',{critDamage:2},1);batchSkill(a,true);a.mydeiCharge=before;a.mydeiActing=false;a.buffs=a.buffs.filter(b=>b.key!=='odeGodslayer');}}if(guard>=500)throw Error('Слишком много реакций новых моделей.');}finally{settlingFinal=false;}}
+    function settleFinal(){
+      if(settlingFinal||form.active)return;
+      settlingFinal=true;let guard=0;
+      try{
+        while(finalQueue.length){
+          const pending=find('1102')?.seeleExtraPending;
+          const index=pending?finalQueue.findIndex(e=>e.actionType==='followup-action'):0;
+          if(index<0)break;
+          if(guard++>=500)timeline.limit('reactions',500);
+          const [e]=finalQueue.splice(index,1);
+          if(e.a.defeated||e.actionType==='followup-action'&&controlled(e.a)){
+            if(scenario.audit)record(e.a,'Реакция недоступна',0,'reaction-skipped',null,{reaction:e.kind,actionType:e.actionType});
+            continue;
+          }
+          if(scenario.audit)record(e.a,'Начало отложенной реакции',0,'reaction-start',null,{reaction:e.kind,actionType:e.actionType});
+          withActionContext(()=>{
+            if(e.kind==='seeleSkill')seeleAutomaticSkill(e.a,e.index);
+            if(e.kind==='acheronEX')acheronEX(e.a);
+            if(e.kind==='imbibitorEX')imbibitorEX(e.a);
+            if(e.kind==='fox')foxAttack(e.a);
+            if(e.kind==='wave')waveAttack(e.a,20,false);
+            if(e.kind==='box')wolfBox(e.a,e.forced);
+            if(e.kind==='demi')demiTurn(e.a,e.attack);
+            if(e.kind==='nova')novaAssist(e.a,e.a,true);
+            if(e.kind==='godslayer'){
+              const a=e.a,before=a.mydeiCharge;a.mydeiActing=true;
+              buff(a,a.id,'odeGodslayer',{critDamage:2},1);batchSkill(a,true);
+              a.mydeiCharge=before;a.mydeiActing=false;a.buffs=a.buffs.filter(b=>b.key!=='odeGodslayer');
+            }
+          });
+        }
+      }finally{settlingFinal=false;}
+    }
     function evanEnergy(a,value,fromBanger=false){if(value<=0||copying===a)return;a.energy=Math.min(480,a.energy+value);a.foxEnergy=(a.foxEnergy||0)+Math.min(240,value);if(!fromBanger)addBanger(a,Math.min(100,value)*(a.s.eidolon>=2?2:1),true);while(a.foxEnergy>=240){a.foxEnergy-=240;queueFinal('fox',a);}}
     function evanElation(a,points){const p=elationParams(a);elationHit(a,p[1],allTargets(),'Эванесса · Мрачный разрыв',points,{toughness:10,ahaSkill:true});addBanger(a,p[0]+(a.s.eidolon>=1?10:0));}
     function foxAttack(a){beginAction(a);a.actionKind='followup';a.followups++;a.foxVulnUntil=a.turn+3;debuffApplied(a);hit(a,1,allTargets(),'Учитель Лиса · бонус-атака',{followup:true,toughness:10});if(banger(a)>0)elationHit(a,.25,allTargets(),'Учитель Лиса · Радость',banger(a),{kind:'additional'});energy(a,10);if(a.s.eidolon>=1)evanElation(a,banger(a));afterAttack(a,false,'followup');}
@@ -792,15 +1106,15 @@
     function finalHealing(target,healer){if(aeon&&target===aeon&&healer!==aeon&&!aeon.wishFromSustain){aeon.wishFromSustain=true;wishpower(1);}const r=find('1512');if(!r||healer.id===r.id)return;if(target.id===r.id)r.rhythm=Math.min(12,(r.rhythm||0)+12);const key=turnOwner?turnOwner.id+':'+turnOwner.turn:'event:'+eventSerial;if(r.healMoodKey!==key){r.healMoodKey=key;mood(r,1,healer._memo?.owner||healer);}}
     function novaAssist(n,user,extra=false){if(n.novaActing||form.active)return;const old=n.actionKind;n.novaActing=true;beginAction(n);n.actionKind='skill';if(G)G.beforeSkill(n);if(!extra){n.novaUsed=true;energy(n,18);if(user!==n)energy(user,4);if(user!==n&&companions.has(user.id)){n.protocol=['1001','1003','1004','1224','1413'].includes(user.id)?'decimation':'verdict';record(n,'Совместный протокол · '+(n.protocol==='verdict'?'Вердикт':'Уничтожение'));}}
       const p=params(n.id,'22'),bonus=n.s.eidolon>=6&&user!==n?.75:0;if(n.s.eidolon>=6&&user!==n)n.novaSource=Math.min(6,(n.novaSource||0)+1);if(n.s.eidolon>=4)for(const ally of actors)buff(ally,n.id,'novaE4',{resPen:ally===n?.3:.2},2);hit(n,user===n?p[3]:p[0],allTargets(),'Звездопроходец · поддержка',{toughness:10,bonus});for(let i=0;i<(user===n?p[4]:p[1])+(n.s.eidolon>=1?1:0);i++)hit(n,user===n?p[5]:p[2],[randomTarget()],'Звездопроходец · отскок',{toughness:2,bonus});afterAttack(n,false,'skill');if(G)G.afterSkill(n);n.novaActing=false;n.actionKind=old;}
-    function novaAllyAssist(a){const n=find('1510');if(!n||n===a||n.assistUses<=0||a.departed||scenario.novaAssistPolicy==='off')return false;const crew=companions.has(a.id);if(!crew&&scenario.novaAssistPolicy!=='all')return false;n.assistUses--;novaAssist(n,a);if(crew||n.s.eidolon>=2){record(a,'Поддержка · дополнительное действие компаньона');beginAction(a);return false;}a.turn++;a.normal++;a.distance=10000;record(a,'Действие заменено навыком поддержки');return true;}
+    function novaAllyAssist(a){const n=find('1510');if(!n||n.defeated||n===a||n.assistUses<=0||a.departed||scenario.novaAssistPolicy==='off')return false;const crew=companions.has(a.id);if(!crew&&scenario.novaAssistPolicy!=='all')return false;n.assistUses--;novaAssist(n,a);if(crew||n.s.eidolon>=2){record(a,'Поддержка · дополнительное действие компаньона');beginAction(a);return false;}a.turn++;a.normal++;a.distance=10000;record(a,'Действие заменено навыком поддержки');return true;}
     function novaTrigger(n){if(n.novaActing||n.novaProcs>=2+(n.s.eidolon>=1?1:0))return;n.novaProcs++;queueFinal('nova',n);}
     function finalAfterAttack(a,targets,kind,isUltimate,wasFollow,hasAttackTargets){
       if(kind==='memo')futureAction(a,kind);
       const av=find('1513');if(av&&a!==av&&!av.waveActing&&hasAttackTargets){punch(1);waveFervor(av,1);if(elationActors.length===1){addBanger(av,2);punch(1);av.soloAhaBoost=(av.soloAhaBoost||0)+25;}}waveAction(a,kind);
-      const r=find('1512');if(r){mood(r,1,a);if(a.buffs.some(b=>b.key==='summerGuest'&&b.expires>=a.turn))mood(r,2,a);}
+      const r=find('1512');if(r&&!r.defeated&&hasAttackTargets){mood(r,1,a);if(a.buffs.some(b=>b.key==='summerGuest'&&b.expires>=a.turn))mood(r,2,a);}
       if(a.ode==='aglaea'&&a.romantic){a.romantic=false;energy(a,70);}if(a.ode==='hysilens'&&a.odeHysiEnergy){a.odeHysiEnergy=false;energy(a,60);}if(a.ode==='hysilens'&&['basic','skill'].includes(kind))detonate(targets,kind==='skill'?.8:.6);
       if(a.ode==='trailblazer'&&kind==='basic'&&a.epic!==undefined&&a.actionKey!==a.odeMemKey){a.odeMemKey=a.actionKey;queueFinal('demi',find('1415'),{attack:true});}
-      const n=find('1510');if(n&&n!==a&&n.protocol==='decimation'&&!n.novaActing){n.novaCount=(n.novaCount||0)+targets.length;const limit=n.s.eidolon>=1?6:9;if(n.novaCount>=limit){n.novaCount-=limit;novaTrigger(n);}}
+      const n=find('1510');if(n&&!n.defeated&&n!==a&&n.protocol==='decimation'&&!n.novaActing&&hasAttackTargets){n.novaCount=(n.novaCount||0)+targets.length;const limit=n.s.eidolon>=1?6:9;if(n.novaCount>=limit){n.novaCount-=limit;novaTrigger(n);}}
     }
     function waveAction(a,kind){const av=find('1513');if(!av||a===av||!['basic','skill','ultimate','followup'].includes(kind)||av.waveCredits>=6||a.waveCredit===a.actionKey)return;a.waveCredit=a.actionKey;av.waveCredits=(av.waveCredits||0)+1;for(const b of actors)buff(b,av.id,'waveCD',{critDamage:.48},3);waveFervor(av,2);}
     function finalAction(a){futureAction(a,a.actionKind);waveAction(a,a.actionKind);if(a.id==='1415')futureReset();}
@@ -830,7 +1144,20 @@
     function finalUlt(a){const id=a.id,all=allTargets();
       if(id==='1415'){if(!a.ripple){a.resource=Math.max(0,a.resource-24);a.ripple=true;a.cyreneZoneUntil=Infinity;const old=stat(a).hp,m=spawnMemory(id);a.currentHP+=Math.max(0,stat(a).hp-old);m.unit.currentHP=memoStat(m).hp;m.history=1;for(const ally of actors)if(ally!==a){if(a.s.eidolon>=6)ally.distance=0;if(ally.id==='1220')ally.resource=Math.max(6,ally.resource);else if(ally.id==='1308')ally.resource=Math.max(9,ally.resource);else if(ally.id==='1407')ally.resource=Math.max(34000,ally.resource);else if(ally.id==='1408')ally.resource=Math.max(12,ally.resource);else if(ally.id==='1506')wolfGain(ally,Math.max(0,60-ally.resource));else ally.energy=Math.max(ally.energy,data.characters[ally.id].max_sp);}record(a,'Рябь прошлого · ульты команды активированы');}else a.resource=Math.max(0,a.resource-12);queueFinal('demi',a);return true;}
       if(id==='1506'){a.resource=Math.max(0,a.resource-60);a.godmode=true;a.godBasics=0;a.wolfExtraCount=0;if(a.s.eidolon>=2)for(const b of a.buffs)b.expires++;a.boxChance=1;wolfGain(a,20);a.distance=0;record(a,'Непобедимый игрок · 3 усиленные базовые');return true;}
-      if(id==='1505'){const p=params(id,'03');if(a.s.eidolon>=6&&(a.ults-1)%4===0)energy(a,120/stat(a).energyRegen);hit(a,p[0],all,'Эванесса · Песнь меча',{toughness:20});const extra=all.length===1?4:all.length===2?2:1;for(let n=0;n<p[1]+extra;n++)hit(a,p[2],[pick('evanessa-bounce',all.length)],'Эванесса · отскок ульты',{toughness:5/(5+extra)});if(banger(a)>0){const points=Math.max(480,banger(a));elationHit(a,.24,all,'Эванесса · Радость ульты',points);for(let n=0;n<5+extra;n++)elationHit(a,.28,[pick('evanessa-elation-bounce',all.length)],'Эванесса · отскок Радости ульты',points);}afterAttack(a,true);return true;}
+      if(id==='1505'){
+        const p=params(id,'03'),talent=params(id,'04'),count=p[1]+(all.length===1?4:all.length===2?2:1);
+        if(a.s.eidolon>=6&&(a.ults-1)%4===0)energy(a,120/stat(a).energyRegen);
+        const points=banger(a)>0?Math.max(data.characters[id].max_sp,banger(a)):0;
+        hit(a,p[0],all,'Эванесса · Песнь меча',{toughness:20});
+        if(points)elationHit(a,talent[6],allTargets(),'Эванесса · Радость ульты',points);
+        for(let n=0;n<count;n++){
+          const living=allTargets();if(!living.length)break;
+          const target=living[pick('evanessa-bounce',living.length)];
+          hit(a,p[2],[target],'Эванесса · отскок ульты',{toughness:5/count});
+          if(points&&allTargets().includes(target))elationHit(a,talent[7],[target],'Эванесса · отскок Радости ульты',points);
+        }
+        afterAttack(a,true);return true;
+      }
       if(id==='1510'){novaUltimate(a);return true;}
       if(id==='1512'){const target=focusFor(a);if(target===a)return true;target.distance=0;const p=params(id,'03');energy(target,data.characters[target.id].max_sp*p[2]/stat(target).energyRegen);buff(target,id,'summerGuest',{},p[1]);targetedRelics(a,target);assist(target,a);record(a,'Особый гость → '+data.characters[target.id].name);return true;}
       if(id==='1513'){const p=params(id,'03');punch(p[2]);waveFervor(a,p[1]);buff(a,id,'waveSpeed',{speedPct:p[3]},p[4]);hit(a,p[0],all,'Прибой · Победа над волнами',{toughness:20});if(banger(a)>0)elationHit(a,params(id,'04')[2],all,'Прибой · хит ульты');afterAttack(a,true);return true;}return false;
@@ -846,13 +1173,14 @@
       if(a.id==='1509'){r.speed+=a.s.baseSpeed*(a.enthusiasm||0)*.1;r.critDamage+=Math.min(6,a.enthusiasmEarned||0)*.25;}
       const yao=find('1502'),pearl=find('1503'),sparxie=find('1501');
       if(a.id==='1502')r.critDamage+=.6;
+      if(a.id==='8009')r.crit+=.15;
       if(yao?.s.eidolon>=2&&yao.yaoZoneUntil>yao.turn)r.speed+=a.s.baseSpeed*.12;
       if(pearl?.s.eidolon>=6&&pearl.pearlLearn>0)r.resPen+=.2;
       if(sparxie?.s.eidolon>=1)r.resPen+=Math.min(.15,aha.punchline*.015);
       if(a===sparxie&&a.s.eidolon>=6)r.resPen+=.2;
       if(a.id==='1508'&&a.s.eidolon>=6)r.resPen+=.2;
       if(gil?.s.eidolon>=6)r.resPen+=.2;
-      if(a===gil){if(a.s.eidolon>=4)r.energyRegen+=.2;if(a.s.eidolon>=1&&a.buffs.some(b=>b.key==='kingBurden'))r.atk+=a.s.baseAtk*.6;}
+      if(a===gil){if(a.s.eidolon>=4)r.energyRegen+=.2;if(a.s.eidolon>=1&&a.buffs.some(b=>b.key==='kingAcknowledgement'&&b.expires>=a.turn))r.atk+=a.s.baseAtk*.6;}
       if(a.id==='1504'&&a.s.eidolon>=6)r.damage+=.04*Math.min(30,a.gluttonyEarned||0);
       if(a.id==='1510'&&a.s.eidolon>=6)r.resPen+=.2;
       if(find('1501'))r.critDamage+=Math.min(.8,aha.punchline*.08);
@@ -862,7 +1190,7 @@
       if(mb?.rageUntil>now){r.damage+=.5+(mb.s.eidolon>=4?.5:0);if(actors.some(b=>b!==mb&&data.characters[b.id].path==='Warlock')){if(a.actionKind==='ultimate')r.damage+=.75;}else if(a===mb)r.damage+=.75;}
       if(a.id==='1507'&&a.rageUntil>now){r.crit+=.2;r.critDamage+=.6;}
     }
-    function sixthVulnerability(index=0){const e=find('1413'),m=find('1507'),d=dummies[index];return (e?.darkActive?.3:0)+(find('1504')?.s.eidolon>=1?.24:0)+(find('1506')?.s.eidolon>=1&&find('1506').godmode?.2:0)+(m?.rageUntil>now?.5:0)+(d.yaoVulnUntil>d.turn?.16:0)+(d.rinVulnUntil>d.turn?.2:0)+(d.tbE4Until>d.turn?.1:0)+finalVulnerability();}
+    function sixthVulnerability(index=0){const e=find('1413'),m=find('1507'),d=dummies[index];return (e?.darkActive?.3:0)+(find('1504')?.s.eidolon>=1?.24:0)+(find('1506')?.s.eidolon>=1&&find('1506').godmode?.2:0)+(d.balefireUntil>d.turn?.5:0)+(d.yaoVulnUntil>d.turn?.16:0)+(d.rinVulnUntil>d.turn?.2:0)+(d.tbE4Until>d.turn?.1:0)+finalVulnerability();}
     function elation(a,withoutZone=false){const s=stat(a),eq=a.eq?.p||{};let v=(a.s.elation||0)+(eq.ElationDamageAddedRatioBase||0)+a.buffs.reduce((n,b)=>n+(b.expires>=a.turn?b.values.elation||0:0),0);
       if(a.id==='1501')v+=Math.min(.8,Math.max(0,s.atk-2000)*.0005);
       if(a.id==='1502'&&s.speed>=120)v+=.3+Math.min(200,s.speed-120)*.01;
@@ -936,6 +1264,8 @@
       }
     }
     function elationSkill(a,points){useElationRelics(a);beginAction(a);a.actionKind='elation';
+      const trailblazer=find('8009');
+      if(trailblazer&&trailblazer!==a&&!trailblazer.defeated)trailblazer.tbNextBanger=true;
       if(a.id==='1501'){
         const originalMultiplier=facesActive()?(aeon.s.eidolon>=2?2.2:1.5):1;
         const options={toughness:0,originalMultiplier,ahaSkill:true},p=elationParams(a);
@@ -945,7 +1275,14 @@
       }
       if(a.id==='1502'){for(const d of dummies)d.yaoVulnUntil=d.turn+3;debuffApplied(a);const p=elationParams(a),scale=a.s.eidolon>=6?2:1;elationHit(a,p[0]*scale,allTargets(),'Яо Гуан · огни счастья',points,{toughness:10,ahaSkill:true});for(let n=0;n<p[4];n++)elationHit(a,p[5]*scale,[randomTarget()],'Яо Гуан · отскок Радости',points,{toughness:2,ahaSkill:true});gainSP();}
       if(a.id==='1503'){const c=elationParams(a)[Math.max(0,Math.min(4,elationActors.length)-1)]*(aha.yaoExtra&&find('1502')?.s.eidolon>=4?1.5:1)*(a.s.eidolon>=4?2:1);for(const ally of actors)ally.pearlNext={points,coefficient:c};record(a,'Жемчуг · следующий удар команды');}
-      if(a.id==='8009'){const p=data.character_skills['800920'].params[9+(a.s.eidolon>=3?1:0)+(a.s.eidolon>=5?1:0)];if(a.s.eidolon>=4){for(const d of dummies)d.tbE4Until=d.turn+2;debuffApplied(a);}if(a.s.eidolon>=6)buff(a,a.id,'elationTBE6',{critDamage:1},3);for(let n=0;n<p[0];n++)elationHit(a,p[1],[randomTarget()],'Первопроходец · отскок Радости',points,{toughness:2,ahaSkill:true});elationHit(a,p[2]/dummies.length,allTargets(),'Первопроходец · завершение Радости',points,{toughness:5,ahaSkill:true});}
+      if(a.id==='8009'){
+        const p=elationParams(a);
+        if(a.s.eidolon>=4){for(const d of dummies)d.tbE4Until=d.turn+2;debuffApplied(a);}
+        if(a.s.eidolon>=6)buff(a,a.id,'elationTBE6',{critDamage:1},3);
+        for(let n=0;n<p[0]&&allTargets().length;n++)elationHit(a,p[1],[randomTarget()],'Первопроходец · отскок Радости',points,{toughness:2,ahaSkill:true});
+        const living=allTargets();
+        if(living.length)elationHit(a,p[2]/living.length,living,'Первопроходец · завершение Радости',points,{toughness:5,ahaSkill:true});
+      }
       const finalHandled=finalElationSkill(a,points);if(!['1506','1513'].includes(a.id))energy(a,5);if(a.id!=='1503'&&finalHandled!=='noAttack')afterAttack(a,false,a.id==='1513'&&elationActors.length===1?'followup':'elation');
     }
     function ahaTurn(fixed){if(aha.acting||form.active)return;aha.acting=true;aha.count++;aha.instantDamage=0;const points=fixed??aha.punchline;record(null,'Аха · '+(fixed===undefined?'ход':'дополнительный ход')+' · Юмор '+points);
@@ -961,7 +1298,7 @@
         trueHit(aeon,aha.instantDamage*(aeon.s.eidolon>=4?.25:.2),allTargets(),'Эон Аха · истинный урон Мига');
         addBanger(aeon,points);wishpower(1);afterAttack(aeon,false,'elation');
       }
-      if(fixed===undefined)aha.punchline=Math.max(0,aha.punchline-points)+(facesActive()?points*.1:0);
+      if(fixed===undefined){aha.punchline=Math.max(0,aha.punchline-points)+(facesActive()?points*.1:0);for(const pool of aha.temporaryPools||[])pool.remaining*=facesActive()?.1:0;}
       aha.acting=false;const sparxie=find('1501');if(sparxie?.s.eidolon>=1)punch(5);if(sparxie?.s.eidolon>=2){sparxie.distance=0;sparxie.thrill=(sparxie.thrill||0)+2;}
       if(aeon)aeon.humorTriggered=false;
       const av=find('1513');if(av)av.soloAhaBoost=0;settleFinal();
@@ -979,29 +1316,74 @@
     function rinSP(n){const a=find('1508');if(!a||n<=0)return;a.gems=Math.min(999,(a.gems||0)+n);if(activeActor&&!activeActor._memo){const stacks=activeActor===a&&a.s.eidolon>=4&&a.buffs.some(b=>b.key==='rinCD')?2:1;buff(activeActor,a.id,'rinCD',{critDamage:params(a.id,'04')[2]*stacks},2);}}
     function enthusiasm(n){const a=find('1509');if(!a)return;a.enthusiasm=(a.enthusiasm||0)+n;a.enthusiasmEarned=(a.enthusiasmEarned||0)+n;if(a.enthusiasm>=10)a.kingBurst=true;}
     function cyreneTrueRatio(c){return params(c.id,'02')[0]+(c.s.eidolon>=2?.06*Math.min(4,actors.filter(a=>a.ode||a.buffs.some(b=>b.key==='cyreneOde')).length):0);}
-    function sixthTrue(a,damage,target,options){const c=find('1415');if(c&&(c.ripple||c.cyreneZoneUntil>c.turn))trueHit(a,damage*cyreneTrueRatio(c),[target],'Кирена · истинный урон');const mem=find('8007');if(options.memo&&!(mem?.s.eidolon>=1))return;if(a.buffs.some(b=>b.key==='memSupport'&&b.expires>=a.turn))trueHit(a,damage*((a.memRatio||.28)+(mem?.s.eidolon>=4&&data.characters[a.id].max_sp===0?.06:0)),[target],'Поддержка Мемо · истинный урон');}
+    function sixthTrue(a,damage,target,options){const c=find('1415');if(c&&(c.ripple||c.cyreneZoneUntil>c.turn))trueHit(a,damage*cyreneTrueRatio(c),[target],'Кирена · истинный урон','true',false,c.id);const mem=find('8007');if(options.memo&&!(mem?.s.eidolon>=1))return;if(a.buffs.some(b=>b.key==='memSupport'&&b.expires>=a.turn))trueHit(a,damage*((a.memRatio||.28)+(mem?.s.eidolon>=4&&data.characters[a.id].max_sp===0?.06:0)),[target],'Поддержка Мемо · истинный урон');}
     function ashGluttony(a,n){a.gluttony=Math.min(a.s.eidolon>=2?18:12,(a.gluttony||0)+n);a.gluttonyEarned=(a.gluttonyEarned||0)+n;}
-    function ashFollow(a,enhanced=false){if(a.ashActing)return;a.ashActing=true;beginAction(a);a.followups++;if(!enhanced)a.ashCharge--;const extra=enhanced&&(a.gluttony||0)>=4;if(extra){a.gluttony-=4;if(a.s.eidolon>=2)ashGluttony(a,4*.35);}
-      const bonus=.8+(a.gluttony||0)*.1,p=params(a.id,'04');hit(a,p[0],[0],enhanced?'Эшвейл · усиленная бонус-атака':'Эшвейл · бонус-атака',{followup:true,bonus,toughness:10});if(extra)hit(a,p[0],[0],'Эшвейл · Прожорливость',{followup:true,bonus,toughness:0});if(!enhanced)ashGluttony(a,2);a.resource=a.ashCharge;afterAttack(a,false,'followup');a.ashActing=false;}
+    function ashBaitTarget(a){
+      const living=allTargets();
+      if(!living.includes(a.ashBait))a.ashBait=living.reduce((best,i)=>dummies[i].hp<dummies[best].hp?i:best,living[0]);
+      return a.ashBait;
+    }
+    function ashFollow(a,enhanced=false){
+      let target=ashBaitTarget(a);
+      if(a.ashActing||a.defeated||target===undefined)return;
+      a.ashActing=true;beginAction(a);a.followups++;
+      if(!enhanced)a.ashCharge--;
+      if(G)G.followupStart(a,actors);
+      const p=params(a.id,'04');
+      hit(a,p[0],[target],enhanced?'Эшвейл · усиленная бонус-атака':'Эшвейл · бонус-атака',
+        {followup:true,group:true,bonus:.8+a.gluttony*.1,toughness:10});
+      if(boss&&dummies[target].hp<=0)ashGluttony(a,1);
+      if(enhanced){
+        target=ashBaitTarget(a);
+        while(target!==undefined&&a.gluttony>=4){
+          a.gluttony-=4;
+          if(a.s.eidolon>=2)ashGluttony(a,4*.35);
+          hit(a,p[0],[target],'Эшвейл · Прожорливость',{followup:true,group:true,bonus:.8+a.gluttony*.1,toughness:0});
+          if(!boss||dummies[target].hp>0)break;
+          ashGluttony(a,1);target=ashBaitTarget(a);
+        }
+      }else ashGluttony(a,2);
+      a.resource=a.ashCharge;
+      if(G)G.followupEnd(a);
+      afterAttack(a,false,'followup');a.ashActing=false;
+    }
+    function mortBind(a,index){
+      const enemy=dummies[index];
+      if(!boss||enemy.hp>0){enemy.balefireUntil=enemy.turn+params(a.id,'03')[7];debuffApplied(a,index);}
+    }
     function mortSkill(a,followup=false){const p=params(a.id,'02');beginAction(a);a.actionKind=followup?'followup':'skill';loseHP(a,stat(a).hp*.1);if(followup){a.followups++;if(G)G.followupStart(a,actors);}else energy(a,30);hit(a,0,allTargets(),'Мортенакс · Под клинком',{baseDamage:stat(a).hp*p[0],followup,group:followup,toughness:10});for(let n=0;n<4;n++)hit(a,0,[randomTarget()],'Мортенакс · отскок',{baseDamage:stat(a).hp*p[2],followup,group:followup,toughness:2.5});if(followup&&G)G.followupEnd(a);afterAttack(a,false,followup?'followup':'skill');}
     function sixthAfterAttack(a,targets,kind,isUltimate,wasFollow,hasAttackTargets){finalAfterAttack(a,targets,kind,isUltimate,wasFollow,hasAttackTargets);
       if(kind==='memo'){const mem=find('8007');if(mem?.s.eidolon>=2&&mem!==a&&mem.memE2Turn!==mem.turn){mem.memE2Turn=mem.turn;energy(mem,8);}const e=find('1413');if(e){everGain(1);energy(e,5);}}
-      const yao=find('1502');if(yao&&banger(yao)>0){const n=(a.actionSPSpent||0)>0?2:1;for(let k=0;k<n;k++)elationHit(a,.2,[targets[pick('yao-luck',targets.length)]],'Великая удача',banger(yao),{kind:'additional',elationValue:Math.max(elation(a),elation(yao))});}
-      if(a.pearlNext){const p=a.pearlNext;a.pearlNext=null;elationHit(a,p.coefficient,targets,'Жемчуг · дополнительный урон',p.points,{kind:'additional'});}
-      const ash=find('1504');if(ash&&a!==ash&&targets.includes(0)){energy(ash,8);if(ash.ashCharge>0)ashFollow(ash);}
-      const mb=find('1507');if(mb?.rageUntil>now&&!mb.mortActing){mb.mortCharge=(mb.mortCharge||0)+1;mb.resource=mb.mortCharge;const cap=mb.s.eidolon>=2?7:9;if(mb.mortCharge>=cap&&mb.currentHP>1){mb.mortCharge-=cap;if(mb.s.eidolon>=1)mb.rageUntil+=10000/70*.15;mb.mortActing=true;energy(mb,25);mortSkill(mb,true);mb.mortActing=false;}}
+      const yao=find('1502');if(yao&&!yao.defeated&&hasAttackTargets&&banger(yao)>0){const n=(a.actionSPSpent||0)>0?2:1;for(let k=0;k<n;k++)elationHit(a,.2,[targets[pick('yao-luck',targets.length)]],'Великая удача',banger(yao),{kind:'additional',elationValue:Math.max(elation(a),elation(yao))});}
+      if(hasAttackTargets&&a.pearlNext){const p=a.pearlNext;a.pearlNext=null;elationHit(a,p.coefficient,targets,'Жемчуг · дополнительный урон',p.points,{kind:'additional'});}
+      const ash=find('1504');
+      if(ash&&!ash.defeated&&a!==ash&&hasAttackTargets&&targets.includes(ashBaitTarget(ash))){
+        energy(ash,8/stat(ash).energyRegen);
+        if(ash.ashCharge>0)ashFollow(ash);
+      }
+      const mb=find('1507');if(mb&&!mb.defeated&&mb.rageUntil>now&&!mb.mortActing&&hasAttackTargets){for(const i of targets)mortBind(mb,i);mb.mortCharge=(mb.mortCharge||0)+1;mb.resource=mb.mortCharge;const cap=mb.s.eidolon>=2?7:9;if(mb.mortCharge>=cap&&mb.currentHP>1){mb.mortCharge-=cap;if(mb.s.eidolon>=1)mb.rageUntil+=10000/70*.15;mb.mortActing=true;energy(mb,25);mortSkill(mb,true);mb.mortActing=false;}}
       const rin=find('1508');if(rin&&a.id==='1015'&&kind==='skill'&&!rin.rinJoint&&(sp<=3||(a.archerActiveUses||0)>=5)){rin.rinJoint=true;beginAction(rin);rin.followups++;hit(rin,3,allTargets(),'Свободный стиль Тосаки · Рин',{followup:true,toughness:10});afterAttack(rin,false,'followup');beginAction(a);a.followups++;hit(a,3,allTargets(),'Свободный стиль Тосаки · Арчер',{followup:true,toughness:10});gainSP(4);afterAttack(a,false,'followup');}
       const gil=find('1509'),saber=find('1014');if(gil&&saber&&['1509','1014'].includes(a.id)&&!gil.gilJoint){gil.jointCount=(gil.jointCount||0)+1;if(gil.jointCount>=8){gil.jointCount=0;gil.gilJoint=true;beginAction(gil);gil.followups++;hit(gil,4,allTargets(),'Королевский дуэт · Гильгамеш',{followup:true,toughness:10});afterAttack(gil,false,'followup');beginAction(saber);saber.followups++;hit(saber,6,allTargets(),'Королевский дуэт · Сэйбер',{followup:true,toughness:10});afterAttack(saber,false,'followup');enthusiasm(3);energy(saber,120/stat(saber).energyRegen);saber.kingUlt=true;gil.gilJoint=false;}}
     }
     function sixthAction(a){finalAction(a);if(find('8007')?.s.eidolon>=4&&data.characters[a.id].max_sp===0)memCharge(.03);const gil=find('1509');if(gil&&a!==gil)enthusiasm(1);}
-    function sixthAfterUlt(a){finalAfterUlt(a);a.kingUltActive=false;const gil=find('1509');if(gil){if(a!==gil){if(gil.s.eidolon>=6)gil.goldenRule=Math.min(3,(gil.goldenRule||0)+1);enthusiasm(2);energy(gil,(a.id==='1014'?360:data.characters[a.id].max_sp)*.3/stat(gil).energyRegen);buff(gil,gil.id,'kingBurden',{},3);}else enthusiasm(gil.s.eidolon>=2?7:2);}}
+    function sixthAfterUlt(a){finalAfterUlt(a);
+      const pearl=find('1503');
+      if(pearl&&!pearl.defeated&&pearl.pearlRefundTarget===a.id){
+        pearl.pearlRefundTarget=undefined;
+        energy(pearl,90/stat(pearl).energyRegen);
+        record(pearl,'Жемчуг · 90 энергии от сверхспособности Архетипа');
+      }
+      a.kingUltActive=false;const gil=find('1509');if(gil){if(a!==gil){if(gil.s.eidolon>=6)gil.goldenRule=Math.min(3,(gil.goldenRule||0)+1);enthusiasm(2);energy(gil,(a.id==='1014'?360:data.characters[a.id].max_sp)*.3/stat(gil).energyRegen);buff(gil,gil.id,'kingBurden',{},3);}else enthusiasm(gil.s.eidolon>=2?7:2);}}
     function sixthStartTurn(a){finalStartTurn(a);if(a.id==='1413'){a.buffs=a.buffs.filter(b=>b.key!=='everReturn');if(a.darkCharges===0)a.darkActive=false;}if(a.id==='1508')a.rinJoint=false;const p=find('1503');if(p&&a!==p)addBanger(p,5);a.bangers=(a.bangers||[]).filter(b=>b.expires>=a.turn);}
     function sixthRegular(a){const id=a.id;if(!['1413','8007','1501','1502','1503','8009','1504','1507','1508','1509'].includes(id))return false;const all=allTargets(),adj=all.slice(1,3),target=focusFor(a);let use=a.s.policy!=='basic'&&sp>0;
       if(id==='8007')use=use&&(a.s.policy==='skill'||!memo(id).active);
       if(id==='1502')use=use&&(a.s.policy==='skill'||!(a.yaoZoneUntil>a.turn));
       if(id==='1503')use=use&&(a.s.policy==='skill'||(!a.pearlLearn&&actors.some(b=>b.currentHP<stat(b).hp*.8)));
       if(id==='1507')use=a.s.policy!=='basic'&&a.rageUntil>now&&a.currentHP>1;
-      if(id==='1509'){if(a.normal===1)use=false;else if(a.kingBurst)use=sp>0;}
+      if(id==='1509'){
+        use=Boolean(a.kingBurst);
+        if(use&&sp<=0){record(a,'Гильгамеш · нет SP для навыка');return true;}
+      }
       if(id==='1501')use=a.s.policy!=='basic'&&(sp>0||a.thrill>0);
       if(id==='1508'&&a.rinShadow>0&&a.s.policy!=='basic')use=true;
       a.actionKind=use?'skill':'basic';
@@ -1014,10 +1396,19 @@
         if(id==='8007'){const had=memo(id).active,m=spawnMemory(id);if(had){const p=params(id,'02');heal(m.unit,memoStat(m).hp*p[0],a);memCharge(p[1]);}record(a,'Я выбираю тебя!');}
         if(id==='1502'){a.yaoZoneUntil=a.turn+3;punch(3);record(a,'Свет десяти граней · зона');}
         if(id==='1503'){const p=params(id,'02');addBanger(a,p[0]);pearlHeal(a,p[1],p[2]);record(a,'Жемчуг · лечение');}
-        if(id==='8009'){const p=params(id,'02');if(a.s.eidolon>=1)a.tbE1=Math.min(3,(a.tbE1||0)+1);addBanger(a,p[1]);hit(a,p[0],all,'Первопроходец · Пусть бушует буря',{toughness:10});if(banger(a)>0)elationHit(a,.3,all,'Первопроходец · хит навыка',Math.max(...actors.map(banger)));energy(a,10/stat(a).energyRegen);punch(3);afterAttack(a);}
-        if(id==='1504'){ashGluttony(a,1);a.ashBait='active';hit(a,3+params(id,'02')[0]-2,[0],'Эшвейл · Приманка',{toughness:20});gainSP();afterAttack(a);}
-        if(id==='1508'){const bonus=a.s.eidolon>=2?.3:0;if(rinEnhanced){const p=params(id,'09');let spent=0,available=rinShadow||a.gems;hit(a,p[0],all,'Рин · Эксперимент со Второй магией',{toughness:20,bonus});for(let n=0;n<33&&available>=3;n++){available-=3;spent+=3;hit(a,p[2],[pick('rin-gem-bounce',all.length)],'Рин · отскок камня',{toughness:2,bonus});}if(rinShadow)a.rinShadow=0;else{a.gems=available;if(a.s.eidolon>=1&&spent>=30){a.rinShadow=spent;record(a,'Рин E1 · теневые камни');}}buff(a,id,'rinSpeed',{speedPct:.2},3);}else hit(a,params(id,'02')[0],[0],'Рин · Самоцветный меч',{toughness:20,bonus});afterAttack(a);}
-        if(id==='1509'){const p=params(id,'02');if(a.s.eidolon>=1)energy(a,40);hit(a,p[0]+(a.s.eidolon>=2?1:0),[0],'Гильгамеш · Сокровища короля',{toughness:20});if(adj.length)hit(a,p[1]+(a.s.eidolon>=2?.5:0),adj,'Гильгамеш · соседние сокровища',{toughness:10});a.enthusiasm=0;afterAttack(a);}
+        if(id==='8009'){const p=params(id,'02');if(a.s.eidolon>=1)a.tbE1=Math.min(3,(a.tbE1||0)+1);addBanger(a,p[1]+(a.tbNextBanger?2:0));a.tbNextBanger=false;hit(a,p[0],all,'Первопроходец · Пусть бушует буря',{toughness:10});if(banger(a)>0)elationHit(a,params(id,'04')[2],allTargets(),'Первопроходец · хит навыка',Math.max(...actors.map(banger)));energy(a,10/stat(a).energyRegen);punch(3);afterAttack(a);}
+        if(id==='1504'){
+          const primary=enemyFor(a),alreadyBait=ashBaitTarget(a)===primary,p=params(id,'02');
+          ashGluttony(a,1);a.ashBait=primary;
+          hit(a,p[0]+(alreadyBait?p[1]:0),[primary],'Эшвейл · Приманка',{toughness:20});
+          if(alreadyBait)gainSP();
+          afterAttack(a);
+        }
+        if(id==='1508'){const bonus=a.s.eidolon>=2?.3:0;if(rinEnhanced){const p=params(id,'09');let spent=0,available=rinShadow||a.gems;hit(a,p[0],all,'Рин · Эксперимент со Второй магией',{toughness:20,bonus});for(let n=0;n<33&&available>=3;n++){
+          const living=allTargets();if(!living.length)break;
+          available-=3;spent+=3;hit(a,p[2],[living[pick('rin-gem-bounce',living.length)]],'Рин · отскок камня',{toughness:2,bonus});
+        }if(rinShadow)a.rinShadow=0;else{a.gems=available;if(a.s.eidolon>=1&&spent>=30){a.rinShadow=spent;record(a,'Рин E1 · теневые камни');}}buff(a,id,'rinSpeed',{speedPct:.2},3);}else hit(a,params(id,'02')[0],[0],'Рин · Самоцветный меч',{toughness:20,bonus});afterAttack(a);}
+        if(id==='1509'){const p=params(id,'02');buff(a,id,'kingAcknowledgement',{},p[5]);if(a.s.eidolon>=1)energy(a,40/stat(a).energyRegen);hit(a,p[0]+(a.s.eidolon>=2?1:0),[0],'Гильгамеш · Сокровища короля',{toughness:20});if(adj.length)hit(a,p[1]+(a.s.eidolon>=2?.5:0),adj,'Гильгамеш · соседние сокровища',{toughness:10});a.enthusiasm=0;afterAttack(a);}
         if(G)G.afterSkill(a);
       }else{const enhancedMem=id==='8007'&&a.epic>0&&memo(id).active,pearl=id==='1503'&&a.pearlLearn>0;if(!enhancedMem)gainSP();energy(a,id==='1502'?30:20);
         if(enhancedMem){a.epic--;const m=memo(id);startMemoryAttack(m);hit(a,1.2,all,'Первопроходец · совместная базовая',{toughness:5});afterAttack(a,false,'basic');beginJointMemoryHalf(m);memoHit(m,1.2,all,'совместная базовая',{toughness:5});memCharge(.1);afterAttack(a,false,'memo');}
@@ -1032,23 +1423,32 @@
       else if(id==='8007'){const m=spawnMemory(id);memCharge(.4);a.epic=Math.min(2,(a.epic||0)+1);memoHit(m,params(id,'03')[0],all,'Вместе, Мемо!',{toughness:20,guaranteedCrit:a.s.eidolon>=6});afterAttack(a,true,'memo');}
       else if(id==='1501'){const n=elationActors.length;punch(2+(n>=3?8:n===2?4:2)+(a.s.eidolon>=4?5:0));if(a.s.eidolon>=4)buff(a,id,'sparxieE4',{elation:.36},3);a.thrill=(a.thrill||0)+(n>=3?4:1);hit(a,params(id,'03')[1]+params(id,'03')[2]*elation(a),all,'Искра · Пока камера снимает',{toughness:20});if(banger(a)>0)elationHit(a,params(id,'04')[1],all,'Искра · хит ульты');afterAttack(a,true);}
       else if(id==='1502'){punch(5);for(const ally of actors)buff(ally,id,'yaoPen',{resPen:.2},3);aha.yaoExtra=true;ahaTurn(a.s.eidolon>=1?40:params(id,'03')[3]);aha.yaoExtra=false;}
-      else if(id==='1503'){targetedRelics(a,target);addBanger(a,params(id,'03')[2]);a.pearlLearn=3;a.pearlModel=target.id;target.distance=Math.max(0,target.distance-10000*([0,.1,.15,.3,1][Math.min(4,elationActors.length)]));if(a.s.eidolon>=2)for(const ally of elationActors)if(ally!==a&&ally!==target)ally.distance=Math.max(0,ally.distance-10000*([0,.1,.15,.3,1][Math.min(4,elationActors.length)]));assist(target,a);record(a,'Глубокое обучение → '+data.characters[target.id].name);if(data.characters[target.id].path==='Elation'){if(a.pearlRefund)energy(a,90/stat(a).energyRegen);a.pearlRefund=true;}}
-      else if(id==='8009'){punch(5);if(a.tbE1){for(const ally of actors)addBanger(ally,a.tbE1*2);a.tbE1=0;}const p=params(id,'03');buff(target,id,'elationTB',{critDamage:p[0]},p[1]);if(a.s.eidolon>=2)buff(target,id,'elationTBE2',{elation:.12},2);targetedRelics(a,target);assist(target,a);if(data.characters[target.id].path==='Elation'){addBanger(target,10);elationSkill(target,20+banger(target));}else target.distance=Math.max(0,target.distance-5000);}
-      else if(id==='1504'){ashGluttony(a,2);a.ashBait='active';if(a.s.eidolon>=4)buff(a,id,'ashE4',{atk:.4},3);hit(a,params(id,'03')[0],[0],'Эшвейл · Пиршество',{toughness:30});afterAttack(a,true);ashFollow(a,true);a.ashCharge=3;a.resource=3;}
-      else if(id==='1507'){if(a.rageUntil>now){hit(a,0,all,'Мортенакс · Закалка одного',{baseDamage:stat(a).hp*params(id,'14')[0]*(a.s.eidolon>=6?1.5:1),toughness:20});afterAttack(a,true);}else{a.rageUntil=now+10000/70;loseHP(a,stat(a).hp*.2);for(const i of all)debuffApplied(a,i);record(a,'Безмерная ярость · отсчёт SPD 70');}}
+      else if(id==='1503'){
+        targetedRelics(a,target);const p=params(id,'03');addBanger(a,p[2]);a.pearlLearn=3;a.pearlModel=target.id;
+        const count=Math.min(4,elationActors.length),advance=[0,p[3],p[4],p[5]][Math.min(3,count)];
+        const recipients=[target,...(a.s.eidolon>=2?elationActors.filter(ally=>ally!==a&&ally!==target):[])];
+        for(const recipient of recipients){
+          if(count>=4)queueExtraTurn(recipient,a.id,{punchline:p[6],banger:p[7],amplification:a.s.eidolon>=2?2:1});
+          else recipient.distance=timeline.advance(recipient.distance,advance);
+        }
+        assist(target,a);record(a,'Глубокое обучение → '+data.characters[target.id].name);a.pearlRefundTarget=data.characters[target.id].path==='Elation'?target.id:undefined;
+      }
+      else if(id==='8009'){const p=params(id,'03');punch(p[5]);gainSP();if(a.tbE1){for(const ally of actors)addBanger(ally,a.tbE1*2);a.tbE1=0;}buff(target,id,'elationTB',{critDamage:p[0]},p[1]);if(a.s.eidolon>=2)buff(target,id,'elationTBE2',{elation:.12},2);targetedRelics(a,target);assist(target,a);if(data.characters[target.id].path==='Elation'){addBanger(target,p[3]);elationSkill(target,p[4]);}else target.distance=Math.max(0,target.distance-10000*p[2]);}
+      else if(id==='1504'){ashGluttony(a,2);a.ashBait=enemyFor(a);if(a.s.eidolon>=4)buff(a,id,'ashE4',{atk:.4},3);hit(a,params(id,'03')[0],[a.ashBait],'Эшвейл · Пиршество',{toughness:30});afterAttack(a,true);ashFollow(a,true);a.ashCharge=3;a.resource=3;}
+      else if(id==='1507'){if(a.rageUntil>now){hit(a,0,all,'Мортенакс · Закалка одного',{baseDamage:stat(a).hp*params(id,'14')[0]*(a.s.eidolon>=6?1.5:1),toughness:20});afterAttack(a,true);}else{a.rageUntil=now+10000/70;loseHP(a,stat(a).hp*.2);for(const i of all)mortBind(a,i);record(a,'Безмерная ярость · отсчёт SPD 70');}}
       else if(id==='1508'){const p=params(id,'03');a.gems=Math.min(999,(a.gems||0)+p[2]+(a.s.eidolon>=6?24:0));if(a.s.eidolon>=6)a.distance=0;for(const d of dummies)d.rinVulnUntil=d.turn+3;gainSP();hit(a,p[0],[0],'Рин · An Gal Ta Ki Gal Šè',{toughness:30});if(all.length>1)hit(a,p[1],all.slice(1),'Рин · остальные цели ульты',{toughness:20});debuffApplied(a);afterAttack(a,true);}
-      else if(id==='1509'){const bonus=a.buffs.some(b=>b.key==='kingBurden')?.4:0,p=params(id,'03'),extraCritDamage=a.goldenRule||0;a.goldenRule=0;hit(a,p[0],all,'Гильгамеш · Энума Элиш',{bonus,toughness:20,extraCritDamage});for(let n=0;n<p[2];n++)hit(a,p[1]+(a.s.eidolon>=6?.8:0),[pick('gilgamesh-bounce',all.length)],'Гильгамеш · отскок Энума',{bonus,toughness:2,extraCritDamage});afterAttack(a,true);}
+      else if(id==='1509'){const bonus=a.buffs.some(b=>b.key==='kingBurden'&&b.expires>=a.turn)?.4:0,p=params(id,'03'),extraCritDamage=a.goldenRule||0;a.goldenRule=0;hit(a,p[0],all,'Гильгамеш · Энума Элиш',{bonus,toughness:20,extraCritDamage});for(let n=0;n<p[2];n++)hit(a,p[1]+(a.s.eidolon>=6?.8:0),[pick('gilgamesh-bounce',all.length)],'Гильгамеш · отскок Энума',{bonus,toughness:2,extraCritDamage});afterAttack(a,true);}
       else return false;return true;
     }
     function sixthInit(){if(find('1509')?.s.eidolon>=2)enthusiasm(5);const e=find('1413');if(e){e.resource=1;energy(e,70);spawnMemory(e.id);}const mem=find('8007');if(mem)mem.distance=Math.max(0,mem.distance-3000);const ash=find('1504');if(ash){ash.ashCharge=2;ash.resource=2;ash.gluttony=0;}const mb=find('1507');if(mb)mb.energy=Math.max(mb.energy,data.characters[mb.id].max_sp*.75);const rin=find('1508');if(rin){rin.gems=20;buff(rin,rin.id,'rinSpeed',{speedPct:.2},3);}}
     function fifthSkill(a){const id=a.id,p=params(id,'02'),target=focusFor(a),all=allTargets(),adj=all.slice(1,3);a.actionKind='skill';if(G)G.beforeSkill(a);energy(a,id==='1402'?20:30);
       if(id==='1402'){const had=memo(id).active,m=spawnMemory(id);heal(m.unit,memoStat(m).hp*.5,a);if(!had)a.distance=0;record(a,'Аглая · призыв/лечение Швеи');}
       else if(id==='1407'){const enhanced=memo(id).active;if(copying!==a)for(const ally of livingAllies())if(ally!==memo(id).unit)loseHP(ally,ally.currentHP*(enhanced?.4:.3));if(enhanced){startMemoryAttack(memo(id));if(a.castE2Ready&&!copying){a.castE2Ready=false;a.resource=Math.min(34000,a.resource+10200);record(a,'Кастория E2 · Новое цветение');}hit(a,0,all,'Костяной коготь · Кастория',{baseDamage:stat(a).hp*.3,toughness:10});afterAttack(a);const m=memo(id);if(m.active){beginJointMemoryHalf(m);memoHit(m,0,all,'совместная атака',{baseDamage:stat(a).hp*.5,toughness:10});afterAttack(a,false,'memo');}}else{hit(a,0,[0],'Кастория · навык',{baseDamage:stat(a).hp*p[1],toughness:20});if(adj.length)hit(a,0,adj,'Кастория · соседние цели',{baseDamage:stat(a).hp*p[2],toughness:10});afterAttack(a);}}
-      else if(id==='1409'){const m=spawnMemory(id);for(const ally of livingAllies())heal(ally,stat(a).hp*p[ally===m.unit?2:0]+p[ally===m.unit?3:1],a);record(a,'Гиацина · лечение навыком');settleMemories();if(a.rainUntil>a.turn)icaTurn();}
+      else if(id==='1409'){const m=spawnMemory(id);for(const ally of livingAllies()){cleanse(ally,a);heal(ally,stat(a).hp*p[ally===m.unit?2:0]+p[ally===m.unit?3:1],a);}record(a,'Гиацина · лечение навыком');settleMemories();if(a.rainUntil>a.turn)icaTurn();}
       else if(id==='1408'){if(!copying)phainonGain(2);hit(a,p[0],[0],'Фаенон · навык',{toughness:20});if(adj.length)hit(a,p[1],adj,'Фаенон · соседние цели',{toughness:10});afterAttack(a);}
       else if(id==='8001'){hit(a,p[0],[0],'Первопроходец · Похоронный хоум-ран',{toughness:20,bonus:.25});if(adj.length)hit(a,p[0],adj,'Первопроходец · соседние цели навыка',{toughness:10});afterAttack(a);}
-      else if(id==='8003'){a.magma=Math.min(8,(a.magma||0)+1);for(const i of all)if(chanceOf('trailblazer-taunt',effectChance(a,1,i))){dummies[i].tauntUntil=dummies[i].turn+1;debuffApplied(a,i);}trailShield(a);record(a,'Вечно горящий янтарь');}
-      else if(id==='1001'){const [ratio,duration,,flat]=params(id,'02');target.marchShield={amount:(stat(a).def*ratio+flat)*shieldScale(a),expires:target.turn+duration+1,skill:true,source:a.id};finalHealing(target,a);targetedRelics(a,target);assist(target,a);phainonTarget(target,a,true);record(a,'Март 7 · щит → '+data.characters[target.id].name);}
+      else if(id==='8003'){a.magma=Math.min(8,(a.magma||0)+1);a.amberUntil=a.turn+1;for(const ally of livingAllies())ally.amberTeamUntil=ally.turn+1;for(const i of all)if(chanceOf('trailblazer-taunt',effectChance(a,1,i))){dummies[i].tauntUntil=dummies[i].turn+1;debuffApplied(a,i);}trailShield(a);record(a,'Вечно горящий янтарь');}
+      else if(id==='1001'){cleanse(target,a);const [ratio,duration,,flat]=params(id,'02');target.marchShield={amount:(stat(a).def*ratio+flat)*shieldScale(a),expires:target.turn+duration+1,skill:true,source:a.id};finalHealing(target,a);targetedRelics(a,target);assist(target,a);phainonTarget(target,a,true);record(a,'Март 7 · щит → '+data.characters[target.id].name);}
       else if(id==='1008'){const [cost,damage]=params(id,'02');loseHP(a,stat(a).hp*cost);hit(a,damage,[0],'Арлан · навык без SP',{toughness:20,bonus:a.s.eidolon>=1&&a.currentHP<=stat(a).hp*.5?.1:0});afterAttack(a);}
       else if(id==='1110'){const old=stat(target).hp;const p=params(id,'02'),hp=stat(a).hp;buff(target,id,'survival',{flatHP:hp*(p[0]+(a.s.eidolon>=6?.06:0))+p[1],effectRes:a.s.eidolon>=6?.3:0},p[2]);if(a.s.eidolon>=4)buff(target,id,'lynxE4',{flatAtk:hp*.03},1);target.currentHP+=Math.max(0,stat(target).hp-old);heal(target,hp*p[3]+p[4],a);target.lynxHot={owner:id,expires:target.turn+3};targetedRelics(a,target);assist(target,a);record(a,'Реакция выживания → '+data.characters[target.id].name);}
       else if(id==='1312'){a.mishaHits=Math.min(10,(a.mishaHits||3)+1);a.resource=a.mishaHits;const p=params(id,'02');if(a.mishaRefund){a.mishaRefund=false;gainSP();}hit(a,p[0],[0],'Миша · навык',{toughness:20});if(adj.length)hit(a,p[1],adj,'Миша · соседние цели',{toughness:10});afterAttack(a);}
@@ -1062,7 +1462,7 @@
       if(id==='1001')use=use&&(a.s.policy==='skill'||!(target.marchShield?.expires>target.turn));
       if(id==='1110')use=use&&(a.s.policy==='skill'||actors.some(b=>b.currentHP<stat(b).hp*.7));
       if(id==='8003')use=use&&a.s.policy==='skill';
-      if(id==='8003'&&(a.trailShield?.expires>=a.turn)){energy(a,5);buff(a,id,'trailATK',{atk:.15},1);}
+      if(id==='8003'&&activeShields(a).length){energy(a,5);buff(a,id,'trailATK',{atk:.15},1);}
       if(use){if(!['1407','1008'].includes(id))spendSP();coup(a,()=>fifthSkill(a));fifthSkill(a);if(G)G.afterSkill(a);return true;}
       a.actionKind='basic';const ag=id==='1402'&&a.supremeUntil>now&&memo(id).active,fire=id==='8003'&&((a.magma||0)>=4||a.freeMagma);if(!ag)gainSP();energy(a,20);
       if(ag){const m=memo(id);startMemoryAttack(m);const p=data.character_skills['140208'].params[a.s.eidolon>=3?6:5],bonus=aglaeaJointBonus(a,stat(a).speed);dummies[0].stitch=true;hit(a,p[0],[0],'Тысячекратный поцелуй · Аглая',{toughness:10,bonus});if(dummies.length>1)hit(a,p[1],allTargets().slice(1,3),'Аглая · соседние цели',{toughness:5,bonus});hit(a,.3,[0],'Связующая нить',{kind:'additional'});energy(a,10);afterAttack(a,false,'basic');beginJointMemoryHalf(m);memoHit(m,p[2],[0],'совместная базовая',{toughness:10,bonus:aglaeaJointBonus(a,memoSpeed(memo(id)))});if(dummies.length>1)memoHit(memo(id),p[3],allTargets().slice(1,3),'соседние цели',{toughness:5,bonus:aglaeaJointBonus(a,memoSpeed(memo(id)))});memo(id).stacks=Math.min(a.s.eidolon>=4?7:6,memo(id).stacks+1);afterAttack(a,false,'memo');}
@@ -1072,13 +1472,13 @@
     function fifthUlt(a){const id=a.id,all=allTargets();
       if(id==='1402'){spawnMemory(id);memo(id).unit.currentHP=memoStat(memo(id)).hp;a.supremeUntil=now+100;a.distance=0;record(a,'Высшая форма · отсчёт SPD 100');}
       else if(id==='1407'){const overflow=Math.max(0,a.resource-34000)/34000*100;a.resource=0;const m=spawnMemory(id);if(a.s.eidolon>=2){m.burningWill=2;a.distance=0;a.castE2Ready=true;}if(a.ode==='castorice')m.odeEndBonus=.0024*overflow+(dummies.length<=2?.0048:0);record(a,'Новое цветение · Крылья Смерти');}
-      else if(id==='1409'){const m=spawnMemory(id),old=livingAllies().map(b=>[b,stat(b).hp]);a.rainUntil=a.turn+3;for(const [b,hp] of old)b.currentHP+=Math.max(0,stat(b).hp-hp);for(const ally of livingAllies())heal(ally,stat(a).hp*params(id,'03')[ally===m.unit?5:0]+params(id,'03')[ally===m.unit?6:1],a);record(a,'После дождя · командный HP');settleMemories();icaTurn();}
+      else if(id==='1409'){const m=spawnMemory(id),old=livingAllies().map(b=>[b,stat(b).hp]);a.rainUntil=a.turn+3;for(const [b,hp] of old)b.currentHP+=Math.max(0,stat(b).hp-hp);for(const ally of livingAllies()){cleanse(ally,a);heal(ally,stat(a).hp*params(id,'03')[ally===m.unit?5:0]+params(id,'03')[ally===m.unit?6:1],a);}record(a,'После дождя · командный HP');settleMemories();icaTurn();}
       else if(id==='1408'){if(turnOwner&&turnOwner!==a)for(const b of turnOwner.buffs)b.expires++;const hp=stat(a).hp;a.resource-=12;a.phainonFormHP=0;if(a.ode==='phainon')a.odeFlameCD=Math.min(.72,Math.max(0,a.resource+12-12)*.12);form.active=true;form.turns=0;form.actions=0;form.extra=false;form.scourge=4;form.distance=0;a.phainonFormHP=hp*2.7;a.currentHP+=a.phainonFormHP;record(a,'Каослана · союзники покидают поле');}
       else if(id==='8001'){hit(a,params(id,'03')[all.length===1?0:1],[0],'Прорыв · основной удар',{toughness:30,bonus:all.length>1?.25:0});if(all.length>1)hit(a,params(id,'03')[2],all.slice(1,3),'Прорыв · соседние цели',{toughness:20});afterAttack(a,true);}
       else if(id==='8003'){const s=stat(a);hit(a,0,all,'Пылающее копьё',{baseDamage:s.atk*params(id,'03')[0]+s.def*params(id,'03')[1],toughness:20});if(a.s.eidolon>=6)a.trailDefense=Math.min(3,(a.trailDefense||0)+1);a.freeMagma=true;trailShield(a);afterAttack(a,true);}
       else if(id==='1001'){const [damage,chance,,freeze]=params(id,'03');hit(a,damage,all,'Ледниковый каскад',{toughness:20});for(const i of all)if(chanceOf('march-freeze',effectChance(a,chance+.15,i))){dummies[i].freeze={owner:id,coefficient:freeze};if(a.s.eidolon>=1)energy(a,6);debuffApplied(a,i);}afterAttack(a,true);}
-      else if(id==='1008'){const [damage,adjacent]=params(id,'03'),boost=a.s.eidolon>=6&&a.currentHP<=stat(a).hp*.5;hit(a,damage,[0],'Арлан · ульта',{toughness:30,bonus:boost?.2:0});if(all.length>1)hit(a,boost?damage:adjacent,all.slice(1,3),'Арлан · соседние цели ульты',{toughness:20,bonus:boost?.2:0});afterAttack(a,true);}
-      else if(id==='1110'){for(const ally of livingAllies()){heal(ally,stat(a).hp*params(id,'03')[1]+params(id,'03')[2],a);ally.lynxHot={owner:id,expires:ally.turn+3};phainonTarget(ally,a,true);}record(a,'Рысь · ульта и периодическое лечение');}
+      else if(id==='1008'){const [damage,adjacent]=params(id,'03'),boost=a.s.eidolon>=6&&a.currentHP<=stat(a).hp*.5;hit(a,damage,[0],'Арлан · ульта',{toughness:20,bonus:boost?.2:0});if(all.length>1)hit(a,boost?damage:adjacent,all.slice(1,3),'Арлан · соседние цели ульты',{toughness:20,bonus:boost?.2:0});afterAttack(a,true);}
+      else if(id==='1110'){for(const ally of livingAllies()){cleanse(ally,a);heal(ally,stat(a).hp*params(id,'03')[1]+params(id,'03')[2],a);ally.lynxHot={owner:id,expires:ally.turn+3};phainonTarget(ally,a,true);}record(a,'Рысь · ульта и периодическое лечение');}
       else if(id==='1312'){const p=params(id,'03'),count=(a.mishaHits||3)+(a.s.eidolon>=1?Math.min(5,all.length):0);if(a.s.eidolon>=6){a.mishaRefund=true;buff(a,id,'mishaE6',{damage:.3},1);}buff(a,id,'mishaEHR',{effectHit:.6},1);for(let n=0;n<count;n++){const i=n?pick('misha-bounce',all.length):0;if(a.s.eidolon>=2&&chanceOf('misha-e2',effectChance(a,.24,i))){applyDefenseDebuff(a,i,'mishaDefUntil',3);}if(chanceOf('misha-freeze',effectChance(a,n?p[2]:1,i))){dummies[i].freeze={owner:id,coefficient:p[3]};debuffApplied(a,i);}hit(a,p[1]+(a.s.eidolon>=4?.06:0),[i],'Миша · удар ульты '+(n+1),{toughness:n?5:10,extraCritDamage:dummies[i].freeze?.3:0});}a.buffs=a.buffs.filter(b=>b.key!=='mishaEHR');a.mishaHits=3;a.resource=3;afterAttack(a,true);}
       else return false;return true;
     }
@@ -1094,7 +1494,7 @@
     }
     function marchGain(actor,n=1){const before=actor.marchCharge||0;actor.marchCharge=Math.min(10,before+n);actor.resource=actor.marchCharge;if(before<7&&actor.marchCharge>=7){energy(actor,5);actor.distance=0;record(actor,'Март 7 · продвижение 100%');}}
     function mydeiState(){const a=find('1404');if(!a||copying===a||a.mydeiActing)return;if(!a.vendetta&&(a.mydeiCharge||0)>=100){a.mydeiCharge-=100;a.vendettaHP=stat(a).hp*.5;a.vendetta=true;a.currentHP+=a.vendettaHP;heal(a,stat(a).hp*.25);a.distance=0;record(a,'Кровная месть · продвижение 100%');}a.resource=a.mydeiCharge||0;if(a.vendetta&&a.mydeiCharge>=(a.s.eidolon>=6?100:150)){a.mydeiActing=true;beginAction(a);a.actionKind='skill';record(a,'Мидей · дополнительное действие');coup(a,()=>batchSkill(a,true));batchSkill(a,true);if(G)G.afterSkill(a);a.mydeiActing=false;}}
-    function batchSkill(actor,god=false){const id=actor.id,target=focusFor(actor),adj=allTargets().slice(1,3);actor.actionKind='skill';if(G)G.beforeSkill(actor);energy(actor,god?10:30);
+    function batchSkill(actor,god=false,opening=false){const id=actor.id,target=focusFor(actor),adj=allTargets().slice(1,3);actor.actionKind='skill';if(G)G.beforeSkill(actor);if(!opening)energy(actor,god?10:30);
       if(id==='1014'){buff(actor,id,'saberSkill',{critDamage:.5},2);const n=actor.resonance||0,full=n>0&&actor.energy+(copying===actor?30*stat(actor).energyRegen:0)+n*8>=360,p=params(id,'02'),extra=full?n*p[3]:0,bonus=full&&actor.s.eidolon>=2?n*.07:0;hit(actor,p[0]+extra,[0],'Сэйбер · навык',{toughness:20,bonus});if(adj.length)hit(actor,p[1]+extra,adj,'Сэйбер · соседние цели',{toughness:10,bonus});if(full){energy(actor,n*8/stat(actor).energyRegen);actor.resonance=0;actor.resource=0;if(actor.manaBurst&&!copying){actor.manaBurst=false;gainSP();actor.distance=0;record(actor,'Вспышка маны · продвижение 100%');}}else resonance(actor,3);if(actor.s.eidolon>=1&&!copying)resonance(actor,1);afterAttack(actor);}
       else if(id==='1015'){hit(actor,params(id,'02')[0],[0],'Арчер · навык '+((actor.circuit||0)+1),{toughness:20,bonus:Math.min(actor.s.eidolon>=6?3:2,actor.circuit||0)});if(!copying)actor.circuit=(actor.circuit||0)+1;afterAttack(actor);}
       else if(id==='1404'){if(god){if(!copying)actor.mydeiCharge-=actor.s.eidolon>=6?100:150;}else loseHP(actor,actor.currentHP*(actor.vendetta?.35:.5));const hp=stat(actor).hp,p=god?params(id,'11'):actor.vendetta?params(id,'09'):params(id,'02');hit(actor,0,god&&actor.s.eidolon>=1?allTargets():[0],god?'Убить бога, чтобы стать богом':actor.vendetta?'Убить царя, чтобы стать царём':'Мидей · навык',{baseDamage:hp*(p[0]+(god&&actor.s.eidolon>=1?.3:0)),toughness:god?30:20});if(adj.length&&!(god&&actor.s.eidolon>=1))hit(actor,0,adj,'Мидей · соседние цели',{baseDamage:hp*p[1],toughness:god?20:10});actor.resource=actor.mydeiCharge||0;afterAttack(actor);}
@@ -1102,7 +1502,7 @@
       else if(id==='1414'){actor.bondOwnAtk=stat(actor,true).atk;actor.bondmate=target.id;dragon.active=true;actor.dragonActive=true;targetedRelics(actor,target);dragonShield(actor,params(id,'02')[0],params(id,'02')[1]);record(actor,'Соратник → '+data.characters[target.id].name);}
       else if(id==='1207'){actor.bow=2;actor.bowCrit=false;actor.bowAcquiredTurn=actor.turn;for(const a of actors)assist(a,actor);record(actor,'Ревущая тетива · 2 уровня');}
       else if(id==='1215'){actor.burden=0;actor.burdenHits=0;actor.burdenRefunds=0;if(actor.s.eidolon>=2)buff(actor,id,'hanyaE2',{speedPct:.2},1);hit(actor,params(id,'02')[0],[0],'Ханья · Ноша',{toughness:20});afterAttack(actor);}
-      else if(id==='1223'){hit(actor,params(id,'02')[0],[0],'Моцзэ · навык',{toughness:20});afterAttack(actor);actor.prey=0;actor.mozeCharge=9;actor.mozeSpent=0;actor.departed=true;actor.resource=9;debuffApplied(actor);record(actor,'Отсутствие · 9 зарядов');}
+      else if(id==='1223'){const target=enemyFor(actor);actor.prey=target;actor.mozeCharge=9;actor.mozeSpent=0;actor.departed=true;actor.resource=9;debuffApplied(actor,target);record(actor,'Отсутствие · 9 зарядов');hit(actor,params(id,'02')[0],[target],'Моцзэ · навык',{toughness:20});if(actor.departed)hit(actor,params(id,'04')[0],[target],'Моцзэ · дополнительный урон',{kind:'additional',toughness:0});afterAttack(actor);}
       else if(id==='1224'){if(actor.master!==target.id){for(const a of actors)a.buffs=a.buffs.filter(b=>b.source!==id||b.key!=='marchMasterSpeed');actor.master=target.id;}buff(target,id,'marchMasterSpeed',{speedPct:params(id,'02')[0]},100000);targetedRelics(actor,target);assist(target,actor);record(actor,'Учитель → '+data.characters[target.id].name);}
     }
     function batchRegular(actor,extra=false){const id=actor.id;if(!['1014','1015','1404','1412','1414','1201','1207','1215','1223','1224'].includes(id))return false;
@@ -1113,7 +1513,7 @@
       if(id==='1414'&&actor.s.policy!=='skill')use=use&&(!actor.bondmate||actors.some(a=>!(a.dragonShield?.expires>a.turn)));
       if(id==='1207'&&actor.s.policy!=='skill')use=use&&!(actor.bow>0);
       if(id==='1215'&&actor.s.policy!=='skill')use=use&&actor.burden===undefined;
-      if(id==='1223')use=use&&actors.length>1;
+      if(id==='1223')use=use&&actors.some(ally=>ally!==actor&&!ally.defeated&&!ally.departed);
       if(id==='1224')use=use&&actors.length>1&&!(actor.marchCharge>=7)&&(actor.s.policy==='skill'||!actor.master);
       if(id==='1201'){
         let draws=0,autarky=false;while(use&&!actor.kong&&sp>0&&draws<20){beginAction(actor);actor.actionKind='skill';spendSP();if(G)G.beforeSkill(actor);if(!actor.qFirst){actor.qFirst=true;gainSP();}drawTile(actor,2);if(actor.s.eidolon>=4&&!autarky&&chanceOf('qingque-autarky',.24))autarky=true;draws++;cerydraAction(actor);yukongAction(actor);if(G)G.afterSkill(actor);record(actor,'Цинцюэ · добор '+actor.tiles.join(''));}actor.qDraws=Math.min(4,draws);
@@ -1124,7 +1524,7 @@
       actor.actionKind='basic';const saber=id==='1014'&&actor.saberEnhanced,march=id==='1224'&&actor.marchCharge>=7;
       if(!march)gainSP();energy(actor,saber||march?30:20);
       if(id==='1014'&&actor.s.eidolon>=1)resonance(actor,1);
-      if(saber){const [damage,,two,one]=data.character_skills['101408'].params[actor.s.eidolon>=3?6:5];resonance(actor,2);actor.saberEnhanced=false;actor.manaBurst=true;hit(actor,damage,allTargets(),'Отпущенный золотой скипетр',{toughness:20});if(dummies.length<=2)hit(actor,dummies.length===1?one:two,allTargets(),'Золотой скипетр · дополнительный урон',{kind:'additional'});}
+      if(saber){const [damage,,two,one]=data.character_skills['101408'].params[actor.s.eidolon>=3?6:5];const living=allTargets();resonance(actor,2);actor.saberEnhanced=false;actor.manaBurst=true;hit(actor,damage,living,'Отпущенный золотой скипетр',{toughness:20});if(living.length<=2)hit(actor,living.length===1?one:two,allTargets(),'Золотой скипетр · дополнительный урон',{kind:'additional'});}
       else if(march){actor.marchCharge-=7;actor.resource=actor.marchCharge;let count=3+(actor.marchUlt?2:0),chance=actor.marchUlt?.8:.6;for(let n=0;n<3&&chanceOf('march-enhanced-hits',chance);n++)count++;const [damage]=data.character_skills['122408'].params[actor.s.eidolon>=3?6:5],extraCritDamage=actor.marchUlt&&actor.s.eidolon>=6?.5:0,master=find(actor.master),support=master&&['Shaman','Warlock','Knight','Priest'].includes(data.characters[master.id].path);for(let n=0;n<count;n++){hit(actor,damage,[0],'Март 7 · усиленный удар',{toughness:5*(support?2:1),bonus:.8,extraCritDamage});if(master&&!support)hit(actor,.2,[0],'Март 7 · урон Учителя',{kind:'additional',element:data.characters[master.id].element,bonus:.8});}actor.marchUlt=false;if(master)buff(master,id,'marchGift',{critDamage:.6,breakEffect:.36},2);record(actor,'Март 7 · '+count+' усиленных ударов');}
       else{const yuk=id==='1207'&&actor.turn>=(actor.yukongReady||0),master=id==='1224'?find(actor.master):null,support=master&&['Shaman','Warlock','Knight','Priest'].includes(data.characters[master.id].path);hit(actor,id==='1404'?0:['1014','1015','1207','1215','1223','1224'].includes(id)?params(id,'01')[0]:1,[0],'Базовая атака',{toughness:yuk||support?20:10,baseDamage:id==='1404'?stat(actor).hp*.5:undefined});if(yuk){hit(actor,params(id,'04')[0],[0],'Семь слоёв Юйкун',{kind:'additional'});actor.yukongReady=actor.turn+2;}if(id==='1224'){marchGain(actor);if(master&&!support)hit(actor,.2,[0],'Март 7 · урон Учителя',{kind:'additional',element:data.characters[master.id].element});}}
       afterAttack(actor,false,'basic');if(G)G.afterBasic(actor);return true;
@@ -1138,11 +1538,28 @@
       else if(id==='1201'){hit(actor,params(id,'03')[0],all,'Ульта Цинцюэ',{toughness:20,bonus:actor.s.eidolon>=1?.1:0});actor.tiles=[0,0,0,0];actor.kong=true;afterAttack(actor,true);}
       else if(id==='1207'){actor.yukongCredits?.clear();if(actor.s.eidolon>=6){actor.bow=Math.min(2,(actor.bow||0)+1);actor.bowAcquiredTurn=actor.turn;}if(actor.bow>0)actor.bowCrit=true;hit(actor,params(id,'03')[0],[0],'Ульта Юйкун',{toughness:30});afterAttack(actor,true);}
       else if(id==='1215'){const target=focusFor(actor),[atk,duration,speed]=params(id,'03');buff(target,id,'hanyaUlt',{atk,speed:stat(actor).speed*speed},duration+(target===activeActor?1:0)+(actor.s.eidolon>=4?1:0));targetedRelics(actor,target);assist(target,actor);record(actor,'Ульта Ханьи → '+data.characters[target.id].name);}
-      else if(id==='1223'){if(actor.s.eidolon>=4)buff(actor,id,'mozeE4',{damage:.3},2);hit(actor,params(id,'03')[0],[0],'Ульта Моцзэ',{followup:true,ultimate:true,toughness:30});afterAttack(actor,true,'followup');mozeFollow(actor);}
+      else if(id==='1223'){
+        const target=actor.prey??enemyFor(actor);
+        if(actor.s.eidolon>=4)buff(actor,id,'mozeE4',{damage:.3},2);
+        hit(actor,params(id,'03')[0],[target],'Ульта Моцзэ',{followup:true,ultimate:true,toughness:30});
+        afterAttack(actor,true,'followup');
+        const living=allTargets();
+        if(living.length)mozeFollow(actor,living.includes(target)?target:living[pick('moze-ultimate-target',living.length)]);
+      }
       else if(id==='1224'){actor.marchUlt=true;hit(actor,params(id,'03')[0],[0],'Ульта Март 7',{toughness:30});afterAttack(actor,true);}
       else return false;return true;
     }
-    function mozeFollow(actor){actor.followups++;energy(actor,10);if(actor.turn>=(actor.mozeSPReady||0)){gainSP();actor.mozeSPReady=actor.turn+1;}hit(actor,params(actor.id,'04')[2]+(actor.s.eidolon>=6?.25:0),[0],'Моцзэ · бонус-атака',{followup:true,toughness:10});afterAttack(actor,false,'followup');}
+    function leavePrey(actor){
+      actor.departed=false;actor.prey=undefined;actor.mozeCharge=0;actor.resource=0;actor.distance=8000;
+      record(actor,'Отсутствие · окончание, продвижение 20%');
+    }
+    function mozeFollow(actor,target=actor.prey??enemyFor(actor)){
+      if(!allTargets().includes(target))return;
+      beginAction(actor);actor.followups++;energy(actor,10);
+      if(actor.turn>=(actor.mozeSPReady||0)){gainSP();actor.mozeSPReady=actor.turn+1;}
+      hit(actor,params(actor.id,'04')[2]+(actor.s.eidolon>=6?.25:0),[target],'Моцзэ · бонус-атака',{followup:true,toughness:10});
+      afterAttack(actor,false,'followup');
+    }
     function implanted(actor,targets){const a=find('1321');if(!a)return;buff(actor,a.id,'implantSpeed',{speedPct:.3},2);if(data.characters[actor.id].element==='Fire'){for(const i of targets)reduceToughness(actor,i,20/efficiency(actor));energy(actor,Math.min(.5,targets.length*.1)*data.characters[actor.id].max_sp/stat(actor).energyRegen);}}
     function sampoWind(actor,targets){
       const [chance,damage,duration,maxStacks]=params(actor.id,'04');
@@ -1151,7 +1568,12 @@
         d.sampoWind={owner:actor.id,expires:d.turn+duration+1,coefficient:(damage+(actor.s.eidolon>=6?.15:0))*d.sampoStacks};debuffApplied(actor,i);
       }
     }
-    function lukaGain(actor,n){actor.will=Math.min(4,(actor.will||0)+n);if(actor.s.eidolon>=4)actor.lukaE4=Math.min(4,(actor.lukaE4||0)+n);energy(actor,3*n);}
+    function lukaGain(actor,n){
+      const before=actor.will||0;
+      actor.will=Math.min(4,before+n);
+      if(actor.s.eidolon>=4)actor.lukaE4=Math.min(4,(actor.lukaE4||0)+n);
+      energy(actor,3*(actor.will-before));
+    }
     function sushangSpeed(actor){
       const [speedPct,duration]=params(actor.id,'04');
       const previous=actor.buffs.find(b=>b.key==='sushangSpeed'&&b.expires>=actor.turn)?.values.speedPct||0;
@@ -1167,16 +1589,43 @@
       if(id==='8005'&&actor.s.policy!=='skill')useSkill=useSkill&&sp>=2;
       if(id==='1317'&&actor.ink>0)useSkill=false;
       if(id==='1315'){
-        if(actor.s.policy!=='basic'&&!(actor.duelUntil>actor.turn)&&sp>0){spendSP();actor.duelUntil=actor.turn+2;dummies[0].tauntUntil=dummies[0].turn+2;debuffApplied(actor);record(actor,'Дуэль · без завершения хода');}
+        if(actor.s.policy!=='basic'&&!(actor.duelUntil>actor.turn)&&sp>0){spendSP();if(actor.boothillTechnique){actor.boothillTechnique=false;implantWeakness(0,'Physical',2);}actor.duelUntil=actor.turn+2;dummies[0].tauntUntil=dummies[0].turn+2;debuffApplied(actor);record(actor,'Дуэль · без завершения хода');}
         useSkill=false;
       }
       const freeFireflySkill=id==='1310'&&actor.combustionUntil>now&&actor.s.eidolon>=1;
       if(freeFireflySkill&&actor.s.policy!=='basic')useSkill=true;
       actor.actionKind=useSkill?'skill':'basic';if(useSkill){coup(actor,()=>breakRegular(actor),true);if(!freeFireflySkill)spendSP();if(G)G.beforeSkill(actor);}else if(!(id==='1315'&&actor.duelUntil>actor.turn)&&!(id==='1317'&&actor.ink>0))gainSP();
       if(id==='1310'&&actor.combustionUntil>now){
-        const be=Math.min(3.6,breakValue(actor));actor.fireflyEnhanced=true;actor.fireflySkill=useSkill;if(useSkill){const p=data.character_skills['131009'].params[actor.s.eidolon>=3?11:9];heal(actor,stat(actor).hp*p[2]);hit(actor,p[0]+p[4]*be,[0],'Светлячок · усиленный навык',{toughness:30});if(adj.length)hit(actor,p[1]+p[5]*be,adj,'Светлячок · соседние цели',{toughness:15});actor.fireflyEnhanced=false;implanted(actor,[0]);}else{const [damage,restore]=data.character_skills['131008'].params[actor.s.eidolon>=3?6:5];heal(actor,stat(actor).hp*restore);hit(actor,damage,[0],'Светлячок · усиленная базовая',{toughness:15});actor.fireflyEnhanced=false;}
+        const be=Math.min(3.6,breakValue(actor));actor.fireflyEnhanced=true;actor.fireflySkill=useSkill;
+        if(useSkill){
+          const p=data.character_skills['131009'].params[actor.s.eidolon>=3?11:9];
+          heal(actor,stat(actor).hp*p[2]);
+          implantWeakness(0,'Fire',p[3]);
+          if(actor.s.novaflare)for(const i of adj)implantWeakness(i,'Fire',p[3]);
+          hit(actor,p[0]+p[4]*be,[0],'Светлячок · усиленный навык',{toughness:30});
+          if(adj.length)hit(actor,p[1]+p[5]*be,adj,'Светлячок · соседние цели',{toughness:15,weaknessRatio:actor.s.novaflare?0:.55});
+          implanted(actor,[0]);
+        }else{
+          const [damage,restore]=data.character_skills['131008'].params[actor.s.eidolon>=3?6:5];
+          heal(actor,stat(actor).hp*restore);
+          hit(actor,damage,[0],'Светлячок · усиленная базовая',{toughness:15,weaknessRatio:actor.s.novaflare?0:.55});
+        }
+        actor.fireflyEnhanced=false;
       }else if(id==='1317'&&actor.ink>0){
-        energy(actor,20);for(let n=0;n<2;n++){hit(actor,data.character_skills['131708'].params[actor.s.eidolon>=5?6:5][0],[0],'Раппа · лепестки '+(n+1),{toughness:actor.s.eidolon>=2?15:10});if(adj.length)hit(actor,data.character_skills['131708'].params[actor.s.eidolon>=5?6:5][1],adj,'Раппа · соседние лепестки',{toughness:5});}hit(actor,data.character_skills['131712'].params[actor.s.eidolon>=5?6:5][0],all,'Раппа · третий удар',{toughness:5});const charges=actor.rappaCharges||0;actor.rappaCharges=actor.s.eidolon>=6?5:0;for(const i of all){reduceToughness(actor,i,2+charges);breakDamage(actor,i,params(id,'04')[2]+params(id,'04')[4]*charges,'Imaginary','Раппа · брейк таланта');}afterAttack(actor);actor.ink--;if(!actor.ink&&actor.s.eidolon>=1)energy(actor,20);record(actor,'Цветные чернила · '+actor.ink);if(G)G.afterBasic(actor);return true;
+        const level=actor.s.eidolon>=5?6:5,[direct,splash]=data.character_skills['131708'].params[level];
+        for(let n=0;n<2;n++){
+          hit(actor,direct,[0],'Раппа · лепестки '+(n+1),{toughness:actor.s.eidolon>=2?15:10,weaknessRatio:.5});
+          if(adj.length)hit(actor,splash,adj,'Раппа · соседние лепестки',{toughness:5,weaknessRatio:.5});
+        }
+        hit(actor,data.character_skills['131712'].params[level][0],all,'Раппа · третий удар',{toughness:5,weaknessRatio:.5});
+        const charges=actor.rappaCharges||0;actor.rappaCharges=actor.s.eidolon>=6?5:0;
+        for(const i of allTargets()){
+          reduceToughness(actor,i,2+charges,{ignoreWeakness:true});
+          breakDamage(actor,i,params(id,'04')[2]+params(id,'04')[4]*charges,'Imaginary','Раппа · брейк таланта');
+        }
+        afterAttack(actor);actor.ink--;
+        if(!actor.ink&&actor.s.eidolon>=1)energy(actor,20);
+        record(actor,'Цветные чернила · '+actor.ink);if(G)G.afterBasic(actor);return true;
       }else if(id==='1315'&&actor.duelUntil>actor.turn){
         const stacks=actor.pocket||0;energy(actor,30);hit(actor,data.character_skills['131508'].params[actor.s.eidolon>=3?6:5][0],[0],'Бутхилл · усиленная базовая',{toughness:20*(1+.5*stacks)});if(maxToughness&&dummies[0].toughness===0&&actor.pocket>0){const damage=params(id,'04')[actor.pocket-1];breakDamage(actor,0,damage,'Physical','Бутхилл · повторное пробитие',160);if(actor.s.eidolon>=6){breakDamage(actor,0,damage*.4,'Physical','Бутхилл E6 · дополнительное пробитие',160);if(adj.length)breakDamage(actor,adj[0],damage*.7,'Physical','Бутхилл E6 · соседнее пробитие',160);}}
       }else if(id==='1111'&&!useSkill&&actor.will>=2){
@@ -1201,7 +1650,7 @@
         if(id==='1301'){const patient=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0];targetedRelics(actor,patient);heal(patient,params(id,'02')[0],actor);if(actor.s.eidolon>=2)buff(patient,id,'gallagherE2',{effectRes:.3},2);assist(patient,actor);}
         if(id==='1214'){const p=params(id,'02');hit(actor,p[0],[0],'Сюэи · навык',{toughness:20});if(adj.length)hit(actor,p[1],adj,'Сюэи · соседние цели',{toughness:10});}
         if(id==='1111'){const [damage,chance,,bleed,duration]=params(id,'02');hit(actor,damage,[0],'Лука · навык',{toughness:20});if(chanceOf('luka-bleed',effectChance(actor,chance,0))){dummies[0].lukaBleed={owner:id,coefficient:bleed,expires:dummies[0].turn+duration};debuffApplied(actor);}lukaGain(actor,actor.s.eidolon>=2?2:1);}
-        if(id==='1206'){const [damage,sword,chance]=params(id,'02'),alreadyBroken=maxToughness&&dummies[0].toughness===0;hit(actor,damage,[0],'Сушан · навык',{toughness:20});if(alreadyBroken&&actor.s.eidolon>=1)gainSP();const broken=!maxToughness||dummies[0].toughness===0;if(broken||chanceOf('march-sword',chance)){hit(actor,sword,[0],'Стойка меча',{kind:'additional',bonus:Math.min(10,actor.swordStacks||0)*.025});actor.swordStacks=Math.min(10,(actor.swordStacks||0)+1);}if(actor.sushangUntil>=actor.turn)for(let n=0;n<2;n++)if(broken||chanceOf('march-sword-enhanced',chance)){hit(actor,sword*params(id,'03')[2],[0],'Стойка меча · дополнительная',{kind:'additional',bonus:Math.min(10,actor.swordStacks||0)*.025});actor.swordStacks=Math.min(10,(actor.swordStacks||0)+1);}}
+        if(id==='1206'){const [damage,sword,chance]=params(id,'02'),alreadyBroken=maxToughness&&dummies[0].toughness===0;hit(actor,damage,[0],'Сушан · навык',{toughness:20});if(alreadyBroken&&actor.s.eidolon>=1)gainSP();const broken=maxToughness&&dummies[0].toughness===0;if(broken||chanceOf('march-sword',chance)){hit(actor,sword,[0],'Стойка меча',{kind:'additional',bonus:Math.min(10,actor.swordStacks||0)*.025});actor.swordStacks=Math.min(10,(actor.swordStacks||0)+1);}if(actor.sushangUntil>=actor.turn)for(let n=0;n<2;n++)if(broken||chanceOf('march-sword-enhanced',chance)){hit(actor,sword*params(id,'03')[2],[0],'Стойка меча · дополнительная',{kind:'additional',bonus:Math.min(10,actor.swordStacks||0)*.025});actor.swordStacks=Math.min(10,(actor.swordStacks||0)+1);}}
         if(id==='1108'){
           const [bounces,damage]=params(id,'02');
           for(let n=0;n<=bounces+(actor.s.eidolon>=1?1:0);n++){
@@ -1215,31 +1664,241 @@
       if(!(id==='1301'&&useSkill))afterAttack(actor,false,actor.actionKind);actor.fireflySkill=false;actor.gallagherEnhanced=false;if(G){if(useSkill)G.afterSkill(actor);else G.afterBasic(actor);}return true;
     }
     function breakUlt(actor){const id=actor.id,all=allTargets();
-      if(id==='1310'){actor.combustionUntil=now+10000/70;actor.distance=0;record(actor,'Полное сгорание · отсчёт SPD 70');}
-      else if(id==='1315'){const p=params(id,'03');hit(actor,p[0],[0],'Ульта Бутхилла',{toughness:30});dummies[0].distance+=10000*p[1];implanted(actor,[0]);afterAttack(actor,true);}
+      if(id==='1310'){actor.combustionExtensions=0;actor.combustionUntil=now+10000/70;actor.distance=0;record(actor,'Полное сгорание · отсчёт SPD 70');}
+      else if(id==='1315'){
+        const p=params(id,'03'),target=enemyFor(actor);
+        implantWeakness(target,'Physical',p[2]);
+        hit(actor,p[0],[target],'Ульта Бутхилла',{toughness:30});
+        dummies[target].distance+=10000*p[1];implanted(actor,[target]);afterAttack(actor,true);
+      }
       else if(id==='1317'){actor.ink=params(id,'03')[2];actor.distance=0;record(actor,'Форма печати · 3 усиленные базовые');}
-      else if(id==='1321'){hit(actor,params(id,'03')[0]/all.length,all,'Ульта Георгины',{toughness:20});implanted(actor,all);afterAttack(actor,true);}
+      else if(id==='1321'){
+        const p=params(id,'03'),living=allTargets();
+        const elements=new Set([data.characters[id].element,data.characters[actor.partner]?.element].filter(Boolean));
+        for(const i of living){
+          dummies[i].wiltUntil=dummies[i].turn+p[1];
+          for(const element of elements)implantWeakness(i,element,p[1]);
+        }
+        if(living.length){debuffApplied(actor,living[0]);hit(actor,p[0]/living.length,living,'Ульта Георгины',{toughness:20});implanted(actor,living);}
+        afterAttack(actor,true);
+      }
       else if(id==='8005'){actor.hmcUntil=actor.turn+3;record(actor,'Запасной танцор · суперпробитие и BE');}
       else if(id==='1301'){const p=params(id,'03');for(const d of dummies)d.besottedUntil=d.turn+p[1]+(actor.s.eidolon>=4?1:0);debuffApplied(actor);hit(actor,p[0],all,'Ульта Галлахера',{toughness:20});actor.gallagherEnhanced=true;actor.distance=0;afterAttack(actor,true);}
-      else if(id==='1214'){if(actor.s.eidolon>=4)buff(actor,id,'xueyiE4',{breakEffect:.4},2);const p=params(id,'03'),available=maxToughness?dummies[0].toughness:0,removed=Math.min(40*efficiency(actor),available),bonus=Math.min(p[2],removed/10*p[1])+(available>=maxToughness*.5&&maxToughness?.1:0);hit(actor,p[0],[0],'Ульта Сюэи',{toughness:40,bonus});afterAttack(actor,true);}
+      else if(id==='1214'){if(actor.s.eidolon>=4)buff(actor,id,'xueyiE4',{breakEffect:.4},2);const p=params(id,'03'),available=maxToughness?dummies[0].toughness:0,removed=Math.min(40*efficiency(actor),available),bonus=Math.min(p[2],removed/10*p[1])+(available>=maxToughness*.5&&maxToughness?.1:0);hit(actor,p[0],[0],'Ульта Сюэи',{toughness:40,bonus,ignoreWeakness:true});afterAttack(actor,true);}
       else if(id==='1111'){const [damage,chance,,duration,gain]=params(id,'03');lukaGain(actor,gain);if(chanceOf('luka-vulnerability',effectChance(actor,chance,0))){dummies[0].lukaVulnUntil=dummies[0].turn+duration;debuffApplied(actor);}hit(actor,damage,[0],'Ульта Луки',{toughness:30});afterAttack(actor,true);}
       else if(id==='1206'){const [damage,duration,,atk]=params(id,'03');hit(actor,damage,[0],'Ульта Сушан',{toughness:30});buff(actor,id,'sushangAtk',{atk},duration);actor.sushangUntil=actor.turn+duration;actor.distance=0;afterAttack(actor,true);}
       else if(id==='1108'){const [damage,,duration,chance]=params(id,'03');hit(actor,damage,all,'Ульта Сампо',{toughness:20});sampoWind(actor,all);for(const i of all)if(chanceOf('sampo-vulnerability',effectChance(actor,chance,i))){dummies[i].sampoVulnUntil=dummies[i].turn+duration;debuffApplied(actor,i);}energy(actor,10);afterAttack(actor,true);}
       else return false;return true;
     }
-    function targetSpeed(index){const d=dummies[index];return Math.max(1,(d.speed??100)*(1-(d.breakSlowUntil>d.turn?.1:0)-(d.slowUntil>d.turn?(d.danSlow||.12):0)-(d.weltSlowUntil>d.turn?.1:0)-(d.imprisonedUntil>d.turn?.1:0)-(d.swSpeedUntil>d.turn?.06:0)-(d.gepardSlowUntil>d.turn?.2:0)));}
-    function spendSP(virtual=false){if(copying)return;if(activeActor)activeActor.actionSPSpent=(activeActor.actionSPSpent||0)+1;if(!virtual){sp--;const il=find('1213');if(il?.s.exEidolon&&activeActor&&activeActor!==il){il.exSpent=(il.exSpent||0)+1;if(il.exSpent>=5){il.exSpent-=5;queueFinal('imbibitorEX',il);}}}if(!virtual||virtual==='thrill'){rinSP(1);const mi=find('1312');if(mi){mi.mishaHits=Math.min(10,(mi.mishaHits||3)+1);mi.resource=mi.mishaHits;energy(mi,params(mi.id,'04')[0]);}}wolfSpend();if(!virtual){turnSPSpent++;if(G)G.skillPointSpent(actors,turnSPSpent);}const sparkle=find('1306');if(sparkle)for(const a of actors){const count=a.buffs.find(b=>b.source==='1306'&&b.key==='sparkleTalent')?.values.stacks||0;buff(a,'1306','sparkleTalent',{stacks:Math.min(3,count+1)},2);}}
-    function silverBug(actor,index=0){if(chanceOf('silver-wolf-bug',effectChance(actor,params('1006','04')[3],index))){const key=['swAtkUntil','swDefUntil','swSpeedUntil'][pick('silver-wolf-bug-type',3)];if(key==='swDefUntil')applyDefenseDebuff(actor,index,key,4);else{dummies[index][key]=dummies[index].turn+4;debuffApplied(actor,index);}record(actor,'Баг · '+key);}}
+    function targetSpeed(index){const d=dummies[index];return Math.max(1,(d.speed??100)*(1-(d.breakSlowUntil>d.turn?.1:0)-(d.slowUntil>d.turn?(d.danSlow||.12):0)-(d.weltSlowUntil>d.turn?.1:0)-(d.ratioTechniqueSlowUntil>d.turn?.15:0)-(d.weightlessUntil>d.turn?params('1004','04')[2]:0)-(d.imprisonedUntil>d.turn?.1:0)-(d.swSpeedUntil>d.turn?.06:0)-(d.gepardSlowUntil>d.turn?.2:0)));}
+    function spendSP(virtual=false){if(copying)return;if(activeActor)activeActor.actionSPSpent=(activeActor.actionSPSpent||0)+1;if(!virtual){sp--;const il=find('1213');if(il?.s.exEidolon&&activeActor&&activeActor!==il){il.exSpent=(il.exSpent||0)+1;if(il.exSpent>=5){il.exSpent-=5;queueFinal('imbibitorEX',il);}}}if(!virtual||virtual==='thrill'){rinSP(1);const mi=find('1312');if(mi){mi.mishaHits=Math.min(10,(mi.mishaHits||3)+1);mi.resource=mi.mishaHits;energy(mi,params(mi.id,'04')[0]);}}wolfSpend();if(!virtual){turnSPSpent++;if(G)G.skillPointSpent(actors,turnSPSpent);}const sparkle=find('1306');if(sparkle?.s.novaflare&&!sparkle.defeated){
+      sparkle.figment=Math.min(3,sparkleFigment(sparkle)+1);sparkle.figmentUntil=sparkle.turn+2;
+      if(activeActor?.buffs.some(b=>b.key==='sparkleSkill'&&b.expires>=activeActor.turn))energy(sparkle,1);
+      if(turnSPSpent>=3)sparkle.freeSkill=true;
+    }else if(sparkle&&!sparkle.s.novaflare)for(const a of actors){const count=a.buffs.find(b=>b.source==='1306'&&b.key==='sparkleTalent')?.values.stacks||0;buff(a,'1306','sparkleTalent',{stacks:Math.min(3,count+1)},2);}}
+    function silverBug(actor,index=0,baseChance=params('1006','04')[3]){if(chanceOf('silver-wolf-bug',effectChance(actor,baseChance,index))){const keys=['swAtkUntil','swDefUntil','swSpeedUntil'],enemy=dummies[index],missing=keys.filter(key=>!(enemy[key]>enemy.turn));const options=missing.length?missing:keys;const key=options[pick('silver-wolf-bug-type',options.length)];if(key==='swDefUntil')applyDefenseDebuff(actor,index,key,4);else{dummies[index][key]=dummies[index].turn+4;debuffApplied(actor,index);}record(actor,'Баг · '+key);}}
+    function silverSkill(actor,index,p){
+      const enemy=dummies[index],many=debuffCount(index)>=3;
+      if(actor.s.novaflare){
+        const first=actors.find(ally=>!ally.defeated&&!ally.departed)||actor;
+        if(chanceOf('silver-wolf-implant',effectChance(actor,p[1],index))){
+          const type=data.characters[first.id].element;
+          enemy.swWeakness=type;
+          enemy.swWeaknessUntil=enemy.turn+p[2];
+          enemy.swWeaknessRes=boss&&!enemy.weaknesses.includes(type)?p[3]:0;
+          debuffApplied(actor,index);
+          if(scenario.audit)record(actor,'Имплант уязвимости · '+type,0,'debuff',null,{targets:[index],element:type});
+        }
+      }else if(boss){
+        const types=[...new Set(actors.filter(ally=>!ally.defeated&&!ally.departed).map(ally=>data.characters[ally.id].element))];
+        const possible=types.filter(type=>!enemy.weaknesses.includes(type));
+        if(possible.length&&chanceOf('silver-wolf-implant',effectChance(actor,p[1],index))){
+          enemy.swWeakness=possible[pick('silver-wolf-implant-type',possible.length)];
+          enemy.swWeaknessUntil=enemy.turn+p[2]+1;
+          enemy.swWeaknessRes=p[3];
+          debuffApplied(actor,index);
+          if(scenario.audit)record(actor,'Имплант уязвимости · '+enemy.swWeakness,0,'debuff',null,{targets:[index],element:enemy.swWeakness});
+        }
+      }
+      if(chanceOf('silver-wolf-res',effectChance(actor,p[4],index))){
+        enemy.swResUntil=enemy.turn+p[6];
+        enemy.swResAmount=p[5]+(!actor.s.novaflare&&many?.03:0);
+        debuffApplied(actor,index);
+      }
+      hit(actor,p[0],[index],'Навык Серебряного Волка',{toughness:20});
+      afterAttack(actor);
+    }
+    function silverTransfer(index){
+      const wolf=find('1006'),source=dummies[index];
+      if(!wolf?.s.novaflare||wolf.defeated||!(source.swWeaknessUntil>source.turn))return;
+      const target=allTargets().find(i=>!(dummies[i].swWeaknessUntil>dummies[i].turn));
+      if(target===undefined)return;
+      const enemy=dummies[target];
+      enemy.swWeakness=source.swWeakness;
+      enemy.swWeaknessUntil=enemy.turn+source.swWeaknessUntil-source.turn;
+      enemy.swWeaknessRes=enemy.weaknesses.includes(source.swWeakness)?0:source.swWeaknessRes;
+      if(scenario.audit)record(wolf,'Серебряный Волк · перенос уязвимости',0,'debuff',null,{targets:[target],element:enemy.swWeakness});
+    }
     function ash(actor,targets,chance=1,fromTalent=true){for(const i of targets)if(chanceOf('jiaoqiu-ashen',effectChance(actor,chance,i))){const d=dummies[i],p=params('1218','04');d.ashStacks=Math.min(actor.s.eidolon>=6?9:p[3],(d.ashenBurn?d.ashStacks||0:0)+(actor.s.eidolon>=1&&fromTalent?2:1));d.ashenBurn={owner:actor.id,expires:d.turn+p[4],coefficient:p[5]+(actor.s.eidolon>=2?3:0)};debuffApplied(actor);record(actor,'Жаркий пепел · '+d.ashStacks+' ур.');}}
-    function huohuoHeal(target){const hh=find('1217');if(!hh||!(hh.divineUntil>hh.turn))return;const list=[target,...actors.filter(a=>a!==target&&a.currentHP<=stat(a).hp*.5)];for(const a of list){heal(a,stat(hh).hp*params('1217','04')[2]+params('1217','04')[4],hh);energy(hh,1);}}
+    function huohuoProvision(actor,duration){
+      actor.divineUntil=actor.turn+duration+(actor.s.eidolon>=1?1:0);
+      actor.divineCleanses=params(actor.id,'04')[6];
+      record(actor,'Хохо · Жертвенность жизни');
+    }
+    function allyDebuffs(actor){
+      return (actor.debuffs||[]).filter(status=>status.expires>=actor.turn);
+    }
+    function controlled(actor){return allyDebuffs(actor).some(status=>status.kind==='freeze');}
+    function inflictAllyDebuff(actor,kind,value=0,turns=1){
+      const fu=find('1208');
+      if(kind==='freeze'&&fu&&!fu.defeated&&fu.matrixUntil>fu.turn&&
+        (!fu.matrixCCUsed||fu.matrixCCAction===enemySerial)){
+        fu.matrixCCUsed=true;fu.matrixCCAction=enemySerial;
+        record(fu,'Матрица · контроль предотвращён',0,'resist',null,{recipient:actor.id});return;
+      }
+      if(actor.id==='1207'&&actor.turn>=(actor.yukongResistUntil||0)){
+        actor.yukongResistUntil=actor.turn+2;
+        record(actor,'Юйкун · ослабление предотвращено',0,'resist');return;
+      }
+      const ccResistance=kind==='freeze'?(actor.id==='1217'?.35:actor.id==='1203'?.7:actor.id==='1107'?.35:0):0;
+      const chance=(1-clamp(stat(actor).effectRes,0,1))*(1-ccResistance);
+      if(!chanceOf('ally-debuff-'+actor.id,chance))return;
+      actor.debuffs=allyDebuffs(actor).filter(d=>d.kind!==kind);
+      actor.debuffs.push({kind,value,expires:actor.turn+turns});
+      record(actor,'Наложено ослабление · '+kind,0,'ally-debuff');
+      if(actor.id==='1107'&&chanceOf('clara-cleanse',.35))cleanse(actor,actor);
+    }
+    function cleanse(actor,source,count=1){
+      actor.debuffs=allyDebuffs(actor);
+      let removed=0;
+      while(removed<count&&actor.debuffs.length){
+        const status=actor.debuffs.pop();
+        record(source,'Очищение · '+status.kind,0,'cleanse',null,{recipient:actor.id,status:status.kind});
+        removed++;
+      }
+      return removed;
+    }
+    function cleanseControl(actor,source){
+      const controls=allyDebuffs(actor).filter(status=>status.kind==='freeze');
+      actor.debuffs=allyDebuffs(actor).filter(status=>status.kind!=='freeze');
+      for(const status of controls)
+        record(source,'Очищение контроля · '+status.kind,0,'cleanse',null,{recipient:actor.id,status:status.kind});
+    }
+    function huohuoRestore(actor,hh,amount){
+      heal(actor,amount,hh);
+      energy(hh,1);
+      if(hh.divineCleanses>0)hh.divineCleanses-=cleanse(actor,hh);
+    }
+    const hpFraction=a=>a.currentHP/stat(a).hp;
+    function huohuoHeal(target){const hh=find('1217');if(!hh||hh.defeated||!(hh.divineUntil>hh.turn))return;if(hh.s.novaflare){
+        const p=params(hh.id,'04'),amount=stat(hh).hp*p[2]+p[4];
+        const team=livingAllies().filter(a=>!a.departed);
+        const lowest=[...team].sort((a,b)=>hpFraction(a)-hpFraction(b))[0];
+
+        const restore=a=>huohuoRestore(a,hh,amount);
+        if(team.includes(target))restore(target);
+        if(lowest)restore(lowest);
+        for(const ally of team)if(hpFraction(ally)<=p[5])restore(ally);
+        return;
+      }
+      const list=[target,...livingAllies().filter(a=>hpFraction(a)<=.5)];
+      for(const a of list)huohuoRestore(a,hh,stat(hh).hp*params('1217','04')[2]+params('1217','04')[4]);
+    }
     function aventShield(actor,ratio=.24,flat=320,extraTarget=null){const value=(stat(actor).def*ratio+flat)*shieldScale(actor),cap=(stat(actor).def*.24+320)*2*shieldScale(actor);for(const a of extraTarget?[extraTarget]:actors){const previous=a.avenShield?.expires>=a.turn?a.avenShield.amount:0;a.avenShield={amount:Math.min(cap,previous+value),expires:a.turn+3,source:actor.id};finalHealing(a,actor);}record(actor,'Укреплённая ставка · '+value.toFixed(2));}
-    function aventFollow(actor){if((actor.blindBet||0)<7)return;actor.blindBet-=7;actor.resource=actor.blindBet;actor.followups++;energy(actor,1);if(actor.s.eidolon>=4)buff(actor,actor.id,'aventE4',{def:.4},2);if(G)G.followupStart(actor,actors);const talent=params('1304','04');const hits=talent[1]+(actor.s.eidolon>=4?3:0);for(let n=0;n<hits;n++)hit(actor,0,[randomTarget()],'Авантюрин · попадание бонус-атаки',{followup:true,group:true,baseDamage:stat(actor).def*talent[2],toughness:10/7});if(G)G.followupEnd(actor);const lowest=[...actors].sort((a,b)=>(a.avenShield?.amount||0)-(b.avenShield?.amount||0))[0];aventShield(actor,.072,96);aventShield(actor,.072,96,lowest);afterAttack(actor,false,'followup');}
-    function jadeFollow(actor){if((actor.jadeCharges||0)<8)return;actor.jadeCharges-=8;actor.resource=actor.jadeCharges;actor.followups++;energy(actor,10);const boosted=actor.jadeEnhanced>0;if(boosted)actor.jadeEnhanced--;hit(actor,params(actor.id,'04')[4]+(boosted?params(actor.id,'03')[0]:0),allTargets(),'Яшма · бонус-атака',{followup:true,bonus:actor.s.eidolon>=1?.32:0});actor.pawn=Math.min(50,(actor.pawn||0)+5);afterAttack(actor,false,'followup',true);}
-    function ilHits(actor,weights,main,adjacent=0,roar=false,ultimate=false){for(let n=0;n<weights.length;n++){if(roar&&n>=3){actor.outroar=Math.min(4,(actor.outroar||0)+1);if(actor.s.eidolon>=4)actor.outroarUntil=actor.turn+1;}const s=stat(actor),bonus=(actor.righteous||0)*params('1213','04')[0],extraCritDamage=.24+(actor.outroar||0)*.12;hit(actor,main*weights[n],[0],'Пожиратель Луны · удар '+(n+1),{statSnapshot:s,bonus,extraCritDamage});if(adjacent&&(ultimate||n>=3))hit(actor,ultimate?adjacent*weights[n]:adjacent/(weights.length-3),allTargets().slice(1,3),'Пожиратель Луны · соседние цели',{statSnapshot:s,bonus,extraCritDamage});actor.righteous=Math.min(6+(actor.s.eidolon>=1?4:0),(actor.righteous||0)+(actor.s.eidolon>=1?2:1));}}
+    function aventFollow(actor){if((actor.blindBet||0)<7)return;beginAction(actor);actor.blindBet-=7;actor.resource=actor.blindBet;actor.followups++;energy(actor,1);if(actor.s.eidolon>=4)buff(actor,actor.id,'aventE4',{def:.4},2);if(G)G.followupStart(actor,actors);const talent=params('1304','04');const hits=talent[1]+(actor.s.eidolon>=4?3:0);for(let n=0;n<hits;n++)hit(actor,0,[randomTarget()],'Авантюрин · попадание бонус-атаки',{followup:true,group:true,baseDamage:stat(actor).def*talent[2],toughness:10/7});if(G)G.followupEnd(actor);const lowest=[...actors].sort((a,b)=>(a.avenShield?.amount||0)-(b.avenShield?.amount||0))[0];aventShield(actor,.072,96);aventShield(actor,.072,96,lowest);afterAttack(actor,false,'followup');}
+    function jadeFollow(actor){
+      const targets=allTargets();
+      if(actor.defeated||(actor.jadeCharges||0)<8||!targets.length)return;
+      beginAction(actor);
+      actor.jadeCharges-=8;actor.resource=actor.jadeCharges;actor.followups++;energy(actor,10);
+      const boosted=actor.jadeEnhanced>0;if(boosted)actor.jadeEnhanced--;
+      actor.pawn=Math.min(50,(actor.pawn||0)+5);
+      if(G)G.followupStart(actor,actors);
+      hit(actor,params(actor.id,'04')[4]+(boosted?params(actor.id,'03')[0]:0),targets,'Яшма · бонус-атака',{followup:true,bonus:actor.s.eidolon>=1?.32:0});
+      if(G)G.followupEnd(actor);
+      afterAttack(actor,false,'followup',true);
+    }
+    function ilHits(actor,weights,main,adjacent=0,roar=false,ultimate=false){for(let n=0;n<weights.length;n++){if(roar&&n>=3){actor.outroar=Math.min(4,(actor.outroar||0)+1);if(actor.s.eidolon>=4)actor.outroarUntil=actor.turn+1;}const s=stat(actor),bonus=(actor.righteous||0)*params('1213','04')[0],extraCritDamage=(actor.outroar||0)*.12;hit(actor,main*weights[n],[0],'Пожиратель Луны · удар '+(n+1),{statSnapshot:s,bonus,extraCritDamage});if(adjacent&&(ultimate||n>=3))hit(actor,ultimate?adjacent*weights[n]:adjacent/(weights.length-3),allTargets().slice(1,3),'Пожиратель Луны · соседние цели',{statSnapshot:s,bonus,extraCritDamage});actor.righteous=Math.min(6+(actor.s.eidolon>=1?4:0),(actor.righteous||0)+(actor.s.eidolon>=1?2:1));}}
     function ilBasic(actor){const level=actor.s.policy==='basic'?0:Math.min(3,sp+(actor.squama||0)),key=['121301','121308','121310','121312'][level],p=data.character_skills[key].params[actor.s.eidolon>=3?6:5];actor.actionKind='basic';for(let n=0;n<level;n++){if(actor.squama>0){actor.squama--;spendSP(true);}else spendSP();}actor.resource=actor.squama||0;if(!level)gainSP();energy(actor,[20,30,35,40][level]);record(actor,'Усиление базовой · '+level);actor.ilLeap=level===3;if(G)G.beforeBasic(actor);ilHits(actor,[[.3,.7],[.33,.33,.34],[.2,.2,.2,.2,.2],[.142,.142,.142,.142,.142,.142,.148]][level],p[0],p[1]||0,level>=2);if(actor.ilLeap)actor.ilPen=0;actor.ilLeap=false;afterAttack(actor,false,'basic');if(G)G.afterBasic(actor);}
     function argentiTalent(actor,count){actor.apotheosis=Math.min(10+(actor.s.eidolon>=4?2:0),(actor.apotheosis||0)+count);energy(actor,params('1302','04')[0]*count);}
-    function weltTalent(actor,targets){for(const i of targets)if(slowed(i)){hit(actor,params('1004','04')[0],[i],'Талант Вельта',{kind:'additional',bonus:!maxToughness||dummies[i].toughness===0?.2:0});if(actor.s.eidolon>=2)energy(actor,3);}}
-    function jingliuGain(actor,amount){const e6=actor.s.eidolon>=6;actor.syzygy=Math.min(3+(e6?1:0),(actor.syzygy||0)+amount);if(!actor.transmigration&&actor.syzygy>=2){if(e6)actor.syzygy++;actor.transmigration=true;actor.distance=0;record(actor,'Спектральная трансмиграция · продвижение 100%');}actor.resource=actor.syzygy;}
+    function weltNovaE1(actor,targets){
+      if(!(actor.s.eidolon>=1))return;
+      for(const i of targets)if(allTargets().includes(i)&&dummies[i].weightlessUntil>dummies[i].turn)
+        hit(actor,params(actor.id,'03')[0]*.4,[i],'Вельт E1 · Невесомость',{kind:'additional',toughness:0});
+    }
+    function weltNovaSkill(actor,p){
+      const main=enemyFor(actor),targets=new Set();
+      for(let n=0;n<5&&allTargets().length;n++){
+        const i=n?randomTarget():main,wasSlowed=slowed(i);
+        targets.add(i);
+        hit(actor,p[0],[i],'Навык Вельта · попадание',{toughness:10});
+        if(!allTargets().includes(i))continue;
+        if(wasSlowed)weltTalent(actor,[i]);
+        if(allTargets().includes(i)&&chanceOf('welt-slow',effectChance(actor,p[1],i))){
+          dummies[i].weltSlowUntil=dummies[i].turn+p[3];
+          debuffApplied(actor,i);
+        }
+      }
+      if(allTargets().includes(main))
+        hit(actor,p[0]*1.2,[main],'Вельт · Суждение',{kind:'additional',toughness:0});
+      weltNovaE1(actor,targets);
+      afterAttack(actor);
+    }
+    function weltNovaUltimate(actor,p){
+      const targets=allTargets(),previouslyWeightless=targets.filter(i=>dummies[i].weightlessUntil>dummies[i].turn);
+      for(const share of [.1,.9]){
+        const living=allTargets(),alreadySlowed=living.filter(slowed);
+        for(const i of living)
+          hit(actor,p[0]*share,[i],'Ульта Вельта',{toughness:20*share});
+        weltTalent(actor,alreadySlowed.filter(i=>allTargets().includes(i)));
+      }
+      weltNovaE1(actor,previouslyWeightless);
+      for(const i of allTargets()){
+        const d=dummies[i];
+        if(chanceOf('welt-imprison',effectChance(actor,p[2],i))){
+          d.imprisonedUntil=d.turn+1;
+          d.distance+=10000*p[1];
+          debuffApplied(actor,i);
+        }
+        applyDefenseDebuff(actor,i,'weightlessUntil',p[6]);
+      }
+      energy(actor,5);
+      record(actor,'Вельт · Невесомость',0,'debuff');
+      afterAttack(actor,true);
+    }
+    function weltTalent(actor,targets){for(const i of targets)if(slowed(i)){hit(actor,params('1004','04')[0],[i],'Талант Вельта',{kind:'additional',bonus:!actor.s.novaflare&&maxToughness&&dummies[i].toughness===0?.2:0});if(actor.s.eidolon>=2)energy(actor,3);}}
+    function jingliuGain(actor,amount){
+      const e6=actor.s.eidolon>=6,enhanced=actor.s.novaflare,cap=(enhanced?4:3)+(e6?1:0);
+      actor.syzygy=Math.min(cap,(actor.syzygy||0)+amount);
+      if(!actor.transmigration&&actor.syzygy>=2){
+        actor.syzygy=Math.min(cap,actor.syzygy+(enhanced?1+(e6?2:0):e6?1:0));
+        actor.transmigration=true;actor.distance=0;actor.resource=actor.syzygy;
+        record(actor,'Спектральная трансмиграция · продвижение 100%');
+      }
+      if(enhanced&&actor.syzygy===cap)actor.jingliuPen=true;
+      actor.resource=actor.syzygy;
+    }
+    function jingliuHPLoss(target,enemyHit){
+      const actor=find('1212');
+      if(!actor?.s.novaflare||actor.defeated||enemyHit&&target.jingliuLossSerial===enemySerial)return;
+      if(enemyHit)target.jingliuLossSerial=enemySerial;
+      if(actor.transmigration)actor.moonlight=Math.min(5,(actor.moonlight||0)+1);
+      actor.jingliuLosses=(actor.jingliuLosses||0)+1;
+      if(scenario.audit)record(actor,'Цзинлю · событие потери HP',0,'hp-loss',null,{recipient:target.id,moonlight:actor.moonlight||0,lossEvents:actor.jingliuLosses});
+      if(actor.jingliuLosses===20){actor.jingliuLosses=0;jingliuGain(actor,1);}
+    }
+    function jingliuNovaAttack(actor,coefficient,splash,label,bonus=0){
+      const defIgnore=actor.jingliuPen?.25:0;
+      actor.jingliuPen=false;
+      if(actor.transmigration)for(const ally of livingAllies())if(ally!==actor)loseHP(ally,stat(ally).hp*.05);
+      if(actor.s.eidolon>=1&&(actor.actionKind==='ultimate'||splash))buff(actor,actor.id,'jingliuE1',{critDamage:.36},1);
+      const s=stat(actor),primary=enemyFor(actor),adjacent=allTargets().filter(i=>Math.abs(i-primary)===1);
+      hit(actor,0,[primary],label,{statSnapshot:s,baseDamage:s.hp*coefficient,bonus,defIgnore});
+      if(splash&&adjacent.length)hit(actor,0,adjacent,label+' · соседние цели',{statSnapshot:s,baseDamage:s.hp*splash,bonus,defIgnore,toughness:actor.actionKind==='ultimate'?20:10});
+      if(actor.s.eidolon>=1&&(actor.actionKind==='ultimate'||splash)){
+        hit(actor,0,[primary],'Цзинлю E1 · дополнительный урон',{statSnapshot:s,baseDamage:s.hp*.8,defIgnore,kind:'additional',toughness:0});
+      }
+    }
     function jingliuSnapshot(actor){if(!actor.transmigration)return stat(actor);let lost=0;for(const a of livingAllies())if(a!==actor){const before=a.currentHP;if(copying===actor)lost+=Math.min(stat(a).hp*.04,Math.max(0,before-1));else{loseHP(a,stat(a).hp*.04);lost+=before-a.currentHP;}}const s=stat(actor);const p=params(actor.id,'04');s.atk+=Math.min(actor.s.baseAtk*p[3],lost*p[2]);if(actor.s.eidolon>=4)s.atk+=Math.min(actor.s.baseAtk*.3,lost*.9);record(actor,'Цзинлю · поглощено HP '+lost.toFixed(2));return s;}
     function jingliuE1(actor){
       if(actor.s.eidolon>=1)buff(actor,actor.id,'jingliuE1',{critDamage:.24},1);
@@ -1247,12 +1906,23 @@
     function jingliuSingleTarget(actor,s){
       if(actor.s.eidolon>=1&&dummies.length===1)hit(actor,1,[0],'Цзинлю E1 · дополнительный урон',{statSnapshot:s,kind:'additional',toughness:0});
     }
-    function jingliuEnhanced(actor){const p=data.character_skills['121209'].params[actor.s.eidolon>=5?11:9];actor.actionKind='skill';if(G)G.beforeSkill(actor);energy(actor,30);jingliuE1(actor);const s=jingliuSnapshot(actor),bonus=actor.jingliuE2?.8:0;if(!copying)actor.jingliuE2=false;hit(actor,p[0],[0],'Луна на застывшей реке',{statSnapshot:s,bonus});if(dummies.length>1)hit(actor,p[2],allTargets().slice(1,3),'Луна на застывшей реке · соседние цели',{statSnapshot:s,bonus});jingliuSingleTarget(actor,s);if(!copying)actor.syzygy--;actor.resource=actor.syzygy;if(!actor.syzygy){actor.transmigration=false;record(actor,'Спектральная трансмиграция · окончание');}afterAttack(actor);if(G)G.afterSkill(actor);settleHP();}
+    function jingliuEnhanced(actor){const p=actor.s.novaflare?params(actor.id,'09'):data.character_skills['121209'].params[actor.s.eidolon>=5?11:9];actor.actionKind='skill';if(G)G.beforeSkill(actor);energy(actor,actor.s.novaflare?38:30);const bonus=actor.jingliuE2?.8:0;if(!copying)actor.jingliuE2=false;
+      if(actor.s.novaflare)jingliuNovaAttack(actor,p[0],p[2],'Луна на застывшей реке',bonus);
+      else{jingliuE1(actor);const s=jingliuSnapshot(actor);hit(actor,p[0],[0],'Луна на застывшей реке',{statSnapshot:s,bonus});if(dummies.length>1)hit(actor,p[2],allTargets().slice(1,3),'Луна на застывшей реке · соседние цели',{statSnapshot:s,bonus});jingliuSingleTarget(actor,s);}if(!copying)actor.syzygy--;actor.resource=actor.syzygy;if(!actor.syzygy){actor.transmigration=false;actor.moonlight=0;record(actor,'Спектральная трансмиграция · окончание');}afterAttack(actor);if(G)G.afterSkill(actor);settleHP();}
     function luochaFlower(actor){if(actor.fieldUntil>actor.turn)return;actor.flowers=(actor.flowers||0)+1;if(actor.flowers>=2){actor.flowers=0;actor.fieldUntil=actor.turn+2;if(actor.s.eidolon>=4)debuffApplied(actor);record(actor,'Поле Цветка Бездны · начало');}}
     function settleHP(){if(form.active)return;const luocha=find('1203'),fu=find('1208');if(luocha&&!luocha.defeated&&luocha.turn>=(luocha.autoHealReady||0)){const patient=actors.find(a=>!a.defeated&&a.currentHP<=stat(a).hp*.5);if(patient){luocha.autoHealReady=luocha.turn+2;const p=params('1203','02');luochaSkillHeal(luocha,patient,p);energy(luocha,30);assist(patient,luocha,Symbol());luochaFlower(luocha);record(luocha,'Автоматическое лечение → '+data.characters[patient.id].name);}}if(fu&&!fu.defeated&&(fu.reversals||0)>0&&fu.currentHP<=stat(fu).hp*.5){fu.reversals--;fu.currentHP+=(stat(fu).hp-fu.currentHP)*.9;record(fu,'Фу Сюань · восстановление HP');}const blade=find('1205');if(blade&&!blade.defeated&&blade.bladeCharges>=bladeChargeCap(blade))bladeFollow(blade);const l=find('1222');if(l&&!l.defeated&&fuyuan.actions>0&&!fuyuan.acting&&l.turn>=(l.emergencyReady||0)&&hpLossSerial>(l.lastHPSeen||0)&&actors.some(a=>a.currentHP<=stat(a).hp*.6)){l.emergencyReady=l.turn+2;record(l,'Фуюань · экстренное действие');fuyuanTurn(true);}if(l)l.lastHPSeen=hpLossSerial;mydeiState();settleMemories();}
     function burning(index){const d=dummies[index];return burnKeys.some(key=>d[key]&&d[key].expires>=d.turn);}
-    function effectChance(actor,base,index){return clamp(base*(1+stat(actor).effectHit)*(1+(find('1006')?.s.eidolon>=2?.2:0)+(dummies[index].guiResUntil>dummies[index].turn?.1:0)+(find('1307')?.s.eidolon>=4&&dummies[index].epiphanyUntil>dummies[index].turn?.1:0))*(dummies[index].ratioDebuff>dummies[index].turn?1.1:1),0,1);}
+    function effectChance(actor,base,index){
+      const enemy=dummies[index],wolf=find('1006'),swan=find('1307');
+      const reduction=(wolf?.s.eidolon>=2&&!wolf.s.novaflare?.2:0)+
+        (enemy.guiResUntil>enemy.turn?.1:0)+
+        (swan?.s.eidolon>=4&&!swan.s.novaflare&&enemy.epiphanyUntil>enemy.turn?.1:0)+
+        (enemy.ratioDebuff>enemy.turn?.1:0);
+      const resistance=clamp((scenario.enemyEffectRes||0)-reduction,0,1);
+      return clamp(base*(1+stat(actor).effectHit)*(1-resistance),0,1);
+    }
     function luochaSkillHeal(actor,target,p){
+      cleanse(target,actor);
       targetedRelics(actor,target);
       const atk=stat(actor).atk;
       const low=target.currentHP<stat(target).hp*.5;
@@ -1278,6 +1948,14 @@
       }
     }
     function targetedRelics(actor,target){
+      const cone=actor.eq?.cone;
+      if(cone?.id==='23065'&&actor!==target&&actor.actionKind==='skill'&&actor.ultimateKey!==actor.actionKey&&actor.turn>=(actor.eq.improvReadyTurn??0)){
+        const [,humor,interval,ignore]=cone.params;
+        actor.eq.improvReadyTurn=actor.turn+interval;
+        punch(humor);
+        improvDefenseIgnore=Math.max(improvDefenseIgnore,ignore);
+        if(scenario.audit)record(actor,'Импровизированное турне',0,'buff',null,{defenseIgnore:improvDefenseIgnore});
+      }
       if(actor!==target&&G?.has(actor,'133',4)){
         buff(target,actor.id,'dreamlitElation',{elation:.16},3);
         if(banger(actor)>=10)for(const ally of actors)buff(ally,'133','dreamlitCrit',{critDamage:.12},3);
@@ -1290,7 +1968,7 @@
         buff(recipient,actor.id,'sacerdos',{critDamage:.18*stacks,stacks},2);
       }
     }
-    function assist(target,source,action=source.actionKey){if(target!==source&&source.buffs?.some(b=>b.key==='summerGuest'&&b.expires>=source.turn)&&source.advanceSnapshot?.[target.id]!==undefined){target.distance=source.advanceSnapshot[target.id];record(source,'Особый гость · продвижение союзника запрещено');}phainonTarget(target,source);if(target.id==='1321'&&source!==target&&target.blessTurn!==target.turn){target.blessTurn=target.turn;dahliaBless();}if(G)G.assist(target,source,action);if(target.id==='1002'&&target!==source&&target.turn>=(target.danReadyTurn||0)){target.danPen=true;target.danReadyTurn=target.turn+params('1002','04')[1]-(target.s.eidolon>=2?1:0);record(target,'Превосходство досягаемости · следующая атака');}}
+    function assist(target,source,action=source.actionKey){if(source.id==='1313'&&source.sundayTechnique){source.sundayTechnique=false;buff(target,source.id,'sundayTechnique',{damage:.5},2);}if(target!==source&&source.buffs?.some(b=>b.key==='summerGuest'&&b.expires>=source.turn)&&source.advanceSnapshot?.[target.id]!==undefined){target.distance=source.advanceSnapshot[target.id];record(source,'Особый гость · продвижение союзника запрещено');}phainonTarget(target,source);if(target.id==='1321'&&source!==target&&target.blessTurn!==target.turn){target.blessTurn=target.turn;dahliaBless();}if(G)G.assist(target,source,action);if(target.id==='1002'&&target!==source&&target.turn>=(target.danReadyTurn||0)){target.danPen=true;target.danReadyTurn=target.turn+params('1002','04')[1]-(target.s.eidolon>=2?1:0);record(target,'Превосходство досягаемости · следующая атака');}}
     function applyBurn(actor,key,targets,chance,coefficient,duration){for(const i of targets)if(chanceOf('burn',effectChance(actor,chance,i))){dummies[i][key]={owner:actor.id,expires:dummies[i].turn+duration,coefficient};debuffApplied(actor);}}
     function firekiss(index){const gui=find('1210');if(!gui)return;const p=params('1210','04'),d=dummies[index];if(chanceOf('guinaifen-firekiss',effectChance(gui,p[0],index))){d.firekiss=Math.min(p[5]+(gui.s.eidolon>=6?1:0),(d.firekissUntil>d.turn?d.firekiss:0)+1);d.firekissUntil=d.turn+p[4];debuffApplied(gui);record(gui,'Огненный поцелуй · '+d.firekiss+' ур.');}}
     function guiAttack(actor,targets,chance,isSkill=false){
@@ -1305,17 +1983,83 @@
         if(d.guiBurn?.expires>=d.turn)d.guiBurn.guiE2=.4;
       }
     }
-    function dotHit(index,key,multiplier=1,label='Тик DoT',natural=false){const d=dummies[index],dot=d[key],actor=find(dot.owner),stacks=d.arcanaStacks||1,element={hysiWind:'Wind',hysiBurn:'Fire',hysiShock:'Thunder',hysiBleed:'Physical'}[key.replace(/E1$/,'')];hit(actor,(key==='arcana'?params('1307','04')[0]+params('1307','04')[2]*(stacks-1):dot.coefficient+(dot.guiE2||0))*multiplier,[index],label,{dot:true,element,noHysi:natural&&key==='arcana'});if((key==='guiBurn'||key==='kafkaShock')&&actor.s.eidolon>=4)energy(actor,2);if(burnKeys.includes(key)||(key==='arcana'&&d.epiphanyUntil>d.turn))firekiss(index);if(natural&&key==='arcana'){if(stacks>=3)for(const i of [index-1,index+1].filter(i=>i>=0&&i<dummies.length)){hit(actor,params('1307','04')[4],[i],'Аркан · соседний DoT',{dot:true});arcanaAdd(i);}if(d.epiphanyUntil>d.turn&&!d.epiphanyUsed)d.epiphanyUsed=true;else d.arcanaStacks=1;hysiExtra(index);}else if(natural)arcanaAdd(index);else if(find('1307')){const owner=activeActor||actor;owner.arcanaProcs??={};if((owner.arcanaProcs[index]||0)<3){owner.arcanaProcs[index]=(owner.arcanaProcs[index]||0)+1;arcanaAdd(index);}}}
-    function energy(actor,amount){if(actor._memo||['1415','1506','1511'].includes(actor.id))return;if(actor.id==='1505'){evanEnergy(actor,amount*stat(actor).energyRegen);return;}const mem=memo('8007');if(mem?.active&&amount>0)memCharge(amount*stat(actor).energyRegen/1000);if(actor.id==='1408'){if(amount>0&&activeActor&&activeActor!==actor&&!form.active)phainonGain(1);return;}if(copying===actor||['1220','1308','1407'].includes(actor.id))return;const cap=data.characters[actor.id].max_sp,previous=actor.energy;actor.energy=Math.min(cap+(actor.id==='1014'?(actor.s.eidolon>=6?200:120):actor.id==='1507'?80:actor.id==='1512'&&actor.fever&&actor.s.eidolon>=6?cap:0),previous+amount*stat(actor).energyRegen);const yukong=find('1207');if(yukong?.s.eidolon>=2&&cap>0&&previous<cap&&actor.energy>=cap){yukong.yukongCredits??=new Set();if(!yukong.yukongCredits.has(actor.id)){yukong.yukongCredits.add(actor.id);energy(yukong,5);}}}
-    function splitHit(actor,coefficient,target,label,shares,toughness){
-      for(const share of shares){
-        if(boss&&dummies[target].hp<=0)break;
-        hit(actor,coefficient*share,[target],label,{toughness:toughness*share});
+    function dotHit(index,key,multiplier=1,label='Тик DoT',natural=false,triggerSource){
+      const d=dummies[index],dot=d[key],actor=find(dot.owner);
+      const enhancedArcana=key==='arcana'&&actor.s.novaflare;
+      const cap=actor.s.novaflare&&actor.id==='1307'&&actor.s.eidolon>=6?80:50;
+      const stacks=enhancedArcana?d.arcanaStacks||1:Math.min(cap,d.arcanaStacks||1);
+      const element={hysiWind:'Wind',hysiBurn:'Fire',hysiShock:'Thunder',hysiBleed:'Physical'}[key.replace(/E1$/,'')];
+      const coefficient=key==='arcana'?
+        params('1307','04')[0]+params('1307','04')[2]*(enhancedArcana?stacks:stacks-1):
+        dot.coefficient+(dot.guiE2||0);
+      hit(actor,coefficient*multiplier,[index],label,{dot:true,element,triggerSource:triggerSource||(natural?actor.id:activeActor?.id||actor.id),
+        defIgnore:enhancedArcana?.2:0,
+        baseDamage:key==='lukaBleed'&&boss?Math.min(d.maxHP*params('1111','02')[2],stat(actor).atk*dot.coefficient)*multiplier:undefined,
+        noHysi:key==='arcana'});
+      if(enhancedArcana){
+        d.arcanaStacks=Math.min(cap,d.arcanaStacks||1);
+        if(scenario.audit)record(actor,'Аркан · после урона '+d.arcanaStacks,0,'arcana',null,
+          {targets:[index],arcanaStacks:d.arcanaStacks,arcanaDamageStacks:stacks,natural});
+      }
+      if((key==='guiBurn'||key==='kafkaShock')&&actor.s.eidolon>=4)energy(actor,2);
+      if(burnKeys.includes(key)||(key==='arcana'&&(enhancedArcana||d.epiphanyUntil>d.turn)))firekiss(index);
+      if(natural&&key==='arcana'){
+        if(enhancedArcana||stacks>=3)for(const i of [index-1,index+1].filter(i=>i>=0&&i<dummies.length)){
+          hit(actor,params('1307','04')[4],[i],'Аркан · соседний DoT',{dot:true,defIgnore:enhancedArcana?.2:0});
+          arcanaAdd(i);
+        }
+        if(enhancedArcana){
+          if(!(d.epiphanyUntil>d.turn))d.arcanaStacks=Math.floor(d.arcanaStacks/2);
+          if(d.arcanaStacks===0)d.arcana=null;
+        }
+        else if(d.epiphanyUntil>d.turn&&!d.epiphanyUsed)d.epiphanyUsed=true;
+        else d.arcanaStacks=1;
+        hysiExtra(index);
+      }else{
+        if(natural)arcanaAdd(index);
+        else if(find('1307')){
+          const owner=activeActor||actor;owner.arcanaProcs??={};
+          if(find('1307')?.s.novaflare||(owner.arcanaProcs[index]||0)<3){
+            owner.arcanaProcs[index]=(owner.arcanaProcs[index]||0)+1;arcanaAdd(index);
+          }
+        }
+        if(key==='arcana')hysiExtra(index);
       }
     }
+    function energy(actor,amount){if(actor._memo||['1415','1506','1511'].includes(actor.id))return;if(actor.id==='1505'){evanEnergy(actor,amount*stat(actor).energyRegen);return;}const mem=memo('8007');if(mem?.active&&amount>0)memCharge(amount*stat(actor).energyRegen/1000);if(actor.id==='1408'){if(amount>0&&activeActor&&activeActor!==actor&&!form.active)phainonGain(1);return;}if(copying===actor||['1220','1308','1407'].includes(actor.id))return;const cap=data.characters[actor.id].max_sp,previous=actor.energy;actor.energy=Math.min(cap+(actor.id==='1014'?(actor.s.eidolon>=6?200:120):actor.id==='1507'?80:actor.id==='1512'&&actor.fever&&actor.s.eidolon>=6?cap:0),previous+amount*stat(actor).energyRegen);if(['1310','1507'].includes(actor.id)&&amount>0&&actor.energy>=cap)cleanse(actor,actor,Infinity);const yukong=find('1207');if(yukong?.s.eidolon>=2&&cap>0&&previous<cap&&actor.energy>=cap){yukong.yukongCredits??=new Set();if(!yukong.yukongCredits.has(actor.id)){yukong.yukongCredits.add(actor.id);energy(yukong,5);}}}
+    function splitHit(actor,coefficient,target,label,plan,options={}){
+      packetRules.validate(plan);
+      if(options.targeting!==undefined&&!['locked','bounce'].includes(options.targeting))throw Error('Неизвестное правило целей серии.');
+      const originalTargets=Array.isArray(target)?[...target]:[target];
+      const originalPhase=boss?.phase;
+      const sequenceId=++packetSerial;
+      if(plan.coverage==='toughness-unverified'&&!packetWarnings.has(plan.abilityId)){
+        packetWarnings.add(plan.abilityId);
+        if(scenario.audit)record(actor,'Распределение стойкости не подтверждено',0,'coverage',null,{abilityId:plan.abilityId});
+      }
+      if(options.statPolicy==='action'&&actor.actionKind==='basic'&&G)G.beforeBasic(actor);
+      const snapshot=options.statSnapshot||(options.statPolicy==='action'?stat(actor):null);
+      let total=0;
+      for(const [index,packet] of plan.packets.entries()){
+        if(options.beforePacket)options.beforePacket(index);
+        if(boss?.phase!==originalPhase)break;
+        const bounce=options.targeting==='bounce'&&index>0;
+        const targets=packetRules.targets(bounce?[]:originalTargets,allTargets(),bounce?'random-living':options.retarget||'locked',count=>pick('packet-retarget-'+actor.id,count));
+        if(!targets.length)break;
+        total+=hit(actor,coefficient*packet.damageShare,targets,label,{...options,statSnapshot:snapshot||undefined,
+          baseDamage:options.baseDamage===undefined?undefined:options.baseDamage*packet.damageShare,toughness:packet.toughness,
+          packet:{sequenceId,index:index+1,count:plan.packets.length,abilityId:plan.abilityId||null,coverage:plan.coverage||'explicit'}});
+        if(options.afterPacket)options.afterPacket(index);
+      }
+      return total;
+    }
     function hit(actor,coefficient,targets,label,options={}){
-      if(boss){if(actor.defeated)return 0;const living=targets.filter(i=>dummies[i]?.hp>0);targets=living.length||targets.length!==1||options.dot||options.fixedCritical!==undefined?living:allTargets().slice(0,1);if(!targets.length)return 0;}
-      if(!targets.length)return 0;
+      if(boss&&actor.defeated)return 0;
+      const requestedTargets=[...targets];
+      targets=packetRules.targets(targets,allTargets(),options.retarget||'locked',count=>pick('hit-retarget-'+actor.id,count));
+      if(!targets.length){if(scenario.audit)record(actor,'Нет допустимой цели попадания',0,'hit-skipped',null,{attackLabel:label,requestedTargets});return 0;}
+      if(options.statPolicy!==undefined&&!['packet','action','target'].includes(options.statPolicy))throw Error('Неизвестное правило снимка статов.');
+      const packetPhase=boss?.phase;
       const spirit=options.memo;
       if(spirit)startMemoryAttack(spirit);
       refreshPunklorde(actor);
@@ -1323,19 +2067,34 @@
       const acheronE6=actor.id==='1308'&&actor.s.eidolon>=6;
       if(G&&kind==='basic'&&options.basicAttack!==false&&!options.memo)G.beforeBasic(actor);
       const ultimate=kind==='ultimate'||Boolean(options.ultimate)||(acheronE6&&['basic','skill'].includes(kind));
-      if(followup&&!actor.attackTargets)beginAction(actor);
+      if(followup&&!actor.attackTargets&&activeActor!==actor)beginAction(actor);
       if(G&&followup&&!options.group)G.followupStart(actor,actors);
       if(G&&followup&&options.group)G.followupDamageStart(actor);
-      const hanya=find('1215');if(hanya&&hanya.burden!==undefined&&targets.includes(hanya.burden)&&(['basic','skill','ultimate'].includes(kind)||ultimate)){const [damage,duration]=params(hanya.id,'04');buff(actor,hanya.id,'hanyaDamage',{damage:damage+(hanya.s.eidolon>=6?.1:0)},duration);}const s=spirit?memoStat(spirit):options.statSnapshot||stat(actor),bonus=(options.bonus||0)+(kind==='skill'&&find('1405')?.odeAnaxaUntil>find('1405')?.turn&&data.characters[actor.id].path==='Mage'?.4:0)+(actor.id==='1510'&&ultimate&&actor.protocol==='verdict'?1:0)+(actor.id==='1413'&&options.memo&&actor.ode==='evernight'&&label.includes('Роса')?.18:0);let total=0;
+      const hanya=find('1215');if(hanya&&hanya.burden!==undefined&&targets.includes(hanya.burden)&&(['basic','skill','ultimate'].includes(kind)||ultimate)){const [damage,duration]=params(hanya.id,'04');buff(actor,hanya.id,'hanyaDamage',{damage:damage+(hanya.s.eidolon>=6?.1:0)},duration);}const packetStats=spirit?memoStat(spirit):options.statSnapshot||stat(actor),bonus=(options.bonus||0)+(kind==='skill'&&find('1405')?.odeAnaxaUntil>find('1405')?.turn&&data.characters[actor.id].path==='Mage'?.4:0)+(actor.id==='1510'&&ultimate&&actor.protocol==='verdict'?1:0)+(actor.id==='1413'&&options.memo&&actor.ode==='evernight'&&label.includes('Роса')?.18:0);let total=0;
       if(!options.dot&&kind!=='additional'){actor.attackTargets??=new Set();for(const i of targets)actor.attackTargets.add(i);if(followup)actor.attackFollowup=true;}
       // Average linear damage on infinite-HP targets, except hits whose crit changes combat state.
       const yanqingCrit=actor.id==='1209'&&!options.dot&&options.fixedCritical===undefined;
       const rollCrits=yanqingCrit||Boolean(options.onCritical)||scenario.rollCrits&&(!chooseBranch||boss);
       const crits=keepLog&&rollCrits?[]:null;
-      const dukeStart=followup&&G?.has(actor,'115',4)?actor.eq.duke:null;
+      const packetDukeStart=followup&&G?.has(actor,'115',4)?actor.eq.duke:null;
       for(const target of targets){
+        if(boss?.phase!==packetPhase)break;
+        const s=options.statPolicy==='target'&&!options.statSnapshot?(spirit?memoStat(spirit):stat(actor)):packetStats;
+        const dukeStart=options.statPolicy==='target'&&packetDukeStart!==null?actor.eq.duke:packetDukeStart;
+        const targetBonus=actor.id==='1209'&&actor.yanTechniqueUntil>=actor.turn&&enemyHPFraction(target)>=.5?.3:0;
         const dummy=dummies[target],shielded=boss?.shield>0;
-        if(G&&!options.memo&&!options.dot&&kind!=='additional')G.hitStart(actor,!boss||dummy.weaknesses.includes('Fire'));
+        if(actor.id==='1005'&&actor.s.novaflare&&actor.s.eidolon>=1&&!options.dot&&kind!=='additional'){
+          actor.kafkaDebuffedTargets??=new Set();
+          if(!actor.kafkaDebuffedTargets.has(target)){
+            actor.kafkaDebuffedTargets.add(target);
+            if(chanceOf('kafka-e1',effectChance(actor,1,target))){
+              dummy.kafkaDotVulnUntil=dummy.turn+2;
+              debuffApplied(actor,target);
+            }
+          }
+        }
+        const tallyOwner=find('1406'),patron=tallyOwner?cipherPatron(tallyOwner):undefined;
+        if(G&&!options.memo&&!options.dot&&kind!=='additional')G.hitStart(actor,hasWeakness(target,'Fire'));
         if(actor.eq?.cone?.id==='23024'&&!options.dot&&kind!=='additional'){
           dummy.mirage??={};
           if(dummy.mirage[actor.id]?.action!==actor.actionKey){
@@ -1345,51 +2104,77 @@
         }
         const gear=G?G.damage(actor,s,{kind:acheronE6&&ultimate?'ultimate':kind,followup,ultimate,dot:options.dot,element:options.element},{debuffs:debuffCount(target),defenseReduced:defenseDebuffs.some(key=>dummy[key]>dummy.turn),mirage:dummy.mirage?.[actor.id]?.until>dummy.turn,shockOrWind:actor.eq?.cone?.id==='21022'&&['shock','wind'].some(type=>dotTypes(target).has(type)||dummy.breakStatuses?.[type]),imprisoned:scenario.imprisoned||dummy.imprisonedUntil>dummy.turn||dummy.breakSlowUntil>dummy.turn,element:data.characters[actor.id].element}):{damage:0,crit:0,critDamage:0};
         if(actor.id==='1308'&&actor.s.eidolon>=1&&debuffCount(target)>0)gear.crit+=.18;
-        const critRate=options.guaranteedCrit?1:clamp(s.crit+gear.crit+(options.extraCrit||0)+(actor.id==='8001'&&actor.s.eidolon>=4&&maxToughness&&dummy.toughness===0?.25:0),0,1), critWeight=rollCrits&&!options.dot&&options.fixedCritical===undefined?Number(chanceOf('crit-'+actor.id+'-'+kind+'-'+label+'-'+target,critRate)):critRate;
+        const seeleE1=actor.id==='1102'&&actor.s.novaflare&&actor.s.eidolon>=1&&enemyHPFraction(target)<=.8;
+        const weltE6=actor.id==='1004'&&actor.s.novaflare&&actor.s.eidolon>=6&&['skill','ultimate'].includes(kind)&&slowed(target);
+        if(dummy.weightlessUntil>dummy.turn&&!options.dot&&kind!=='additional'&&kind!=='break'){
+          actor.struckWeightless=true;
+          if(dummy.weightlessTurn!==dummy.turn){dummy.weightlessTurn=dummy.turn;dummy.weightlessHits=0;}
+          const p=params('1004','03');
+          if(dummy.weightlessHits++<p[5])dummy.distance+=10000*p[4];
+        }
+        const critRate=options.guaranteedCrit?1:clamp(s.crit+gear.crit+(seeleE1?.15:0)+(weltE6?.3:0)+(options.extraCrit||0)+(actor.id==='8001'&&actor.s.eidolon>=4&&maxToughness&&dummy.toughness===0?.25:0),0,1), critWeight=rollCrits&&!options.dot&&options.fixedCritical===undefined?Number(chanceOf('crit-'+actor.id+'-'+kind+'-'+label+'-'+target,critRate)):critRate;
         if(crits&&!options.dot&&options.fixedCritical===undefined)crits.push(Boolean(critWeight));
         if(critWeight===1){
           options.onCritical?.();
           if(yanqingCrit)buff(actor,actor.id,'yanSpeed',{speedPct:.1},2);
         }
-        const panicCD=dummies[target].panicUntil>dummies[target].turn?.15:0,critical=options.fixedCritical!==undefined?options.fixedCritical+(options.fixedCritical>1?panicCD:0):options.dot?1:1+critWeight*(s.critDamage+(options.extraCritDamage||0)+(kind==='skill'&&find('1412')?.merit===actor.id&&(find('1412').cCharge>=6||actor.peerageOriginal)?.72:0)+gear.critDamage+(find('1223')?.s.eidolon>=2&&find('1223').prey===target?.4:0)+(kind==='skill'&&find('1510')?.protocol==='decimation'?1:0)+(followup&&find('1309')?.concertoUntil>now?.25:0)+panicCD+(followup&&find('1504')?.8:0)+(followup?(dummies[target].topazE1||0)*.25:0)),native=(!options.element||options.element===data.characters[actor.id].element)?(actor.s.elementBonus||0):0;
-        const ratioBonus=actor.id==='1305'&&debuffCount(target)>=3?Math.min(.5,debuffCount(target)*.1):0,himekoBonus=actor.id==='1003'&&(dummies[target].burn||dummies[target].himekoBurn)?.2:0;
+        const panicCD=dummies[target].panicUntil>dummies[target].turn?.15:0,critical=options.fixedCritical!==undefined?options.fixedCritical+(options.fixedCritical>1?panicCD:0):options.dot?1:1+critWeight*(s.critDamage+(weltE6?.6:0)+(options.extraCritDamage||0)+(actor.id==='1213'&&hasWeakness(target,'Imaginary')?.24:0)+(kind==='skill'&&find('1412')?.merit===actor.id&&(find('1412').cCharge>=6||actor.peerageOriginal)?.72:0)+gear.critDamage+(find('1223')?.s.eidolon>=2&&find('1223').prey===target?.4:0)+(kind==='skill'&&find('1510')?.protocol==='decimation'?1:0)+(followup&&find('1309')?.concertoUntil>now?.25:0)+panicCD+(followup&&find('1504')?.8:0)+(followup?(dummies[target].topazE1||0)*.25:0)),native=(!options.element||options.element===data.characters[actor.id].element)?(actor.s.elementBonus||0):0;
+        const ratioBonus=actor.id==='1305'&&debuffCount(target)>=3?Math.min(.5,debuffCount(target)*.1):0,himekoBonus=actor.id==='1003'&&kind==='skill'&&(burning(target)||dummies[target].breakStatuses?.Fire)?.2:0;
         const guiBonus=actor.id==='1210'&&burning(target)?.2:0,danBonus=actor.id==='1002'&&kind==='basic'&&slowed(target)?.4:0,danPen=actor.id==='1002'&&actor.danPen?params('1002','04')[0]:0,d=dummies[target],vulnerability=d.firekissUntil>d.turn?d.firekiss*params('1210','04')[3]:0;
-        const weltVulnerability=d.weltVulnUntil>d.turn?.12:0;
+        const weltVulnerability=(d.weltVulnUntil>d.turn?.12:0)+(d.himekoFireVulnUntil>d.turn&&(options.element||data.characters[actor.id].element)==='Fire'?.1:0);
         const jiao=find('1218'),ashParams=jiao?params('1218','04'):[];
-        const ashen=d.ashenBurn?.expires>=d.turn?ashParams[1]+Math.max(0,(d.ashStacks||0)-1)*ashParams[2]:0,jiaoUlt=jiao?.jiaoZoneUntil>jiao?.turn&&ultimate?params('1218','03')[2]:0,topaz=(followup&&find('1112')&&target===0?.5:0)+(followup&&find('1223')?.departed&&target===find('1223').prey?.25:0),swRes=(d.swResUntil>d.turn?(d.swResAmount||.1):0)+(d.avenResUntil>d.turn?.12:0)+(d.pelaIceUntil>d.turn&&(options.element||data.characters[actor.id].element)==='Ice'?.12:0),topazBonus=actor.id==='1112'?.15:0;
-        const trib=find('1403'),hysi=d.hysiVulnUntil>d.turn?params('1410','02')[2]:0,epiphany=enemyPhase&&target===enemyIndex&&d.epiphanyUntil>d.turn?.25:0,cipher=find('1406'),tribV=trib?.tribZoneUntil>trib?.turn?.3:0,nihility=actors.filter(a=>a!==actor&&data.characters[a.id].path==='Warlock').length,abyss=actor.id==='1308'?(nihility>=(actor.s.eidolon>=2?1:2)?1.6:nihility?1.15:1):1;
+        const ashen=d.ashenBurn?.expires>=d.turn?ashParams[1]+Math.max(0,(d.ashStacks||0)-1)*ashParams[2]:0,jiaoUlt=jiao?.jiaoZoneUntil>jiao?.turn&&ultimate?params('1218','03')[2]:0,topaz=(followup&&numby?.target===target&&!find('1112').defeated?params('1112','02')[1]:0)+(followup&&find('1223')?.departed&&target===find('1223').prey?.25:0),swRes=(d.swResUntil>d.turn?(d.swResAmount||.1):0)+(d.swWeaknessUntil>d.turn&&d.swWeakness===(options.element||data.characters[actor.id].element)?d.swWeaknessRes:0)+(d.avenResUntil>d.turn?.12:0)+(d.pelaIceUntil>d.turn&&(options.element||data.characters[actor.id].element)==='Ice'?.12:0),topazBonus=actor.id==='1112'&&hasWeakness(target,'Fire')?.15:0;
+        const trib=find('1403'),hysi=d.hysiVulnUntil>d.turn?params('1410','02')[2]:0,epiphany=d.epiphanyUntil>d.turn&&(find('1307')?.s.novaflare||enemyPhase&&target===enemyIndex)?params('1307','03')[2]+(find('1307')?.s.novaflare&&find('1307').s.eidolon>=4?.2:0):0,cipher=find('1406'),tribV=trib?.tribZoneUntil>trib?.turn?.3:0,nihility=actors.filter(a=>a!==actor&&data.characters[a.id].path==='Warlock').length,abyss=actor.id==='1308'?(nihility>=(actor.s.eidolon>=2?1:2)?1.6:nihility?1.15:1):1;
         if(actor.id==='1406'&&actor.s.eidolon>=2&&chanceOf('cipher-e2',effectChance(actor,1.2,target))){d.cipherE2Until=d.turn+2;debuffApplied(actor,target);}
-        const calculated=Math.max(0,(options.baseDamage??coefficient*(s.atk+(dukeStart===null?0:actor.s.baseAtk*.06*(actor.eq.duke-dukeStart))+(find('1303')?.s.eidolon>=2&&maxToughness&&d.toughness===0?actor.s.baseAtk*.4:0)))*(options.elation?1:1+s.damage+native+bonus+gear.damage+(followup&&mort?.s.eidolon>=2&&mort.rageUntil>now?.75:0)+(options.dot&&find('1005')?.s.eidolon>=2?.25:0)+(ashen&&jiao?.s.eidolon>=1?.4:0)+(actor.id==='1103'&&actor.s.eidolon>=6&&d.shock?.expires>d.turn?.3:0)+(actor.id==='1109'&&actor.s.eidolon>=6&&!options.dot&&burning(target)?.2:0)+(actor.id==='1006'&&actor.s.eidolon>=6?Math.min(1,debuffCount(target)*.2):0)+ratioBonus+himekoBonus+guiBonus+danBonus+topazBonus+(options.pelaTrace&&isExposed(target)?.2:0)+(actor.id==='1204'&&['basic','skill','ultimate'].includes(kind)&&actor.buffs.some(b=>b.key==='jingE2'&&b.expires>=actor.turn)?.2:0))*critical*defenseMultiplier(actor,target,kind,Boolean(options.memo)||/Повелитель молний|Счетовод|Фуюань|Душа дракона/.test(label),options.elation)*(1+clamp(s.resPen+(options.extraResPen||0)+danPen+swRes+eidolonEnemyRes(target,options.element||data.characters[actor.id].element)+(d.archerQuantumUntil>d.turn&&data.characters[actor.id].element==='Quantum'?.2:0)+(numby?.acting&&actor.id==='1112'&&actor.s.eidolon>=6?.1:0)+(dummies[target].luochaResUntil>dummies[target].turn?.2:0)+(ashen&&jiao?.s.eidolon>=6?d.ashStacks*.03:0)+(actor.id==='1213'&&actor.ilLeap?(actor.ilPen||0)*.2:0)+(acheronE6&&ultimate?.2:0)+(actor.id==='1220'&&actor.s.eidolon>=6&&ultimate?.2:0)-(boss&&!d.weaknesses.includes(options.element||data.characters[actor.id].element)?.2:0),boss?-1:0,1))*(1+sixthVulnerability(target)+(ultimate&&find('1308')?.s.eidolon>=4?.08:0)+(d.jingWeak||0)*.12+vulnerability+weltVulnerability+ashen+jiaoUlt+topaz+hysi+epiphany+tribV+(cipher?.4:0)+(d.cipherE2Until>d.turn?.3:0)+eidolonVulnerability(target)+(d.lukaVulnUntil>d.turn?params('1111','03')[2]:0)+(options.dot&&d.sampoVulnUntil>d.turn?params('1108','03')[1]:0)+(options.dot&&d.kafkaDotVulnUntil>d.turn?.3:0)+(actor.id==='1315'&&actor.duelUntil>actor.turn&&target===0?(actor.s.eidolon>=4?.42:.3):0))*abyss*(options.elation?1:options.originalMultiplier||1)*(kind==='skill'&&find('1508')?.s.eidolon>=2?1.3:1)*(actor.id==='1510'&&actor.s.eidolon>=2&&(ultimate||actor.novaActing)?1.3:1)*(options.memo&&find('1413')?.s.eidolon>=1?(dummies.length===1?1.5:dummies.length===2?1.3:dummies.length===3?1.25:1.2):1)*(actor.id==='1405'&&actor.s.eidolon>=6?1.3:1)*(options.dot&&find('1410')?.s.eidolon>=1?1.16:1)*(actor.id==='1014'&&ultimate&&actor.kingUltActive?2:1)*(maxToughness&&d.toughness>0?.9:1));const damage=enemyDamage(target,calculated);actor.total+=damage;damageByTarget[target]+=damage;total+=damage;summerRecord(actor,damage);if(trib?.s.eidolon>=1&&!options.dot&&kind!=='additional')actor.tribAttackDamage=(actor.tribAttackDamage||0)+damage;if(aeon&&aha.acting)aha.instantDamage+=damage;sixthTrue(actor,damage,target,options);if(options.memo)actor.memoDamage=(actor.memoDamage||0)+damage;if(cipher&&!cipher.cipherUlting){const speed=stat(cipher).speed,mult=speed>=170?2:speed>=140?1.5:1;cipher.bank=(cipher.bank||0)+damage*((target===0?params(cipher.id,'04')[1]:.08)*mult*(cipher.s.eidolon>=1?1.5:1)+(actor===cipher&&followup&&cipher.s.eidolon>=6?.16:0));}if(!shielded)reduceToughness(actor,target,toughnessAmount(actor,target,label,options,kind),options);if(dukeStart!==null)G.hitEnd(actor,1,true);}
-      const mei=find('1303');if(mei?.meiUltUntil>mei?.turn)for(const i of targets)if(!dummies[i].rebloomLock)dummies[i].rebloom={owner:mei.id};if(G&&followup&&!options.group)G.followupEnd(actor);record(actor,label,total,options.dot?'dot':followup?'followup':'attack',crits,{targets,action:actor.actionKey});if(options.dot&&!options.noHysi)for(const i of targets)hysiExtra(i);return total;
+        const damageFactors=[(options.baseDamage??coefficient*(s.atk+(dukeStart===null?0:actor.s.baseAtk*.06*(actor.eq.duke-dukeStart))+(find('1303')?.s.eidolon>=2&&maxToughness&&d.toughness===0?actor.s.baseAtk*.4:0))),(options.elation?1:1+s.damage+native+bonus+targetBonus+gear.damage+(followup&&mort?.s.eidolon>=2&&mort.rageUntil>now?.75:0)+(options.dot&&find('1005')?.s.eidolon>=2&&!find('1005').defeated?(find('1005').s.novaflare?.33:.25):0)+(ashen&&jiao?.s.eidolon>=1?.4:0)+(actor.id==='1103'&&actor.s.eidolon>=6&&d.shock?.expires>d.turn?.3:0)+(actor.id==='1109'&&actor.s.eidolon>=6&&!options.dot&&burning(target)?.2:0)+(actor.id==='1006'&&actor.s.eidolon>=6?Math.min(1,debuffCount(target)*.2):0)+ratioBonus+(actor.id==='1405'&&weaknessCount(target)>=5?.3:0)+(actor.id==='1302'&&enemyHPFraction(target)<=.5?.15:0)+himekoBonus+guiBonus+danBonus+topazBonus+(options.pelaTrace&&debuffCount(target)>0?.2:0)+(actor.id==='1204'&&['basic','skill','ultimate'].includes(kind)&&actor.buffs.some(b=>b.key==='jingE2'&&b.expires>=actor.turn)?.2:0)),critical,defenseMultiplier(actor,target,kind,Boolean(options.memo)||/Повелитель молний|Счетовод|Фуюань|Душа дракона/.test(label),options.elation,(options.defIgnore||0)+(seeleE1?.2:0)),(1+clamp(s.resPen+(options.extraResPen||0)+danPen+swRes+eidolonEnemyRes(target,options.element||data.characters[actor.id].element)+(d.archerQuantumUntil>d.turn&&data.characters[actor.id].element==='Quantum'?.2:0)+(numby?.acting&&actor.id==='1112'&&actor.s.eidolon>=6?.1:0)+(dummies[target].luochaResUntil>dummies[target].turn?.2:0)+(ashen&&jiao?.s.eidolon>=6?d.ashStacks*.03:0)+(actor.id==='1213'&&actor.ilLeap?(actor.ilPen||0)*.2:0)+(acheronE6&&ultimate?.2:0)+(actor.id==='1220'&&actor.s.eidolon>=6&&ultimate?.2:0)-(boss&&!d.weaknesses.includes(options.element||data.characters[actor.id].element)?.2:0),boss?-1:0,1)),(1+sparkleVulnerability(actor)+sixthVulnerability(target)+(ultimate&&find('1308')?.s.eidolon>=4?.08:0)+(d.jingWeak||0)*.12+vulnerability+weltVulnerability+ashen+jiaoUlt+topaz+hysi+epiphany+tribV+(cipher?.4:0)+(d.cipherE2Until>d.turn?.3:0)+eidolonVulnerability(target)+(d.lukaVulnUntil>d.turn?params('1111','03')[2]:0)+(options.dot&&d.sampoVulnUntil>d.turn?params('1108','03')[1]:0)+(options.dot&&d.kafkaDotVulnUntil>d.turn?.3:0)+(actor.id==='1315'&&actor.duelUntil>actor.turn&&target===0?(actor.s.eidolon>=4?.42:.3):0)),abyss,(options.elation?1:options.originalMultiplier||1),(kind==='skill'&&find('1508')?.s.eidolon>=2?1.3:1),(actor.id==='1510'&&actor.s.eidolon>=2&&(ultimate||actor.novaActing)?1.3:1),(options.memo&&find('1413')?.s.eidolon>=1?(dummies.length===1?1.5:dummies.length===2?1.3:dummies.length===3?1.25:1.2):1),(actor.id==='1405'&&actor.s.eidolon>=6?1.3:1),(options.dot&&find('1410')?.s.eidolon>=1?1.16:1),(actor.id==='1014'&&ultimate&&actor.kingUltActive?2:1),(maxToughness&&d.toughness>0?.9:1)];const calculated=Math.max(0,damageFactors.reduce((value,factor)=>value*factor,1));const damage=enemyDamage(target,calculated,options.dot?null:actor,kind,{damageOwner:actor.id,triggerSource:options.triggerSource||actor.id,sourceAction:activeActor?.actionKey??null});actor.total+=damage;damageByTarget[target]+=damage;total+=damage;summerRecord(actor,damage);if(trib?.s.eidolon>=1&&!options.dot&&kind!=='additional')actor.tribAttackDamage=(actor.tribAttackDamage||0)+damage;if(aeon&&aha.acting)aha.instantDamage+=damage;sixthTrue(actor,damage,target,options);if(options.memo)actor.memoDamage=(actor.memoDamage||0)+damage;if(cipher&&!cipher.cipherUlting){const speed=stat(cipher).speed,mult=speed>=170?2:speed>=140?1.5:1;cipher.bank=(cipher.bank||0)+damage*((target===patron?params(cipher.id,'04')[1]:.08)*mult*(cipher.s.eidolon>=1?1.5:1)+(actor===cipher&&followup&&cipher.s.eidolon>=6?.16:0));}if(!shielded)reduceToughness(actor,target,toughnessAmount(actor,target,label,options,kind),options);if(actor.id==='1405'&&['basic','skill','ultimate'].includes(kind)&&(!boss||d.hp>0))anaxaImplant(actor,target);if(scenario.audit&&keepLog)record(actor,'Расчёт попадания',0,'damage-calculation',null,{attackLabel:label,packet:options.packet||null,statPolicy:options.statPolicy||'packet',action:actor.actionKey,targets:[target],damageKind:kind,coefficient,baseDamage:options.baseDamage??null,stats:{atk:s.atk,hp:s.hp,def:s.def,crit:critRate,critDamage:s.critDamage},equipment:gear,factors:Object.fromEntries(["base","damageBoost","critical","defense","resistance","vulnerability","abyss","originalMultiplier","rinE2","novaE2","evernightE1","anaxaE6","hysilensE1","saberUltimate","toughness"].map((key,i)=>[key,damageFactors[i]])),criticalMultiplier:critical,calculated,effectiveDamage:damage});if(dukeStart!==null)G.hitEnd(actor,1,true);}
+      const mei=find('1303');if(mei?.meiUltUntil>mei?.turn)for(const i of targets)if(!dummies[i].rebloomLock)dummies[i].rebloom={owner:mei.id};if(G&&followup&&!options.group)G.followupEnd(actor);record(actor,label,total,options.dot?'dot':followup?'followup':'attack',crits,{targets,action:actor.actionKey,...(options.packet?{packet:options.packet}:{}),statPolicy:options.statPolicy||'packet',damageOwner:actor.id,triggerSource:options.triggerSource||actor.id});if(options.dot&&!options.noHysi)for(const i of targets)hysiExtra(i);return total;
     }
-    function debuffCount(index=0){const d=dummies[index];return (find('1308')?.s.eidolon>=4?1:0)+Object.values(d.mirage||{}).filter(status=>status.until>d.turn).length+(find('1223')?.departed&&find('1223').prey===index?1:0)+Object.keys(d.breakStatuses||{}).length+(d.breakSlowUntil>d.turn?1:0)+(scenario.externalDebuffs||0)+(d.exposed>d.turn?1:0)+(d.ratioDebuff>d.turn?1:0)+(d.slowUntil>d.turn?1:0)+(d.weltSlowUntil>d.turn?1:0)+(d.imprisonedUntil>d.turn?1:0)+(d.weltVulnUntil>d.turn?1:0)+(d.freeze?1:0)+(d.firekissUntil>d.turn?1:0)+(find('1112')&&index===0?1:0)+(d.topazE1?1:0)+(find('1203')?.s.eidolon>=4&&find('1203').fieldUntil>find('1203').turn?1:0)+['swAtkUntil','swDefUntil','swSpeedUntil','swUltUntil','swResUntil','panicUntil','befogUntil','epiphanyUntil','swanDefUntil','cipherWeakUntil','hysiVulnUntil','fugueDefUntil','tauntUntil','avenResUntil','pelaIceUntil','luochaResUntil','gepardSlowUntil','guiResUntil','seeleFlurryUntil','kafkaDotVulnUntil','mishaDefUntil','archerQuantumUntil','anaxaDefUntil','cipherE2Until','tbE4Until'].filter(k=>d[k]>d.turn).length+(d.sublimation?1:0)+(find('1410')?.hysiUntil>find('1410')?.turn?2:0)+dotKeys.filter(k=>d[k]&&d[k].expires>=d.turn).length;}
+    function debuffCount(index=0){const d=dummies[index];return (d.swE2?1:0)+(find('1308')?.s.eidolon>=4?1:0)+Object.values(d.mirage||{}).filter(status=>status.until>d.turn).length+(find('1223')?.departed&&find('1223').prey===index?1:0)+Object.keys(d.breakStatuses||{}).length+(d.breakSlowUntil>d.turn?1:0)+(scenario.externalDebuffs||0)+(d.swWeaknessUntil>d.turn?1:0)+(d.exposed>d.turn?1:0)+(d.ratioDebuff>d.turn?1:0)+(d.slowUntil>d.turn?1:0)+(d.weltSlowUntil>d.turn?1:0)+(d.imprisonedUntil>d.turn?1:0)+(d.weltVulnUntil>d.turn?1:0)+(d.freeze?1:0)+(d.firekissUntil>d.turn?1:0)+(numby?.target===index&&!find('1112').defeated?1:0)+(d.topazE1?1:0)+(find('1203')?.s.eidolon>=4&&find('1203').fieldUntil>find('1203').turn?1:0)+['swAtkUntil','swDefUntil','swSpeedUntil','swUltUntil','swResUntil','panicUntil','befogUntil','epiphanyUntil','swanDefUntil','cipherWeakUntil','hysiVulnUntil','fugueDefUntil','tauntUntil','avenResUntil','pelaIceUntil','luochaResUntil','gepardSlowUntil','guiResUntil','seeleFlurryUntil','weightlessUntil','pelaTechniqueUntil','himekoFireVulnUntil','natashaWeakenUntil','huohuoAtkUntil','ratioTechniqueSlowUntil','kafkaDotVulnUntil','mishaDefUntil','archerQuantumUntil','anaxaDefUntil','cipherE2Until','tbE4Until','balefireUntil'].filter(k=>d[k]>d.turn).length+(d.sublimationUntil>d.turn?1:0)+(find('1410')?.hysiUntil>find('1410')?.turn?2:0)+dotKeys.filter(k=>d[k]&&d[k].expires>=d.turn).length;}
     function isExposed(index=0){return debuffCount(index)>0;}
-    function addBlessingDamage(attacker){const ty=find('1202');if(ty?.blessing&&ty.blessing.target===attacker.id&&attacker.buffs.some(b=>b.source==='1202'&&b.key==='benediction'))hit(attacker,params('1202','02')[0]+(ty.s.eidolon>=4?.2:0),[0],'Благословение · доп. урон',{kind:'additional',element:'Thunder'});}
-    function feixiaoFollow(actor){actor.followups++;if(actor.s.eidolon>=4)buff(actor,actor.id,'feixiaoE4',{speedPct:.08},2);actor.fuaSinceTurn=true;buff(actor,actor.id,'fuaDamage',{damage:params('1220','04')[4]},2);hit(actor,params('1220','04')[0]+(actor.s.eidolon>=6?1.4:0),[0],'Бонус-атака Фэйсяо',{followup:true,ultimate:actor.s.eidolon>=6,extraCritDamage:.36,toughness:actor.s.eidolon>=4?10:5});afterAttack(actor,false,'followup');}
-    function ratioFollow(actor){
-      actor.followups++;energy(actor,5+(actor.s.eidolon>=4?15:0));
-      hit(actor,params('1305','04')[0],[0],'Бонус-атака Рацио',{followup:true,bonus:actor.s.eidolon>=6?.5:0});
-      if(actor.s.eidolon>=2)for(let n=0,count=Math.min(4,debuffCount());n<count;n++)hit(actor,.2,[0],'Рацио E2 · дополнительный урон',{kind:'additional',toughness:0});
+    function blessedAlly(tingyun){
+      const ally=tingyun?.blessing&&find(tingyun.blessing.target);
+      return ally?.buffs.some(effect=>effect.key==='benediction'&&effect.source===tingyun.id&&effect.expires>=ally.turn)?ally:null;
+    }
+    function addBlessingDamage(attacker,target){
+      const tingyun=find('1202');
+      if(blessedAlly(tingyun)===attacker)
+        hit(attacker,params('1202','02')[0]+(tingyun.s.eidolon>=4?.2:0),[target],'Благословение · доп. урон',{kind:'additional',element:'Thunder',triggerSource:tingyun.id});
+    }
+    function feixiaoFollow(actor,target=enemyFor(actor)){if(actor.defeated||controlled(actor))return;beginAction(actor);actor.followups++;if(actor.s.eidolon>=4)buff(actor,actor.id,'feixiaoE4',{speedPct:.08},2);actor.fuaSinceTurn=true;buff(actor,actor.id,'fuaDamage',{damage:params('1220','04')[4]},2);hit(actor,params('1220','04')[0]+(actor.s.eidolon>=6?1.4:0),[target],'Бонус-атака Фэйсяо',{followup:true,ultimate:actor.s.eidolon>=6,extraCritDamage:.36,toughness:actor.s.eidolon>=4?10:5});afterAttack(actor,false,'followup');}
+    function ratioFollow(actor,target=enemyFor(actor)){
+      if(actor.defeated||controlled(actor))return;
+      beginAction(actor);actor.followups++;energy(actor,5+(actor.s.eidolon>=4?15:0));
+      hit(actor,params('1305','04')[0],[target],'Бонус-атака Рацио',{followup:true,bonus:actor.s.eidolon>=6?.5:0});
+      if(actor.s.eidolon>=2)for(let n=0,count=Math.min(4,debuffCount(target));n<count;n++)hit(actor,.2,[target],'Рацио E2 · дополнительный урон',{kind:'additional',toughness:0});
       afterAttack(actor,false,'followup');
+    }
+    function kafkaRecharge(actor){
+      const p=params(actor.id,'04');
+      actor.kafkaCharges=Math.min(p[4],(actor.kafkaCharges||0)+p[3]);
+      actor.resource=actor.kafkaCharges;
     }
     function kafkaShock(actor,index){
       const d=dummies[index],p=params(actor.id,'03'),e6=actor.s.eidolon>=6;
+      if(!chanceOf('kafka-shock',effectChance(actor,p[1]+(actor.s.novaflare?0:.3),index)))return;
       d.kafkaShock={owner:actor.id,expires:d.turn+p[2]+(e6?1:0),coefficient:p[3]+(e6?1.56:0)};
+      debuffApplied(actor,index);
     }
-    function kafkaFollow(actor){
-      actor.followups++;actor.fuaReady=false;energy(actor,10);
-      hit(actor,params(actor.id,'04')[0],[0],'Бонус-атака Кафки',{followup:true});
-      kafkaShock(actor,0);debuffApplied(actor);
-      if(actor.s.eidolon>=1&&chanceOf('black-swan-basic',effectChance(actor,1,0))){
-        dummies[0].kafkaDotVulnUntil=dummies[0].turn+2;debuffApplied(actor,0);
+    function kafkaFollow(actor,index){
+      if(actor.defeated||controlled(actor))return;
+      actor.followups++;actor.fuaReady=false;if(actor.s.novaflare)actor.resource=--actor.kafkaCharges;beginAction(actor);energy(actor,10);
+      hit(actor,params(actor.id,'04')[0],[index],'Бонус-атака Кафки',{followup:true,toughness:10});
+      kafkaShock(actor,index);
+      if(!actor.s.novaflare&&actor.s.eidolon>=1&&chanceOf('kafka-e1',effectChance(actor,1,index))){
+        dummies[index].kafkaDotVulnUntil=dummies[index].turn+2;debuffApplied(actor,index);
         record(actor,'Кафка E1 · уязвимость к DoT');
       }
+      if(actor.s.novaflare)detonate([index],.8);
       afterAttack(actor,false,'followup');
     }
-    function detonate(targets,multiplier,onlyBurn=false){for(const i of targets)for(const key of onlyBurn?[...burnKeys,...(dummies[i].epiphanyUntil>dummies[i].turn&&dummies[i].arcana?['arcana']:[])]:dotKeys){const dot=dummies[i][key];if(dot&&dot.expires>dummies[i].turn)dotHit(i,key,multiplier,onlyBurn?'Подрыв Горения':'Подрыв DoT');}for(const i of targets)breakTick(i,multiplier,false,onlyBurn?'Fire':null);}
-    function heal(actor,amount,healer=actor){if(actor.defeated)return;const owner=healer._memo?.owner||healer;const max=stat(actor).hp,before=actor.currentHP,fraction=before/max,incoming=(actor.s.healingTaken||0)+(actor.id==='1205'&&fraction<=.5?.2:0)+(actor.id==='1507'&&actor.rageUntil>now?.5:0)+(actor.mydeiHeal||0)+(find('1407')?.s.eidolon>=4?.2:0),outgoing=(owner.s.healingBonus||0)+(owner.eq?.p.HealRatioBase||0)+owner.buffs.reduce((sum,b)=>sum+(b.expires>=owner.turn?b.values.healing||0:0),0)+(healer.id==='1409'?Math.min(200,Math.max(0,stat(owner).speed-200))*.01+(fraction<=.5?.25:0):0)+(G?.has(owner,'320')?(stat(owner).speed>=180?.2:stat(owner).speed>=135?.12:0):0)+(healer.id==='1503'?elation(owner)*.2:0)+(healer.id==='1105'?.1:0)+(healer.id==='1105'&&fraction<=.3?.5:0)+(healer.id==='1222'?Math.min(.2,breakValue(healer)*.1):0)+(healer.id==='1110'&&healer.s.eidolon>=1&&fraction<=.5?.2:0)+(healer.id==='1301'?Math.min(.75,breakValue(healer)*.5):0)+(healer.id==='1217'&&healer.s.eidolon>=4?.8*Math.max(0,1-fraction):0),value=amount*(1+incoming)*(1+outgoing);if(healer.id==='1211'&&before+value>max)buff(actor,healer.id,'bailuHP',{hp:.1},2);actor.currentHP=Math.min(stat(actor).hp,before+value);if(actor.id==='1404'&&actor.vendetta&&actor.s.eidolon>=2&&!actor.mydeiActing){const charge=Math.max(0,Math.min(40-(actor.healCharge||0),(actor.currentHP-before)/max*40));actor.healCharge=(actor.healCharge||0)+charge;actor.mydeiCharge=Math.min(200,(actor.mydeiCharge||0)+charge);}if(actor.id==='1321'&&healer!==actor&&actor.blessTurn!==actor.turn){actor.blessTurn=actor.turn;dahliaBless();}if(actor.id==='1415'&&!actor._memo)syncDemiHP();if(healer.id==='1217'&&healer.s.eidolon>=6)buff(actor,healer.id,'huohuoE6',{damage:.5},2);recordHealing(actor,healer,value);if(G?.healing)G.healing(owner,actor);phainonTarget(actor,healer,true);if(actor.currentHP>before)record(healer,'Лечение '+(actor._memo?.name||data.characters[actor.id].name)+' · '+(actor.currentHP-before).toFixed(2)+' HP');}
-    function loseHP(actor,amount,canDie=false){if(copying===actor)return;const before=actor.currentHP,lost=Math.min(amount,Math.max(0,before-(canDie?0:1)));actor.currentHP-=lost;if(actor.id==='1205'&&actor.s.eidolon>=4&&(actor.bladeE4||0)<2){const half=stat(actor).hp*.5;if(before>half&&actor.currentHP<=half){actor.bladeE4=(actor.bladeE4||0)+1;record(actor,'Блэйд E4 · макс. HP повышено');}}const fu=find('1208');if(fu?.s.eidolon>=6&&fu.matrixUntil>fu.turn&&!actor._memo)fu.matrixLoss=(fu.matrixLoss||0)+lost;if(actor.id==='1415'&&!actor._memo)syncDemiHP();if(lost>0){if(actor.id==='1507'&&actor.s.eidolon>=6&&actor.rageUntil>now&&actor.mortLossEvent!==eventSerial){actor.mortLossEvent=eventSerial;actor.mortCharge=(actor.mortCharge||0)+1;}const hy=find('1409');if(hy?.s.eidolon>=2)buff(actor,hy.id,'hyacineE2',{speedPct:.3},2);if(actor.id==='1413'){const e=find('1413');everGain(2);buff(e,e.id,'everLoss',{critDamage:.6},2);}
-      if(actor.id==='1404'&&!actor.mydeiActing)actor.mydeiCharge=Math.min(200,(actor.mydeiCharge||0)+lost/stat(actor).hp*100);hpLossSerial++;actor.hpLost=Math.min(stat(actor).hp*.9,actor.hpLost+lost);actor.bladeCharges=Math.min(bladeChargeCap(actor),actor.bladeCharges+1);if(G)G.hpLoss(actor);const c=find('1407');if(c&&!form.active){c.castStacks=Math.min(3,(c.castBoostUntil>c.turn?c.castStacks||0:0)+1);c.castBoostUntil=c.turn+3;if(actor!==memo('1407').unit)castGain(lost);}const ica=memo('1409');if(ica?.active&&actor!==ica.unit){ica.hurt??=new Set();ica.hurt.add(actor);}}}
+    function detonate(targets,multiplier,onlyBurn=false){const triggerSource=activeActor?.id;for(const i of targets)for(const key of onlyBurn?[...burnKeys,...(dummies[i].arcana&&(find('1307')?.s.novaflare||dummies[i].epiphanyUntil>dummies[i].turn)?['arcana']:[])]:dotKeys){const dot=dummies[i][key];if(dot&&dot.expires>dummies[i].turn)dotHit(i,key,multiplier,onlyBurn?'Подрыв Горения':'Подрыв DoT',false,triggerSource);}for(const i of targets)breakTick(i,multiplier,false,onlyBurn?'Fire':null);}
+    function heal(actor,amount,healer=actor){if(actor.defeated)return;const owner=healer._memo?.owner||healer;const max=stat(actor).hp,before=actor.currentHP,fraction=before/max,incoming=(actor.s.healingTaken||0)+(actor.id==='1205'&&(actor.s.novaflare||fraction<=.5)?.2:0)+(actor.id==='1507'&&actor.rageUntil>now?.5:0)+(actor.mydeiHeal||0)+(find('1407')?.s.eidolon>=4?.2:0),outgoing=(owner.s.healingBonus||0)+(owner.eq?.p.HealRatioBase||0)+owner.buffs.reduce((sum,b)=>sum+(b.expires>=owner.turn?b.values.healing||0:0),0)+(healer.id==='1409'?Math.min(200,Math.max(0,stat(owner).speed-200))*.01+(fraction<=.5?.25:0):0)+(G?.has(owner,'320')?(stat(owner).speed>=180?.2:stat(owner).speed>=135?.12:0):0)+(healer.id==='1503'?elation(owner)*.2:0)+(healer.id==='1105'?.1:0)+(healer.id==='1105'&&fraction<=.3?.5:0)+(healer.id==='1222'?Math.min(.2,breakValue(healer)*.1):0)+(healer.id==='1110'&&healer.s.eidolon>=1&&fraction<=.5?.2:0)+(healer.id==='1301'?Math.min(.75,breakValue(healer)*.5):0)+(healer.id==='1217'&&healer.s.novaflare&&healer.s.eidolon>=1&&healer.divineUntil>healer.turn?.2:0)+(healer.id==='1217'&&healer.s.eidolon>=4?.8*Math.max(0,1-fraction):0),value=amount*(1+incoming)*(1+outgoing);if(healer.id==='1211'&&before+value>max)buff(actor,healer.id,'bailuHP',{hp:.1},2);actor.currentHP=Math.min(stat(actor).hp,before+value);if(actor.id==='1205'&&actor.s.novaflare)actor.hpLost=Math.min(max*.9,actor.hpLost+Math.max(0,value)*.25);if(actor.id==='1404'&&actor.vendetta&&actor.s.eidolon>=2&&!actor.mydeiActing){const charge=Math.max(0,Math.min(40-(actor.healCharge||0),(actor.currentHP-before)/max*40));actor.healCharge=(actor.healCharge||0)+charge;actor.mydeiCharge=Math.min(200,(actor.mydeiCharge||0)+charge);}if(actor.id==='1321'&&healer!==actor&&actor.blessTurn!==actor.turn){actor.blessTurn=actor.turn;dahliaBless();}if(actor.id==='1415'&&!actor._memo)syncDemiHP();if(healer.id==='1217'&&healer.s.eidolon>=6)buff(actor,healer.id,'huohuoE6',{damage:.5},2);recordHealing(actor,healer,value);if(scenario.audit)record(healer,'Исцеление · '+data.characters[actor.id].name,0,'healing',null,{recipient:actor.id,healing:value,effectiveHealing:Math.max(0,actor.currentHP-before),overheal:Math.max(0,value-(actor.currentHP-before)),hpLossTally:actor.hpLost||0});if(G?.healing)G.healing(owner,actor);phainonTarget(actor,healer,true);if(actor.currentHP>before)record(healer,'Лечение '+(actor._memo?.name||data.characters[actor.id].name)+' · '+(actor.currentHP-before).toFixed(2)+' HP');}
+    function loseHP(actor,amount,canDie=false,enemyHit=false){if(copying===actor)return;const before=actor.currentHP,lost=Math.min(amount,Math.max(0,before-(canDie?0:1)));actor.currentHP-=lost;if(actor.id==='1205'&&actor.s.eidolon>=4&&(actor.bladeE4||0)<2){const half=stat(actor).hp*.5;if(before>half&&actor.currentHP<=half){actor.bladeE4=(actor.bladeE4||0)+1;record(actor,'Блэйд E4 · макс. HP повышено');}}const fu=find('1208');if(fu?.s.eidolon>=6&&fu.matrixUntil>fu.turn&&!actor._memo)fu.matrixLoss=(fu.matrixLoss||0)+lost;if(actor.id==='1415'&&!actor._memo)syncDemiHP();if(lost>0){jingliuHPLoss(actor,enemyHit);if(actor.id==='1507'&&actor.s.eidolon>=6&&actor.rageUntil>now&&actor.mortLossEvent!==eventSerial){actor.mortLossEvent=eventSerial;actor.mortCharge=(actor.mortCharge||0)+1;}const hy=find('1409');if(hy?.s.eidolon>=2)buff(actor,hy.id,'hyacineE2',{speedPct:.3},2);if(actor.id==='1413'){const e=find('1413');everGain(2);buff(e,e.id,'everLoss',{critDamage:.6},2);}
+      if(actor.id==='1404'&&!actor.mydeiActing)actor.mydeiCharge=Math.min(200,(actor.mydeiCharge||0)+lost/stat(actor).hp*100);hpLossSerial++;actor.hpLost=Math.min(stat(actor).hp*.9,actor.hpLost+lost);if(!enemyHit||actor.id!=='1205'||actor.bladeEnemyAttack!==enemySerial){actor.bladeCharges=Math.min(bladeChargeCap(actor),actor.bladeCharges+1);if(enemyHit&&actor.id==='1205')actor.bladeEnemyAttack=enemySerial;}if(G)G.hpLoss(actor);const c=find('1407');if(c&&!form.active){c.castStacks=Math.min(3,(c.castBoostUntil>c.turn?c.castStacks||0:0)+1);c.castBoostUntil=c.turn+3;if(actor!==memo('1407').unit)castGain(lost);}const ica=memo('1409');if(ica?.active&&actor!==ica.unit){ica.hurt??=new Set();ica.hurt.add(actor);}}}
     function settleEncounter(){
       if(actors.every(actor=>actor.defeated)){boss.result='defeat';return;}
       if(dummies[0].hp>0)return;
@@ -1397,7 +2182,11 @@
       if(boss.phase===3){boss.result='victory';return;}
       boss.phase++;
       boss.shield=boss.hp*.2;
-      for(let i=0;i<dummies.length;i++)dummies[i]=enemySlot(i);
+      for(let i=0;i<dummies.length;i++)dummies[i]=enemySlot(i);const argenti=find('1302');if(argenti&&!argenti.defeated)energy(argenti,2*dummies.length);if(numby)numby.target=undefined;
+      const ratio=find('1305');if(ratio)ratio.ratioMarks=0;
+      const ash=find('1504');if(ash)ash.ashBait=undefined;
+      const wolf=find('1006');if(wolf?.s.novaflare&&wolf.s.eidolon>=2&&!wolf.defeated)for(const enemy of dummies)enemy.swE2=true;
+      const swan=find('1307');if(swan?.s.novaflare&&!swan.defeated)blackSwanEntry(swan);
       record(null,'Гепард · фаза '+boss.phase+' · призваны стражи',0,'phase',null,{targets:[0,1,2]});
       record(null,'Гарнизонный барьер',0,'shield',null,{shield:boss.shield});
     }
@@ -1406,14 +2195,31 @@
       const area=index===0&&enemy.turn%3===0;
       const name=area?'Ледяной водопад':enemy.name+' · атака';
       const power=(index===0?1800:750)*(1+(boss.phase-1)*.2)*(area?1.25:1);
-      trainingAttack(index,{name,power,area});
+      enemyActionSequence(index,[{name,power,area}]);
     }
     function activeShields(actor){
       return [actor.shield,actor.avenShield,actor.marchShield,actor.trailShield,actor.dragonShield,actor.luochaShield]
         .filter(shield=>shield?.amount>0&&shield.expires>=actor.turn);
     }
     function incomingHit(target,attack,hitIndex,hitCount){
-      let damage=attack.power/hitCount*1000/(1000+stat(target).def)*(G?.has(target,'106')?.92:1);
+      const fu=find('1208'),protecting=fu&&!fu.defeated&&!fu.departed;
+      const power=attack.power/hitCount*(protecting?1-params(fu.id,'04')[0]:1);
+      const share=protecting&&target!==fu&&fu.matrixUntil>fu.turn?params(fu.id,'02')[0]:0;
+      receiveEnemyDamage(target,power*(1-share),attack,hitIndex,hitCount);
+      if(share)receiveEnemyDamage(fu,power*share,attack,hitIndex,hitCount,true);
+    }
+    function receiveEnemyDamage(target,power,attack,hitIndex,hitCount,redirected=false){
+      let damage=power*1000/(1000+stat(target).def)*(G?.has(target,'106')?.92:1);
+      if(target.amberTeamUntil>target.turn)damage*=.85;
+      if(target.id==='8003'&&target.amberUntil>target.turn)damage*=1-params(target.id,'02')[0];
+      if(target.id==='1507'&&target.mortTechniqueUntil>target.turn)damage*=.1;
+      if(target.id==='1507'&&target.rageUntil>now)damage*=1-params(target.id,'03')[5];
+      if(target.id==='1221'&&target.parry)damage*=.8;
+      if(target.vigorUntil>=target.turn)damage*=.9;
+      if(target.id==='1107'){
+        const ultimateReduction=target.counterAggroUntil>target.turn?params(target.id,'03')[3]:0;
+        damage*=1-params(target.id,'04')[2]-ultimateReduction;
+      }
       let blocked=0;
       for(const shield of activeShields(target)){
         const absorbed=Math.min(damage,shield.amount);
@@ -1422,59 +2228,276 @@
       }
       damage-=blocked;
       const hp=target.currentHP;
-      if(G)G.receivedAttack(target);
-      loseHP(target,damage,true);
+      if(G&&!redirected)G.receivedAttack(target);
+      loseHP(target,damage,true,true);
       if(target.id==='1209'&&target.currentHP<hp&&target.soulUntil>=target.turn){
         target.soulUntil=undefined;
         record(target,'Эмпатическая связь · снята входящим уроном',0,'buff-expired');
       }
-      record(null,attack.name+' → '+data.characters[target.id].name,0,'incoming',null,
+      record(null,attack.name+' → '+data.characters[target.id].name,0,redirected?'redirected':'incoming',null,
         {recipient:target.id,hpLoss:hp-target.currentHP,...(hitCount>1?{hit:hitIndex+1,hits:hitCount}:{})});
+      const bailu=find('1211');
       if(target.currentHP<=0){
+        const hh=find('1217');
+        if(hh?.s.novaflare&&hh.s.eidolon>=2&&!hh.defeated&&hh.divineUntil>hh.turn&&(hh.huohuoRevives||0)<2&&!target._memo){
+          hh.huohuoRevives=(hh.huohuoRevives||0)+1;
+          target.currentHP=stat(target).hp*.5;
+          hh.divineUntil--;
+          record(hh,'Хохо E2 · спасение от смертельного удара',0,'revive',null,{recipient:target.id});
+          return;
+        }
+        if(target.id==='1507'&&target.rageUntil>now){
+          target.rageUntil=0;
+          target.currentHP=stat(target).hp*params(target.id,'03')[5];
+          target.energy=Math.max(target.energy,data.characters[target.id].max_sp*.75);
+          record(target,'Безмерная ярость · спасение от смертельного удара',0,'revive');
+          return;
+        }
+        if(target.id==='1104'&&!target.gepardRevived){
+          target.gepardRevived=true;
+          target.currentHP=stat(target).hp*params(target.id,'04')[0];
+          target.energy=data.characters[target.id].max_sp;
+          record(target,'Несгибаемая воля · восстановление HP и энергии',0,'revive');
+          return;
+        }
+        if(bailu&&target!==bailu&&!bailu.defeated&&(bailu.revives||0)<(bailu.s.eidolon>=6?2:1)){
+          bailu.revives=(bailu.revives||0)+1;
+          const [, ,ratio,flat]=params(bailu.id,'04');
+          heal(target,stat(bailu).hp*ratio+flat,bailu);
+          record(bailu,'Байлу · спасение от смертельного удара',0,'revive',null,{recipient:target.id});
+          return;
+        }
         target.defeated=true;
+        if(target.id==='1102')target.seeleExtraPending=false;
         target.buffs=[];
         if(target.id==='1203')target.fieldUntil=target.turn;
         for(const m of memories)if(m.owner===target){m.active=false;target.memoryActive=false;}
         record(target,'Персонаж выбыл',0,'ally-defeated');
       }
+      if(!redirected&&hitIndex===hitCount-1&&!target.defeated&&bailu&&!bailu.defeated&&
+         target.vigorUntil>=target.turn&&target.vigorHeals>0){
+        target.vigorHeals--;
+        const [ratio,flat]=params(bailu.id,'04');
+        heal(target,stat(bailu).hp*ratio+flat,bailu);
+      }
+    }
+    let enemyActionDepth=0;
+    function enemyActionSequence(index,actions){
+      const original=dummies[index],phase=boss?.phase,imprisoned=original.imprisonedUntil||0;
+      for(let action=0;action<actions.length;action++){
+        const reason=boss&&boss.result!=='timeout'?'encounter-ended':
+          dummies[index]!==original||boss?.phase!==phase?'phase':
+          boss&&original.hp<=0?'defeated':original.freeze?'freeze':
+          maxToughness&&original.toughness<=0?'break':
+          action>0&&(original.imprisonedUntil||0)>imprisoned?'imprisonment':null;
+        if(reason){if(scenario.audit)record(null,'Оставшиеся действия врага отменены',0,'enemy-actions-cancelled',null,{enemy:index,remaining:actions.length-action,reason});break;}
+        if(scenario.audit)record(null,'Начало действия врага',0,'enemy-action-start',null,{enemy:index,index:action+1,count:actions.length});
+        trainingAttack(index,actions[action]);
+        if(scenario.audit)record(null,'Конец действия врага',0,'enemy-action-end',null,{enemy:index,index:action+1,count:actions.length});
+        if(action+1<actions.length){
+          const previousPhase=enemyPhase,previousIndex=enemyIndex;
+          enemyPhase=false;enemyIndex=-1;
+          try{settleHP();settleFinal();runUlts();}
+          finally{enemyPhase=previousPhase;enemyIndex=previousIndex;}
+        }
+      }
     }
     function trainingAttack(index,attack=null){
-      const candidates=actors.filter(a=>!a.departed&&!a.defeated),weights=candidates.map(a=>{if(a.id==='1221'&&a.parry)return 1e9;const path=data.characters[a.id].path;let w=path==='Knight'?150:path==='Warrior'?125:['Rogue','Mage'].includes(path)?75:100;if(a.id==='1107'&&a.counterAggroUntil>a.turn)w*=6;if(a.id==='1002'&&a.currentHP<=stat(a).hp*.5)w*=.5;if(a.id==='1209'&&a.soulUntil>=a.turn)w*=.4;return w;});
+      enemyActionDepth++;
+      try{return trainingAttackBody(index,attack);}
+      finally{enemyActionDepth--;}
+    }
+    function trainingAttackBody(index,attack=null){
+      const candidates=actors.filter(a=>!a.departed&&!a.defeated),weights=candidates.map(a=>{
+        if(a.id==='1221'&&a.parry)return 1e9;
+        const path=data.characters[a.id].path,base=path==='Knight'?150:path==='Warrior'?125:['Rogue','Mage'].includes(path)?75:100;
+        let weight=base;
+        if(a.id==='1107'&&a.counterAggroUntil>a.turn)weight*=6;
+        if(a.id==='1104')weight+=3*base;
+        if(a.id==='1205'&&a.s.novaflare&&a.bladeUntil>a.turn)weight+=base*params(a.id,'02')[4];
+        if(a.id==='1002'&&a.currentHP<=stat(a).hp*.5)weight*=.5;
+        if(a.id==='1209'&&a.soulUntil>=a.turn)weight*=.4;
+        if(a.marchShield?.skill&&a.marchShield.amount>0&&a.marchShield.expires>=a.turn&&a.currentHP>=stat(a).hp*.3)weight+=5*base;
+        return weight;
+      });
       const target=candidates[choose('enemy-target-'+index,weights)];if(!target)return;
+      const shieldedBefore=activeShields(target).length>0;
       const hitCount=scenario.incomingHits??1;
       if(attack){
         const recipients=attack.area?candidates:[target];
+        const hysilens=find('1410');
+        const atkDown=(dummies[index].huohuoAtkUntil>dummies[index].turn?.25:0)+(dummies[index].swAtkUntil>dummies[index].turn?params('1006','04')[0]:0)+
+          (hysilens&&!hysilens.defeated&&hysilens.hysiUntil>hysilens.turn?params('1410','03')[5]:0);
+        const weak=dummies[index].natashaWeakenUntil>dummies[index].turn?.3:0;
+        const reduced=atkDown||weak?{...attack,power:attack.power*Math.max(0,1-atkDown)*(1-weak)}:attack;
         for(let hitIndex=0;hitIndex<hitCount;hitIndex++)
-          for(const recipient of recipients)if(!recipient.defeated)incomingHit(recipient,attack,hitIndex,hitCount);
+          for(const recipient of recipients)if(!recipient.defeated)incomingHit(recipient,reduced,hitIndex,hitCount);
         if(target.defeated)return;
       }else{
         for(let i=0;i<hitCount;i++)if(G)G.receivedAttack(target);
         record(null,'Тренировочная атака '+(index+1)+' → '+data.characters[target.id].name+' · без потери HP');
       }
+      if(!boss&&scenario.enemyDebuff==='freeze'&&!target.defeated)inflictAllyDebuff(target,'freeze');
       energy(target,5);
+      const survival=target.buffs.find(effect=>effect.key==='survival'&&effect.expires>=target.turn);
+      const lynx=survival&&find(survival.source);
+      if(lynx&&!lynx.defeated)energy(lynx,2);
       if(target.id==='1404'&&target.vendetta&&target.s.eidolon>=4)heal(target,stat(target).hp*.1);
       if(target.id==='1105'){if(target.s.eidolon>=4)energy(target,5);if(target.s.eidolon>=1&&!target.natashaE1&&target.currentHP<=stat(target).hp*.3){target.natashaE1=true;heal(target,stat(target).hp*.15+400,target);}}
       const fu=find('1208');if(fu?.s.eidolon>=4&&fu.matrixUntil>fu.turn)energy(fu,5);
-      const clara=find('1107');if(clara&&!clara.defeated&&(target===clara||clara.counterCharges>0||(clara.s.eidolon>=6&&chanceOf('clara-e6',.5)))){if(target===clara||clara.s.eidolon>=6)dummies[index].svarogMark=true;beginAction(clara);clara.actionKind='followup';clara.followups++;const enhanced=clara.counterCharges>0,coefficient=params('1107','04')[1]+(enhanced?params('1107','03')[1]:0);if(enhanced)clara.counterCharges--;if(G)G.followupStart(clara,actors);hit(clara,coefficient,[index],'Сварог · контратака',{followup:true,group:true});if(enhanced)hit(clara,coefficient*.5,[index-1,index+1].filter(i=>i>=0&&i<dummies.length),'Сварог · соседние цели',{followup:true,group:true});if(G)G.followupEnd(clara);afterAttack(clara,false,'followup');}
+      const clara=find('1107');if(clara&&!clara.defeated&&!controlled(clara)&&(target===clara||clara.counterCharges>0||(clara.s.eidolon>=6&&chanceOf('clara-e6',.5)))){if(target===clara||clara.s.eidolon>=6)dummies[index].svarogMark=true;beginAction(clara);clara.actionKind='followup';clara.followups++;energy(clara,5);const enhanced=clara.counterCharges>0,coefficient=params('1107','04')[1]+(enhanced?params('1107','03')[1]:0);if(enhanced)clara.counterCharges--;if(G)G.followupStart(clara,actors);hit(clara,coefficient,[index],'Сварог · контратака',{followup:true,group:true,toughness:10,bonus:.3});if(enhanced)hit(clara,coefficient*.5,[index-1,index+1].filter(i=>i>=0&&i<dummies.length),'Сварог · соседние цели',{followup:true,group:true,toughness:10,bonus:.3});if(G)G.followupEnd(clara);afterAttack(clara,false,'followup');}
       const march=find('1001');
-      if(march&&!march.defeated&&activeShields(target).length&&(march.marchCounters||0)<params(march.id,'04')[1]+(march.s.eidolon>=4?1:0)){
+      if(march&&!march.defeated&&!controlled(march)&&shieldedBefore&&(march.marchCounters||0)<params(march.id,'04')[1]+(march.s.eidolon>=4?1:0)){
         march.marchCounters=(march.marchCounters||0)+1;march.followups++;beginAction(march);march.actionKind='followup';energy(march,10);
+        if(G)G.followupStart(march,actors);
         const damage=stat(march).atk*params(march.id,'04')[0]+(march.s.eidolon>=4?stat(march).def*.3:0);
-        hit(march,0,[index],'Март 7 · контратака',{followup:true,baseDamage:damage,toughness:10});afterAttack(march,false,'followup');
+        hit(march,0,[index],'Март 7 · контратака',{followup:true,baseDamage:damage,toughness:10});if(G)G.followupEnd(march);afterAttack(march,false,'followup');
       }
-      const yunli=find('1221');if(yunli?.s.eidolon>=6&&!yunli.defeated&&yunli.parry&&target!==yunli)yunliCounter(yunli,true,index);
-      if(target.id==='1221'){energy(target,params('1221','04')[2]);if(target.parry)yunliCounter(target,true,index);else{beginAction(target);target.actionKind='followup';target.followups++;if(G)G.followupStart(target,actors);hit(target,params('1221','04')[0],[index],'Юньли · контратака',{followup:true,group:true});hit(target,params('1221','04')[1],[index-1,index+1].filter(i=>i>=0&&i<dummies.length),'Юньли · соседние цели',{followup:true,group:true});if(G)G.followupEnd(target);afterAttack(target,false,'followup');}}
+      const yunli=find('1221');if(yunli?.s.eidolon>=6&&!yunli.defeated&&!controlled(yunli)&&yunli.parry&&target!==yunli)yunliCounter(yunli,true,index);
+      if(target.id==='1221'&&!controlled(target)){energy(target,params('1221','04')[2]);if(target.parry)yunliCounter(target,true,index);else{beginAction(target);target.actionKind='followup';target.followups++;energy(target,10);buff(target,target.id,'yunliAtk',{atk:.3},1);if(G)G.followupStart(target,actors);hit(target,params('1221','04')[0],[index],'Юньли · контратака',{followup:true,group:true});hit(target,params('1221','04')[1],[index-1,index+1].filter(i=>i>=0&&i<dummies.length),'Юньли · соседние цели',{followup:true,group:true,toughness:10});if(G)G.followupEnd(target);afterAttack(target,false,'followup');}}
     }
     function bladeChargeCap(actor){return actor.id==='1205'&&actor.s.eidolon>=6?4:5;}
-    function bladeFollow(actor){if(actor.bladeCharges<bladeChargeCap(actor))return;actor.bladeCharges=0;actor.followups++;const p=params('1205','04'),s=stat(actor);hit(actor,0,dummies.map((_,i)=>i),'Бонус-атака Блэйда',{followup:true,baseDamage:s.atk*p[1]+s.hp*(p[3]+(actor.s.eidolon>=6?.5:0)),bonus:.2});heal(actor,s.hp*p[2]);energy(actor,10);afterAttack(actor,false,'followup');}
-    function himekoBurn(actor,targets){for(const i of targets)if(chanceOf('himeko-burn',clamp(.5*(1+stat(actor).effectHit),0,1))){dummies[i].himekoBurn={owner:actor.id,expires:dummies[i].turn+2,coefficient:.3};debuffApplied(actor);}}
+    function bladeFollow(actor){if(actor.bladeCharges<bladeChargeCap(actor))return;actor.bladeCharges=0;actor.followups++;const p=params('1205','04'),s=stat(actor);beginAction(actor);hit(actor,0,allTargets(),'Бонус-атака Блэйда',{followup:true,baseDamage:(actor.s.novaflare?0:s.atk*p[1])+s.hp*(p[3]+(actor.s.eidolon>=6?.5:0)),bonus:.2});heal(actor,s.hp*p[2]);energy(actor,actor.s.novaflare?25:10);afterAttack(actor,false,'followup');}
+    function himekoBurn(actor,targets){for(const i of targets)if(chanceOf('himeko-burn',effectChance(actor,.5,i))){dummies[i].himekoBurn={owner:actor.id,expires:dummies[i].turn+2,coefficient:.3};debuffApplied(actor);}}
+    function hertaFollow(actor){
+      if(!actor||actor.defeated||actor.hertaActing||!actor.hertaSpins)return;
+      if(!allTargets().length){actor.hertaSpins=0;return;}
+      actor.hertaActing=true;
+      beginAction(actor);
+      actor.followups++;
+      if(G)G.followupStart(actor,actors);
+      const [,damage]=params(actor.id,'04');
+      while(actor.hertaSpins&&allTargets().length){
+        actor.hertaSpins--;
+        hit(actor,damage,allTargets(),'Герта · вращение',{followup:true,group:true,toughness:5});
+        energy(actor,5);
+      }
+      actor.hertaSpins=0;
+      if(G)G.followupEnd(actor);
+      afterAttack(actor,false,'followup');
+      actor.hertaActing=false;
+    }
+    function seeleBoost(actor){
+      const [damage,duration]=params(actor.id,'04');
+      buff(actor,actor.id,'seeleBoost',{damage,resPen:actor.s.novaflare?.25:.2},actor.s.novaflare?duration:1);
+    }
+    function seeleDefeat(actor,target,own,kind){
+      const marked=target.seeleFlurryUntil>target.turn;
+      if(own){
+        const previous=actor.buffs.find(b=>b.key==='seeleKills'&&b.expires>=actor.turn);
+        buff(actor,actor.id,'seeleKills',{damage:Math.min(1.5,(previous?.values.damage||0)+.5)},3);
+        if(actor.s.eidolon>=4)energy(actor,15);
+      }
+      if(actor.seeleExtraActive||(!marked&&!(own&&['basic','skill','ultimate'].includes(kind))))return;
+      seeleBoost(actor);
+      if(!actor.seeleExtraPending){
+        actor.seeleExtraPending=true;
+        record(actor,'Зеле · Повторное появление');
+      }
+    }
+    function seeleSkill(actor,index,automatic=false){
+      const p=params(actor.id,'02');
+      const old=actor.buffs.find(b=>b.key==='seeleSpeed'&&b.expires>=actor.turn)?.values.speedPct||0;
+      buff(actor,actor.id,'seeleSpeed',{speedPct:actor.s.eidolon>=2?Math.min(p[1]*2,old+p[1]):p[1]},p[2]);
+      hit(actor,p[0],[index],automatic?'Зеле · автоматический навык':'Навык Зеле',{kind:'skill'});
+      afterAttack(actor,false,'skill');
+    }
+    function queueExtraTurn(actor,source,options={}){
+      extraTurns.push({actor,source,...options});
+      record(actor,'Назначен дополнительный ход',0,'extra-turn-queued',null,{source});
+    }
+    function takeExtraTurn(entry){
+      const actor=entry.actor;
+      if(actor.defeated||actor.departed||controlled(actor)){record(actor,'Дополнительный ход недоступен',0,'extra-turn-skipped');return;}
+      const amplification=entry.amplification||1;
+      const humor={remaining:(entry.punchline||0)*amplification};
+      const amount=(entry.banger||0)*amplification;
+      let token=null;
+      if(amount){addBanger(actor,amount);token=actor.bangers.at(-1);token.expires=Infinity;}
+      if(humor.remaining){aha.temporaryPools??=[];aha.temporaryPools.push(humor);punch(humor.remaining);}
+      const previous=actor.extraTurnActive;actor.extraTurnActive=true;
+      try{playTurn(actor);}finally{
+        actor.extraTurnActive=previous;
+        const retain=facesActive()?(aeon.s.eidolon>=2?.2:.1):0;
+        if(token){token.value*=retain;token.expires=actor.turn+2;if(!token.value)actor.bangers=actor.bangers.filter(b=>b!==token);}
+        if(humor.remaining){aha.punchline=Math.max(0,aha.punchline-humor.remaining*(1-retain));}
+        if(aha.temporaryPools)aha.temporaryPools=aha.temporaryPools.filter(pool=>pool!==humor);
+        record(actor,'Дополнительный ход · окончание',0,'extra-turn-end',null,{source:entry.source,distance:actor.distance,normalTurns:actor.normal,turnCounter:actor.turn});
+      }
+    }
+    function seeleExtraTurn(actor){
+      actor.seeleExtraPending=false;
+      actor.seeleExtraActive=true;
+      turnOwner=actor;
+      turnSPSpent=0;
+      beginAction(actor);
+      record(actor,'Зеле · дополнительный ход',0,'extra-turn',null,{action:actor.actionKey});
+      const useSkill=actor.s.policy!=='basic'&&sp>0;
+      actor.actionKind=useSkill?'skill':'basic';
+      if(useSkill){
+        spendSP();
+        coup(actor,()=>castRegularSkill(actor));
+        castRegularSkill(actor);
+        if(G)G.afterSkill(actor);
+      }else{
+        if(G)G.beforeBasic(actor);
+        gainSP();
+        energy(actor,20);
+        hit(actor,params(actor.id,'01')[0],[enemyFor(actor)],'Базовая атака');
+        actor.distance=Math.max(0,actor.distance-2000);
+        afterAttack(actor);
+        if(G)G.afterBasic(actor);
+      }
+      actor.seeleExtraActive=false;
+      actor.buffs=actor.buffs.filter(buff=>buff.expires>actor.turn);
+      if(G)G.endTurn(actor);
+      turnOwner=null;
+      settleHP();
+      runUlts();
+    }
+    function seeleReact(actor,targets){
+      if(!boss||actor.seeleSkillUsed||actor.defeated)return;
+      const threshold=params(actor.id,'02')[3];
+      const trigger=targets.find(i=>enemyHPFraction(i)<=threshold);
+      if(trigger===undefined)return;
+      const valid=allTargets();
+      const index=valid.includes(trigger)?trigger:[...valid].sort((a,b)=>enemyHPFraction(a)-enemyHPFraction(b))[0];
+      if(index===undefined)return;
+      actor.seeleSkillUsed=true;
+      queueFinal('seeleSkill',actor,{index});
+    }
+    function seeleAutomaticSkill(actor,index){
+      const valid=allTargets();
+      if(!valid.includes(index))index=valid.sort((a,b)=>enemyHPFraction(a)-enemyHPFraction(b))[0];
+      if(index===undefined)return;
+      const previous=actor.actionKind;
+      actor.actionKind='skill';
+      beginAction(actor);
+      if(G)G.beforeSkill(actor);
+      seeleSkill(actor,index,true);
+      if(G)G.afterSkill(actor);
+      actor.actionKind=previous;
+    }
     function yanqingE1(actor){const d=dummies[0];if(actor.s.eidolon>=1&&(d.freeze||d.breakFrozen))hit(actor,.6,[0],'Яньцин E1 · дополнительный урон',{kind:'additional',toughness:0});}
     function afterAttack(attacker,isUltimate=false,kind=attacker.actionKind,suppressJadeCharge=false){
+      const previous=activeActor;
+      try{return afterAttackBody(attacker,isUltimate,kind,suppressJadeCharge);}
+      finally{activeActor=previous;}
+    }
+    function afterAttackBody(attacker,isUltimate,kind,suppressJadeCharge){
       activeActor=attacker;
       if(kind!=='memo'&&attacker.attackTargets?.size&&attacker.eq?.smithTriggered)
         attacker.eq.smithTriggered=false;
       const tribDamage=attacker.tribAttackDamage||0;attacker.tribAttackDamage=0;
       const hasAttackTargets=Boolean(attacker.attackTargets?.size),targets=[...(attacker.attackTargets||new Set([0]))],wasFollow=attacker.attackFollowup||kind==='followup';attacker.attackTargets=null;attacker.attackFollowup=false;if(form.active&&attacker.id==='1408'){if(attacker.ode==='phainon')for(let n=0;n<5;n++)hit(attacker,.1,[randomTarget()],'Вечное горение · огонь',{kind:'additional',element:'Fire',toughness:0});cerydraAction(attacker,kind);if(G&&hasAttackTargets&&kind!=='memo')G.afterAttack(attacker);if(!copying)attacker.peerageOriginal=false;activeActor=null;return;}
+      const welt=find('1004'),struckWeightless=attacker.struckWeightless;
+      attacker.struckWeightless=false;
+      if(welt?.s.novaflare&&hasAttackTargets&&struckWeightless){
+        const recipient=attacker._memo?.owner||attacker;
+        const previous=recipient.buffs.find(b=>b.key==='weltWeightless'&&b.expires>=recipient.turn);
+        buff(recipient,welt.id,'weltWeightless',{damage:Math.min(1,(previous?.values.damage||0)+.1)},2);
+      }
+      if(attacker.id==='1106'&&hasAttackTargets&&targets.some(index=>debuffCount(index)>0))energy(attacker,params(attacker.id,'04')[0]);
       if(attacker.id==='8001'&&attacker.s.eidolon>=2)heal(attacker,stat(attacker).atk*.05*targets.length);
       const hy=find('1409');if(hy?.s.eidolon>=1&&hy.rainUntil>hy.turn)heal(attacker,stat(hy).hp*.08,hy);
       if(attacker.id==='1402'&&targets.some(i=>dummies[i].stitch)){if(attacker.s.eidolon>=1)energy(attacker,20);const seam=memo('1402');if(kind!=='memo'&&attacker.s.eidolon>=4&&seam?.active)seam.stacks=Math.min(7,seam.stacks+1);}
@@ -1483,12 +2506,14 @@
         acheron.exTurn=acheron.turn;
         queueFinal('acheronEX',acheron);
       }
-      const seele=find('1102');if(seele?.s.eidolon>=6)for(const target of targets){const dummy=dummies[target];if(dummy.seeleFlurryUntil>dummy.turn)trueHit(seele,dummy.seeleFlurryDamage,[target],'Зеле E6 · Вихрь бабочек','additional');}
-      const topazOwner=find('1112');if(topazOwner?.s.eidolon>=1&&wasFollow&&targets.includes(0))dummies[0].topazE1=Math.min(2,(dummies[0].topazE1||0)+1);
+      const seele=find('1102');if(seele?.s.eidolon>=6&&!seele.defeated&&(!seele.s.novaflare||hasAttackTargets))for(const target of targets){const dummy=dummies[target];if(dummy.seeleFlurryUntil>dummy.turn)trueHit(seele,dummy.seeleFlurryDamage,[target],'Зеле E6 · Вихрь бабочек','additional',seele.s.novaflare);}
+      if(seele?.s.novaflare&&hasAttackTargets)seeleReact(seele,targets);
+      const topazOwner=find('1112');if(topazOwner?.s.eidolon>=1&&wasFollow&&targets.includes(numby.target)){const marked=dummies[numby.target];marked.topazE1=Math.min(2,(marked.topazE1||0)+1);}
       if(attacker.id==='1106'&&attacker.s.eidolon>=6){const exposed=targets.filter(index=>isExposed(index));if(exposed.length)hit(attacker,.4,exposed,'Пела E6 · дополнительный урон',{kind:'additional',toughness:0});}
       if(attacker.eq?.cone?.id==='21029'&&['basic','skill'].includes(kind)&&targets.length){
-        const target=targets.length===1?targets[0]:targets[pick('form-bounce',targets.length)];
-        hit(attacker,attacker.eq.cone.params[0],[target],'Мы ещё встретимся · дополнительный урон',{kind:'additional',toughness:0});
+        const eligible=targets.filter(target=>allTargets().includes(target));
+        if(eligible.length){const target=eligible.length===1?eligible[0]:eligible[pick('form-bounce',eligible.length)];
+        hit(attacker,attacker.eq.cone.params[0],[target],'Мы ещё встретимся · дополнительный урон',{kind:'additional',toughness:0});}
       }
       sixthAfterAttack(attacker,targets,kind,isUltimate,wasFollow,hasAttackTargets);if(['memo','followup','elation'].includes(kind))sixthAction(attacker);
       attacker.attackMarked=attacker.actionKey;attacker.attackKindMarked=kind;if(kind!=='memo')attacker.lastHeroAttackKey=attacker.actionKey;
@@ -1496,24 +2521,31 @@
       const h=find('1215');if(h&&h.burden!==undefined&&targets.includes(h.burden)&&(['basic','skill','ultimate'].includes(kind)||isUltimate)){
         h.burdenHits=(h.burdenHits||0)+1;if(h.burdenHits%2===0){gainSP();h.burdenRefunds++;energy(h,2);buff(attacker,h.id,'hanyaTrace',{atk:.1},1);record(h,'Ноша · возврат SP '+h.burdenRefunds+'/2');if(h.burdenRefunds>=2)h.burden=undefined;}
       }
-      if(kind!=='memo')cerydraAction(attacker,kind);const swan=find('1307');if(swan?.s.eidolon>=6&&attacker!==swan)for(const i of targets)arcanaAdd(i);const c=find('1412');if(kind!=='memo'&&c?.merit===attacker.id){if((c.cExtra||0)<20){c.cExtra=(c.cExtra||0)+1;hit(c,params(c.id,'04')[2]+(c.s.eidolon>=6?3:0),[targets[0]],'Керидра · дополнительный урон',{kind:'additional',element:'Wind'});}}
+      if(kind!=='memo')cerydraAction(attacker,kind);const swan=find('1307');if(swan?.s.novaflare&&attacker===swan&&hasAttackTargets){
+        for(const i of targets.filter(index=>allTargets().includes(index))){
+          arcanaAdd(i,.65,5);
+          if(kind==='basic'||isUltimate)blackSwanDefense(swan,i);
+        }
+      }if(swan?.s.eidolon>=6&&attacker!==swan&&hasAttackTargets)for(const i of targets)arcanaAdd(i);const c=find('1412');if(kind!=='memo'&&c?.merit===attacker.id){if((c.cExtra||0)<20){c.cExtra=(c.cExtra||0)+1;hit(c,params(c.id,'04')[2]+(c.s.eidolon>=6?3:0),[targets[0]],'Керидра · дополнительный урон',{kind:'additional',element:'Wind'});}}
       const march=find('1224');if(kind!=='memo'&&march?.master===attacker.id)marchGain(march);
       const dhpt=find('1414');if(kind!=='memo'&&dhpt?.bondmate===attacker.id){energy(dhpt,6);if(dragon.active)dragon.distance=Math.max(0,dragon.distance-1500);}
       superBreak(attacker);
       const gallagher=find('1301');if(gallagher&&targets.some(i=>dummies[i].besottedUntil>dummies[i].turn)){const amount=params('1301','04')[1];for(const a of attacker===gallagher&&attacker.gallagherEnhanced?actors:[attacker])heal(a,amount,gallagher);}
       if(attacker.id==='1206'&&maxToughness&&dummies.some(d=>d.toughness===0)&&['basic','skill'].includes(kind))attacker.distance=Math.max(0,attacker.distance-1500);
-      hysiApply(targets);
+      if(hasAttackTargets)hysiApply(targets.filter(i=>allTargets().includes(i)));
       const fugue=find('1225');if(hasFoxPrayer(attacker,fugue))for(const i of targets)if(chanceOf('fugue-defense',effectChance(fugue,1,i))){applyDefenseDebuff(fugue,i,'fugueDefUntil',2);}
       const herta=find('1401');if(herta){for(const i of targets)interpret(i);const two=actors.filter(a=>data.characters[a.id].path==='Mage').length>=2;energy(herta,3*Math.min(5,Math.max(two?3:0,targets.length))/stat(herta).energyRegen);if(two){const i=targets.reduce((a,b)=>(dummies[a].interpret||0)>=(dummies[b].interpret||0)?a:b,targets[0]);interpret(i,data.characters[attacker.id].path==='Mage'?3:1);}}
-      const trib=find('1403');if(trib){if(attacker!==trib)energy(trib,targets.length*1.5);if(trib.tribZoneUntil>trib.turn){const target=targets[0],baseDamage=stat(trib).hp*params(trib.id,'03')[2]*targets.length*(trib.ode==='tribbie'&&attacker===trib&&wasFollow?2:1)*(trib.s.eidolon>=2?1.2:1);for(let n=0;n<(trib.s.eidolon>=2?2:1);n++)hit(trib,0,[target],'Зона Трибби · дополнительный урон',{kind:'additional',baseDamage});if(trib.s.eidolon>=1&&attacker!==trib&&tribDamage>0)trueHit(trib,tribDamage*.24,[target],'Трибби E1 · истинный урон');}}
-      if(attacker.id==='1006')silverBug(attacker);
+      const trib=find('1403');if(trib){if(attacker!==trib)energy(trib,targets.length*1.5);if(trib.tribZoneUntil>trib.turn){const target=targets.reduce((best,i)=>dummies[i].hp>dummies[best].hp?i:best,targets[0]),baseDamage=stat(trib).hp*params(trib.id,'03')[2]*targets.length*(trib.ode==='tribbie'&&attacker===trib&&wasFollow?2:1)*(trib.s.eidolon>=2?1.2:1);for(let n=0;n<(trib.s.eidolon>=2?2:1);n++)hit(trib,0,[target],'Зона Трибби · дополнительный урон',{kind:'additional',baseDamage});if(trib.s.eidolon>=1&&attacker!==trib&&tribDamage>0)trueHit(trib,tribDamage*.24,[target],'Трибби E1 · истинный урон');}}
+      const wolf=find('1006');
+      if(hasAttackTargets&&wolf&&!wolf.defeated&&(attacker===wolf||wolf.s.novaflare&&wolf.s.eidolon>=2))
+        for(const i of targets)if(allTargets().includes(i))silverBug(wolf,i);
       if(attacker.id==='1209'&&hasAttackTargets){
         const p=params(attacker.id,'04'),target=targets[0];
         if(kind!=='followup')yanqingE1(attacker);
-        const iceTargets=targets.filter(i=>!boss||dummies[i].hp>0&&dummies[i].weaknesses.includes('Ice'));
+        const iceTargets=targets.filter(i=>(!boss||dummies[i].hp>0)&&hasWeakness(i,'Ice'));
         if(iceTargets.length)hit(attacker,.3,iceTargets,'Ледяная благодать',{kind:'additional'});
-        if(kind!=='followup'&&attacker.soulUntil>=attacker.turn&&(!boss||dummies[target].hp>0)&&chanceOf('yanqing-followup',p[2])){
-          attacker.followups++;
+        if(kind!=='followup'&&attacker.soulUntil>=attacker.turn&&(!boss||dummies[target].hp>0)&&chanceOf('yanqing-followup',p[2])){withActionContext(()=>{
+          beginAction(attacker);attacker.followups++;
           energy(attacker,10);
           if(G)G.followupStart(attacker,actors);
           for(const share of [.3,.7]){
@@ -1527,36 +2559,91 @@
             debuffApplied(attacker,target);
           }
           afterAttack(attacker,false,'followup');
-        }
+        });}
       }
-      if(numby&&!numby.acting&&targets.includes(0)){if(wasFollow)numby.distance=Math.max(0,numby.distance-5000);if(numby.enhanced>0&&['basic','skill','ultimate'].includes(kind))numby.distance=Math.max(0,numby.distance-5000);}
+      if(numby&&!find('1112').defeated&&!numby.acting&&targets.includes(numby.target)){if(wasFollow)numby.distance=Math.max(0,numby.distance-5000);if(numby.enhanced>0&&['basic','skill','ultimate'].includes(kind))numby.distance=Math.max(0,numby.distance-5000);}
       const avent=find('1304');if(avent&&attacker!==avent&&wasFollow&&attacker.avenShield?.expires>=attacker.turn&&(avent.bingo||0)<3){avent.bingo=(avent.bingo||0)+1;avent.blindBet=Math.min(10,(avent.blindBet||0)+1);avent.resource=avent.blindBet;}
       const jade=find('1314');if(jade){const debtor=jade.debtUntil>jade.turn&&(jade.debtor===attacker.id||(jade===attacker&&jade.s.eidolon>=6));if(debtor){hit(jade,params(jade.id,'02')[2],targets,'Сборщик долгов · дополнительный урон',{kind:'additional'});if(attacker!==jade)loseHP(attacker,stat(attacker).hp*.02);}if(!suppressJadeCharge&&(attacker===jade||debtor)){jade.jadeCharges=(jade.jadeCharges||0)+targets.length+(debtor&&jade.s.eidolon>=1?Math.max(0,3-targets.length):0);jade.resource=jade.jadeCharges;}}
-      if(attacker.id==='1002'){attacker.danPen=false;if(chanceOf('dan-heng-speed',.5))buff(attacker,attacker.id,'danSpeed',{speedPct:.2},2);}
+      if(attacker.id==='1002'&&hasAttackTargets){attacker.danPen=false;if(chanceOf('dan-heng-speed',.5))buff(attacker,attacker.id,'danSpeed',{speedPct:.2},2);}
       if(G&&hasAttackTargets&&kind!=='memo')G.afterAttack(attacker);
-      const robin=find('1309');if(robin){energy(robin,params('1309','04')[1]+(robin.s.eidolon>=2?1:0));if(robin.concertoUntil>now&&attacker!==robin){const boosted=robin.s.eidolon>=6&&robin.e6Hits<8;if(boosted)robin.e6Hits++;hit(robin,params('1309','03')[3],[0],'Концерт · дополнительный урон',{kind:'additional',fixedCritical:boosted?7:2.5});}}
+      const robin=find('1309');
+      if(robin&&!robin.defeated&&hasAttackTargets){
+        energy(robin,params('1309','04')[1]+(robin.s.eidolon>=2?1:0));
+        const target=targets.find(i=>allTargets().includes(i));
+        if(robin.concertoUntil>now&&attacker!==robin&&target!==undefined){
+          const boosted=robin.s.eidolon>=6&&robin.e6Hits<8;
+          if(boosted)robin.e6Hits++;
+          hit(robin,params('1309','03')[3],[target],'Концерт · дополнительный урон',{kind:'additional',fixedCritical:boosted?7:2.5});
+        }
+      }
       const luocha=find('1203');if(luocha&&luocha.fieldUntil>luocha.turn){const atk=stat(luocha).atk;for(const a of livingAllies())heal(a,a===attacker?atk*.18+240:atk*.07+93,luocha);}
-      const fx=find('1220');if(fx&&fx!==attacker&&wasFollow&&fx.s.eidolon>=2&&(fx.e2Triggers||0)<6){fx.e2Triggers=(fx.e2Triggers||0)+1;fx.resource=Math.min(12,fx.resource+1);}if(fx&&!(attacker.id==='1220'&&isUltimate)){attacks++;if(attacks%2===0)fx.resource=Math.min(12,fx.resource+1);}
-      addBlessingDamage(attacker);
-      const archer=find('1015');if(archer&&attacker!==archer&&archer.archerCharge>0){archer.archerCharge--;archer.resource=archer.archerCharge;archer.followups++;energy(archer,5);gainSP();hit(archer,params(archer.id,'04')[0],[0],'Арчер · бонус-атака',{followup:true,toughness:10});afterAttack(archer,false,'followup');}
-      const moze=find('1223');if(moze?.departed&&targets.includes(moze.prey)&&(attacker!==moze||isUltimate)){if(moze.s.eidolon>=1)energy(moze,2);hit(moze,params(moze.id,'04')[0],[moze.prey],'Моцзэ · дополнительный урон',{kind:'additional',toughness:0});moze.mozeCharge--;moze.mozeSpent++;moze.resource=moze.mozeCharge;const follow=moze.mozeSpent%3===0;if(moze.mozeCharge<=0){moze.departed=false;moze.prey=undefined;moze.distance=8000;record(moze,'Отсутствие · окончание, продвижение 20%');}if(follow)mozeFollow(moze);}
-      const dh=find('1321');if(dh?.s.eidolon>=1&&attacker.id===dh.partner&&maxToughness){for(const i of targets)if(!dummies[i].dahliaE1){dummies[i].dahliaE1=true;reduceToughness(attacker,i,clamp(maxToughness*.25,10,300)/efficiency(attacker));}superBreak(attacker);}if(dh&&attacker.id===dh.partner&&!dh.dahliaUsed){dh.dahliaUsed=true;dh.followups++;dh.actionKind='followup';beginAction(dh);if(G)G.followupStart(dh,actors);for(let n=0;n<5+(dh.s.eidolon>=4?5:0);n++){energy(dh,2);hit(dh,params(dh.id,'04')[0],[randomTarget()],'Георгина · бонус-атака',{followup:true,group:true,toughness:3,superRate:2});}if(G)G.followupEnd(dh);if(dh.s.eidolon>=4)for(const d of dummies)d.dahliaVulnUntil=d.turn+2;if(dh.s.eidolon>=6)attacker.distance=Math.max(0,attacker.distance-2000);dh.dahliaFuas=(dh.dahliaFuas||0)+1;if(dh.dahliaFuas%2===1)gainSP();afterAttack(dh,false,'followup');}
-      const x=find('1214'),karmaCap=x?.s.eidolon>=6?6:8;if(x&&x.karma>=karmaCap&&!x.xueyiActing){x.xueyiActing=true;x.karma=Math.min(6,x.karma-karmaCap);x.followups++;beginAction(x);if(G)G.followupStart(x,actors);for(let n=0;n<3;n++)hit(x,params(x.id,'04')[1],[randomTarget()],'Сюэи · бонус-атака',{followup:true,group:true,toughness:5,bonus:x.s.eidolon>=1?.4:0});if(x.s.eidolon>=2)heal(x,stat(x).hp*.05);energy(x,6);if(G)G.followupEnd(x);afterAttack(x,false,'followup');x.xueyiActing=false;}
-      const hm=find('1003');if(hm&&hm.himekoCharges>=3&&!hm.himekoActing){hm.himekoActing=true;hm.himekoCharges-=3;hm.followups++;beginAction(hm);if(hm.s.eidolon>=1)buff(hm,hm.id,'himekoE1',{speedPct:.2},2);hit(hm,params('1003','04')[0],allTargets(),'Химеко · бонус-атака',{followup:true,toughness:10});energy(hm,10);afterAttack(hm,false,'followup');hm.himekoActing=false;}
-      if(fx&&attacker!==fx&&fx.fuaReady){fx.fuaReady=false;feixiaoFollow(fx);}
-      const kafka=find('1005');if(kafka&&attacker!==kafka&&kind==='basic'&&kafka.fuaReady)kafkaFollow(kafka);
-      const ratio=find('1305');if(ratio&&attacker!==ratio&&ratio.ratioMarks>0){ratio.ratioMarks--;ratioFollow(ratio);}
-      if(avent)aventFollow(avent);if(jade)jadeFollow(jade);const cipher=find('1406');if(cipher?.s.eidolon>=4&&attacker!==cipher&&targets.includes(0))hit(cipher,.5,[0],'Цифер E4 · дополнительный урон',{kind:'additional',toughness:0});if(cipher&&attacker!==cipher&&targets.includes(0)&&!cipher.cipherUsed){cipher.cipherUsed=true;cipher.followups++;energy(cipher,5);if(cipher.s.eidolon>=1)buff(cipher,cipher.id,'cipherE1',{atk:.8},2);hit(cipher,params(cipher.id,'04')[0],[0],'Цифер · бонус-атака',{followup:true,extraCritDamage:1,bonus:cipher.s.eidolon>=6?3.5:0});afterAttack(cipher,false,'followup');}settleHP();if(!copying)attacker.peerageOriginal=false;
+      const fx=find('1220');if(fx&&fx!==attacker&&wasFollow&&fx.s.eidolon>=2&&(fx.e2Triggers||0)<6){fx.e2Triggers=(fx.e2Triggers||0)+1;fx.resource=Math.min(12,fx.resource+1);}if(fx&&!fx.defeated&&hasAttackTargets&&!(attacker.id==='1220'&&isUltimate)){attacks++;if(attacks%2===0)fx.resource=Math.min(12,fx.resource+1);}
+      if(hasAttackTargets)addBlessingDamage(attacker,targets[0]);
+      const archer=find('1015'),remainingTargets=archer?allTargets():[];
+      if(archer&&!archer.defeated&&attacker!==archer&&archer.archerCharge>0&&hasAttackTargets&&remainingTargets.length){withActionContext(()=>{
+        const target=remainingTargets.includes(targets[0])?targets[0]:remainingTargets[pick('archer-followup-retarget',remainingTargets.length)];
+        archer.archerCharge--;archer.resource=archer.archerCharge;archer.followups++;beginAction(archer);energy(archer,5);gainSP();
+        hit(archer,params(archer.id,'04')[0],[target],'Арчер · бонус-атака',{followup:true,toughness:10});afterAttack(archer,false,'followup');
+      });}
+      const moze=find('1223');if(moze?.departed&&targets.includes(moze.prey)&&(attacker!==moze||isUltimate)){const prey=moze.prey;if(moze.s.eidolon>=1)energy(moze,2);hit(moze,params(moze.id,'04')[0],[prey],'Моцзэ · дополнительный урон',{kind:'additional',toughness:0});if(moze.departed){moze.mozeCharge--;moze.mozeSpent++;moze.resource=moze.mozeCharge;if(moze.mozeSpent%3===0)mozeFollow(moze,prey);if(moze.departed&&moze.mozeCharge===0)leavePrey(moze);}}
+      const dh=find('1321');if(dh?.s.eidolon>=1&&attacker.id===dh.partner&&maxToughness){for(const i of targets)if(!dummies[i].dahliaE1){dummies[i].dahliaE1=true;reduceToughness(attacker,i,clamp(maxToughness*.25,10,300)/efficiency(attacker));}superBreak(attacker);}if(dh&&attacker.id===dh.partner&&!dh.dahliaUsed){withActionContext(()=>{dh.dahliaUsed=true;dh.followups++;dh.actionKind='followup';beginAction(dh);if(G)G.followupStart(dh,actors);for(let n=0;n<5+(dh.s.eidolon>=4?5:0);n++){energy(dh,2);hit(dh,params(dh.id,'04')[0],[randomTarget()],'Георгина · бонус-атака',{followup:true,group:true,toughness:3,superRate:2});}if(G)G.followupEnd(dh);if(dh.s.eidolon>=4)for(const d of dummies)d.dahliaVulnUntil=d.turn+2;if(dh.s.eidolon>=6)attacker.distance=Math.max(0,attacker.distance-2000);dh.dahliaFuas=(dh.dahliaFuas||0)+1;if(dh.dahliaFuas%2===1)gainSP();afterAttack(dh,false,'followup');});}
+      const x=find('1214'),karmaCap=x?.s.eidolon>=6?6:8;if(x&&x.karma>=karmaCap&&!x.xueyiActing){withActionContext(()=>{x.xueyiActing=true;x.karma=Math.min(6,x.karma-karmaCap);x.followups++;beginAction(x);if(G)G.followupStart(x,actors);for(let n=0;n<3;n++)hit(x,params(x.id,'04')[1],[randomTarget()],'Сюэи · бонус-атака',{followup:true,group:true,toughness:5,bonus:x.s.eidolon>=1?.4:0});if(x.s.eidolon>=2)heal(x,stat(x).hp*.05);energy(x,6);if(G)G.followupEnd(x);afterAttack(x,false,'followup');x.xueyiActing=false;});}
+      const hm=find('1003');if(hm&&hm.himekoCharges>=3&&!hm.himekoActing){withActionContext(()=>{hm.himekoActing=true;hm.himekoCharges-=3;hm.followups++;beginAction(hm);if(hm.s.eidolon>=1)buff(hm,hm.id,'himekoE1',{speedPct:.2},2);hit(hm,params('1003','04')[0],allTargets(),'Химеко · бонус-атака',{followup:true,toughness:10});energy(hm,10);himekoBurn(hm,allTargets());afterAttack(hm,false,'followup');hm.himekoActing=false;});}
+      if(fx&&!fx.defeated&&attacker!==fx&&hasAttackTargets&&fx.fuaReady&&allTargets().length){fx.fuaReady=false;feixiaoFollow(fx,allTargets().includes(targets[0])?targets[0]:randomTarget());}
+      const kafka=find('1005');if(kafka&&!kafka.defeated&&attacker!==kafka&&hasAttackTargets&&allTargets().includes(targets[0])&&(kafka.s.novaflare?kafka.kafkaCharges>0:kind==='basic'&&kafka.fuaReady))kafkaFollow(kafka,targets[0]);
+      if(hasAttackTargets)hertaFollow(find('1013'));
+      const ratio=find('1305');if(ratio&&!ratio.defeated&&attacker!==ratio&&ratio.ratioMarks>0&&hasAttackTargets&&
+        targets.includes(ratio.ratioTarget)&&allTargets().includes(ratio.ratioTarget)){
+        ratio.ratioMarks--;ratioFollow(ratio,ratio.ratioTarget);
+      }
+      if(avent)aventFollow(avent);if(jade)jadeFollow(jade);const cipher=find('1406');
+      if(cipher&&!cipher.defeated&&attacker!==cipher&&hasAttackTargets){
+        const patron=cipherPatron(cipher);
+        if(targets.includes(patron)){
+          if(cipher.s.eidolon>=4)hit(cipher,.5,[patron],'Цифер E4 · дополнительный урон',{kind:'additional',toughness:0});
+          if(!cipher.cipherUsed&&allTargets().includes(patron)){withActionContext(()=>{
+            cipher.cipherUsed=true;cipher.followups++;beginAction(cipher);energy(cipher,5);
+            if(cipher.s.eidolon>=1)buff(cipher,cipher.id,'cipherE1',{atk:.8},2);
+            if(G)G.followupStart(cipher,actors);
+            hit(cipher,params(cipher.id,'04')[0],[patron],'Цифер · бонус-атака',{followup:true,extraCritDamage:1,bonus:cipher.s.eidolon>=6?3.5:0});
+            if(G)G.followupEnd(cipher);
+            afterAttack(cipher,false,'followup');
+          });}
+        }
+      }settleHP();if(!copying)attacker.peerageOriginal=false;
       if(march?.s.eidolon>=2&&march.master===attacker.id&&['basic','skill'].includes(kind)&&march.marchE2Turn!==march.turn){march.marchE2Turn=march.turn;marchFollow(march,attacker,targets[0]??0);}
-      const bronya=find('1101');if(bronya?.s.eidolon>=4&&attacker!==bronya&&kind==='basic'&&bronya.e4Turn!==bronya.turn&&targets.length){bronya.e4Turn=bronya.turn;beginAction(bronya);bronya.followups++;hit(bronya,params('1101','01')[0]*.8,[targets[0]],'Броня E4 · бонус-атака',{followup:true});afterAttack(bronya,false,'followup');}
+      const bronya=find('1101');if(bronya?.s.eidolon>=4&&attacker!==bronya&&kind==='basic'&&bronya.e4Turn!==bronya.turn&&targets.length){withActionContext(()=>{bronya.e4Turn=bronya.turn;beginAction(bronya);bronya.followups++;hit(bronya,params('1101','01')[0]*.8,[targets[0]],'Броня E4 · бонус-атака',{followup:true});afterAttack(bronya,false,'followup');});}
       activeActor=null;
     }
-    function servalTalent(actor){const targets=dummies.map((d,i)=>d.shock&&d.shock.expires>d.turn?i:-1).filter(i=>i>=0);if(targets.length){hit(actor,params('1103','04')[0],targets,'Талант Сервал');if(actor.s.eidolon>=2)energy(actor,4);}}
+    function activeShocks(enemy){return shockKeys.map(key=>enemy[key]).filter(shock=>shock?.expires>enemy.turn);}
+    function servalTalent(actor){
+      const targets=allTargets().filter(i=>activeShocks(dummies[i]).length||dummies[i].breakStatuses?.Thunder?.remaining>0);
+      if(targets.length){hit(actor,params('1103','04')[0],targets,'Талант Сервал',{kind:'additional',toughness:0});if(actor.s.eidolon>=2)energy(actor,4);}
+    }
     function ult(actor){
       beginAction(actor);
       actor.ultimateKey=actor.actionKey;if(['1415','1506'].includes(actor.id)){actor.ults++;finalUlt(actor);return;}if(actor.id==='1014'){actor.kingUltActive=actor.kingUlt;actor.kingUlt=false;}const p=params(actor.id,'03'),all=dummies.map((_,i)=>i);actor.ults++;
       if(actor===aeon){aeonUlt(actor);return;}
-      if(actor.id==='1308'){actor.resource-=9;if(scenario.audit)record(actor,'Рассечённый сон · сверхспособность',0,'resource',null,{before:actor.resource+9,after:actor.resource});actor.acheronUlting=true;for(let n=0;n<3;n++){const i=all.reduce((a,b)=>(dummies[a].knots||0)>=(dummies[b].knots||0)?a:b,0),removed=Math.min(3,dummies[i].knots||0);if(removed){actor.acheronStacks=Math.min(3,(actor.acheronStacks||0)+1);buff(actor,actor.id,'thunderCore',{damage:actor.acheronStacks*.3},3);}dummies[i].knots-=removed;hit(actor,p[0],[i],'Клинок дождя');if(removed)hit(actor,p[1]*(removed+1),all,'Клинок дождя · узлы');}hit(actor,p[2],all,'Стигийское возрождение');for(let n=0;n<6;n++)hit(actor,.25,[randomTarget()],'Ядро грома · дополнительный удар');for(const d of dummies)d.knots=0;afterAttack(actor,true);actor.acheronUlting=false;return;}
+      if(actor.id==='1308'){
+        actor.resource-=9;
+        if(scenario.audit)record(actor,'Рассечённый сон · сверхспособность',0,'resource',null,{before:actor.resource+9,after:actor.resource});
+        actor.acheronUlting=true;
+        for(let n=0;n<3;n++){
+          const i=mostKnots();if(i===undefined)break;
+          const removed=Math.min(3,dummies[i].knots||0);
+          if(removed){
+            actor.acheronStacks=Math.min(3,(actor.acheronStacks||0)+1);
+            buff(actor,actor.id,'thunderCore',{damage:actor.acheronStacks*.3},3);
+            dummies[i].knots-=removed;
+          }
+          hit(actor,p[0],[i],'Клинок дождя');
+          if(removed)hit(actor,p[1]*(removed+1),allTargets(),'Клинок дождя · узлы');
+        }
+        hit(actor,p[2],allTargets(),'Стигийское возрождение');
+        for(let n=0;n<6&&allTargets().length;n++)hit(actor,.25,[randomTarget()],'Ядро грома · дополнительный удар');
+        for(const d of dummies)d.knots=0;
+        afterAttack(actor,true);actor.acheronUlting=false;return;
+      }
       if(actor.id==='1221'){actor.energy-=120;energy(actor,5);actor.parry=true;actor.parryAt=eventSerial;for(const d of dummies)d.tauntUntil=d.turn+1;debuffApplied(actor);record(actor,'Юньли · Блок');return;}
       if(actor.id==='1220')huohuoHeal(actor);
       if(actor.id==='1220'){
@@ -1577,47 +2664,101 @@
       actor.energy=actor.id==='1014'?Math.max(0,actor.energy-360):(actor.id==='1507'||actor.id==='1512'&&actor.fever&&actor.s.eidolon>=6)?Math.max(0,actor.energy-data.characters[actor.id].max_sp):0;energy(actor,5);huohuoHeal(actor);
       if(finalUlt(actor)||sixthUlt(actor)||fifthUlt(actor)||batchUlt(actor)||breakUlt(actor))return;
       if(actor.id==='1222'){for(const d of dummies)d.befogUntil=d.turn+p[4];debuffApplied(actor);if(actor.s.eidolon>=2)for(const a of actors)buff(a,actor.id,'lingshaE2',{breakEffect:.4},3);hit(actor,p[0],all,'Ульта Линша');for(const a of livingAllies())heal(a,stat(actor).atk*p[1]+p[2],actor);if(fuyuan.actions>0)fuyuan.distance=0;afterAttack(actor,true);}
-      else if(actor.id==='1225'){hit(actor,p[0],all,'Ульта Фуги');if(actor.s.eidolon>=2)for(const ally of actors)ally.distance=Math.max(0,ally.distance-2400);afterAttack(actor,true);}
+      else if(actor.id==='1225'){hit(actor,p[0],all,'Ульта Фуги',{ignoreWeakness:true});if(actor.s.eidolon>=2)for(const ally of actors)ally.distance=Math.max(0,ally.distance-2400);afterAttack(actor,true);}
       else if(actor.id==='1307'){for(const d of dummies){d.epiphanyUntil=d.turn+2;d.epiphanyUsed=false;d.swanEnergyUsed=false;}debuffApplied(actor);hit(actor,p[0],all,'Ульта Чёрного Лебедя');afterAttack(actor,true);}
       else if(actor.id==='1401'){const sorted=dummies.map(d=>d.interpret||1).sort((a,b)=>b-a);all.forEach(i=>dummies[i].interpret=sorted[i]);hit(actor,p[0]+(actor.answers||0)*.01+(actor.s.eidolon>=6?(all.length===1?4:all.length===2?2.5:1.4):0),all,'Ульта Великой Герты');buff(actor,actor.id,'hertaUlt',{atk:.8},3);actor.inspiration=Math.min(4,(actor.inspiration||0)+(actor.s.eidolon>=2?2:1));actor.distance=0;afterAttack(actor,true);}
       else if(actor.id==='1403'){const before=stat(actor).hp;actor.tribZoneUntil=actor.turn+2;actor.currentHP+=Math.max(0,stat(actor).hp-before);actor.tribSeen=new Set();hit(actor,0,all,'Ульта Трибби',{baseDamage:stat(actor).hp*p[0]});afterAttack(actor,true);}
-      else if(actor.id==='1405'){for(const d of dummies)d.sublimation=true;debuffApplied(actor);hit(actor,p[0],all,'Ульта Анаксы',{bonus:.3});afterAttack(actor,true);}
-      else if(actor.id==='1406'){const bank=actor.bank||0;actor.bank=actor.s.eidolon>=6?bank*.2:0;actor.cipherUlting=true;record(actor,'Цифер · запись '+bank);hit(actor,p[0],[0],'Ульта Цифер · первый удар');trueHit(actor,bank*.25,[0],'Цифер · истинный урон 25%');hit(actor,p[3],all.slice(0,3),'Ульта Цифер · взрыв');trueHit(actor,bank*.75,all.slice(0,3),'Цифер · истинный урон 75%');actor.cipherUlting=false;afterAttack(actor,true);}
+      else if(actor.id==='1405'){for(const d of dummies)d.sublimationUntil=d.turn+1;debuffApplied(actor);hit(actor,p[0],all,'Ульта Анаксы');afterAttack(actor,true);}
+      else if(actor.id==='1406'){
+        const bank=actor.bank||0,primary=enemyFor(actor),targets=[primary,...allTargets().filter(i=>Math.abs(i-primary)===1)];
+        actor.patron=primary;actor.bank=actor.s.eidolon>=6?bank*.2:0;actor.cipherUlting=true;
+        record(actor,'Цифер · запись '+bank);
+        hit(actor,p[0],[primary],'Ульта Цифер · первый удар',{toughness:30});
+        trueHit(actor,bank*p[1],[primary],'Цифер · истинный урон 25%');
+        hit(actor,p[3],targets,'Ульта Цифер · взрыв',{toughness:20});
+        trueHit(actor,bank*p[2],targets,'Цифер · истинный урон 75%');
+        actor.cipherUlting=false;afterAttack(actor,true);
+      }
       else if(actor.id==='1410'){actor.hysiUntil=actor.turn+3;gainSP();debuffApplied(actor);hit(actor,p[0],all,'Ульта Гисиленсы');detonate(all,1.5);afterAttack(actor,true);}
-      else if(actor.id==='1006'){if(chanceOf('silver-wolf-ultimate',effectChance(actor,p[1],0))){applyDefenseDebuff(actor,0,'swUltUntil',p[3]);}hit(actor,p[0],[0],'Ульта Серебряного Волка');const count=Math.min(5,debuffCount());if(actor.s.eidolon>=1)energy(actor,7*count);if(actor.s.eidolon>=4&&count)hit(actor,.2*count,[0],'Серебряный Волк E4 · дополнительный урон',{kind:'additional',toughness:0});afterAttack(actor,true);}
+      else if(actor.id==='1006'){
+        const targets=actor.s.novaflare?allTargets():[0];
+        for(const i of targets)if(chanceOf('silver-wolf-ultimate',effectChance(actor,p[1],i)))applyDefenseDebuff(actor,i,'swUltUntil',p[3]);
+        hit(actor,p[0],targets,'Ульта Серебряного Волка',{toughness:actor.s.novaflare?20:30});
+        const counts=targets.map(i=>Math.min(5,debuffCount(i)));
+        if(actor.s.eidolon>=1)energy(actor,7*Math.min(5,counts.reduce((sum,count)=>sum+count,0)));
+        if(actor.s.eidolon>=4)targets.forEach((i,index)=>{if(counts[index])hit(actor,.2*counts[index],[i],'Серебряный Волк E4 · дополнительный урон',{kind:'additional',toughness:0});});
+        afterAttack(actor,true);
+      }
       else if(actor.id==='1107'){actor.counterCharges=p[4]+(actor.s.eidolon>=6?1:0);if(actor.s.eidolon>=2)buff(actor,actor.id,'claraE2',{atk:.3},2);actor.counterAggroUntil=actor.turn+p[2];record(actor,'Клара · усиление контратаки');}
       else if(actor.id==='1112'){numby.enhanced=p[3]+(actor.s.eidolon>=6?1:0);record(actor,'Счетовод · Поразительный рост');}
       else if(actor.id==='1209'){buff(actor,actor.id,'yanUlt',{crit:p[0],critDamage:actor.soulUntil>=actor.turn?p[1]:0},1);hit(actor,p[2],[enemyFor(actor)],'Ульта Яньцина',{toughness:30});afterAttack(actor,true);}
       else if(actor.id==='1213'){ilHits(actor,[.3,.3,.4],p[0],p[1],false,true);actor.squama=Math.min(p[3]+(actor.s.exEidolon?1:0),(actor.squama||0)+p[2]+(actor.s.eidolon>=2?1:0));if(actor.s.eidolon>=2)actor.distance=0;actor.resource=actor.squama;afterAttack(actor,true);}
-      else if(actor.id==='1217'){for(const a of actors)if(a!==actor){energy(a,data.characters[a.id].max_sp*p[0]/stat(a).energyRegen);buff(a,actor.id,'huohuoUlt',{atk:p[1]},p[2]);assist(a,actor);}record(actor,'Хохо · энергия и ATK команды');}
+      else if(actor.id==='1217'){if(actor.s.novaflare)huohuoProvision(actor,params(actor.id,'04')[0]);for(const a of actors)if(a!==actor){const max=data.characters[a.id].max_sp;energy(a,max*p[0]/stat(a).energyRegen);buff(a,actor.id,'huohuoUlt',{atk:p[1]+(actor.s.novaflare&&max>=160?.24:0)},p[2]);assist(a,actor);}record(actor,'Хохо · энергия и ATK команды');}
       else if(actor.id==='1218'){const max=Math.max(0,...dummies.map(d=>d.ashenBurn?d.ashStacks||0:0));for(const d of dummies)if(max){d.ashStacks=max;d.ashenBurn={owner:actor.id,expires:d.turn+2,coefficient:params('1218','04')[5]+(actor.s.eidolon>=2?3:0)};}actor.jiaoZoneUntil=actor.turn+p[3];actor.jiaoTriggers=0;hit(actor,p[0],all,'Ульта Цзяоцю');ash(actor,all);afterAttack(actor,true);}
       else if(actor.id==='1304'){actor.blindBet=Math.min(10,(actor.blindBet||0)+1+pick('aventurine-bet',p[0]));actor.resource=actor.blindBet;dummies[0].panicUntil=dummies[0].turn+p[3];debuffApplied(actor);hit(actor,0,[0],'Ульта Авантюрина',{baseDamage:stat(actor).def*p[1]});if(actor.s.eidolon>=1)aventShield(actor,...params('1304','02').slice(0,2));afterAttack(actor,true);}
       else if(actor.id==='1313'){const target=focusFor(actor);actor.beatified=target.id;actor.beatifiedUntil=actor.turn+p[2];actor.beatifiedCD=stat(actor).critDamage*p[1]+p[3];if(actor.s.eidolon>=2&&actor.ults===1){gainSP();gainSP();}if(actor.s.eidolon>=6)sundayCrit(target,actor);energy(target,Math.max(40,data.characters[target.id].max_sp*p[0])/stat(target).energyRegen);targetedRelics(actor,target);assist(target,actor);record(actor,'Блаженный → '+data.characters[target.id].name);}
       else if(actor.id==='1314'){if(actor.s.eidolon>=4)buff(actor,actor.id,'jadeE4',{},3);hit(actor,p[2],all,'Ульта Яшмы');actor.jadeEnhanced=p[1];afterAttack(actor,true);}
-      else if(actor.id==='1004'){hit(actor,p[0],all,'Ульта Вельта',{bonus:!maxToughness||dummies.every(d=>d.toughness===0)?.2:0});weltTalent(actor,all);for(const i of all){const d=dummies[i];if(chanceOf('welt-imprison',effectChance(actor,p[2],i))){d.imprisonedUntil=d.turn+1;d.distance+=10000*p[1];debuffApplied(actor);}if(chanceOf('welt-vulnerability',effectChance(actor,1,i))){d.weltVulnUntil=d.turn+2;debuffApplied(actor);}}energy(actor,10);if(actor.s.eidolon>=1)actor.weltEcho=2;afterAttack(actor,true);}
+      else if(actor.id==='1004'&&actor.s.novaflare)weltNovaUltimate(actor,p);
+      else if(actor.id==='1004'){
+        for(const i of allTargets())if(chanceOf('welt-vulnerability',effectChance(actor,1,i))){dummies[i].weltVulnUntil=dummies[i].turn+2;debuffApplied(actor,i);}
+        for(const share of [.1,.9]){
+          const targets=allTargets(),slowedTargets=targets.filter(slowed);
+          for(const i of targets)hit(actor,p[0]*share,[i],'Ульта Вельта',{bonus:maxToughness&&dummies[i].toughness===0?.2:0,toughness:20*share});
+          weltTalent(actor,slowedTargets);
+        }
+        for(const i of allTargets())if(chanceOf('welt-imprison',effectChance(actor,p[2],i))){const d=dummies[i];d.imprisonedUntil=d.turn+1;d.distance+=10000*p[1];debuffApplied(actor,i);}
+        energy(actor,10);if(actor.s.eidolon>=1)actor.weltEcho=2;afterAttack(actor,true);}
       else if(actor.id==='1302'){const q=data.character_skills['130214'].params[actor.s.eidolon>=5?11:9];if(actor.s.eidolon>=2&&all.length>=3)buff(actor,actor.id,'argentiE2',{atk:.4},1);hit(actor,q[0],all,'Аргенти · полная ульта');argentiTalent(actor,all.length);for(let i=0;i<q[1];i++){hit(actor,q[2],[randomTarget()],'Аргенти · отскок ульты');argentiTalent(actor,1);}afterAttack(actor,true);}
-      else if(actor.id==='1212'){jingliuE1(actor);const enhanced=actor.transmigration,s=jingliuSnapshot(actor);hit(actor,p[0],[0],'Ульта Цзинлю',{statSnapshot:s,bonus:enhanced?.2:0});if(all.length>1)hit(actor,p[2],all.slice(1,3),'Ульта Цзинлю · соседние цели',{statSnapshot:s,bonus:enhanced?.2:0});jingliuSingleTarget(actor,s);if(actor.s.eidolon>=2)actor.jingliuE2=true;jingliuGain(actor,p[1]);afterAttack(actor,true);settleHP();}
+      else if(actor.id==='1212'){const enhanced=actor.transmigration;
+        if(actor.s.novaflare)jingliuNovaAttack(actor,p[0],p[2],'Ульта Цзинлю',enhanced?.2:0);
+        else{jingliuE1(actor);const s=jingliuSnapshot(actor);hit(actor,p[0],[0],'Ульта Цзинлю',{statSnapshot:s,bonus:enhanced?.2:0});if(all.length>1)hit(actor,p[2],all.slice(1,3),'Ульта Цзинлю · соседние цели',{statSnapshot:s,bonus:enhanced?.2:0});jingliuSingleTarget(actor,s);}if(actor.s.eidolon>=2)actor.jingliuE2=true;jingliuGain(actor,p[1]);afterAttack(actor,true);settleHP();}
       else if(actor.id==='1303'){actor.meiUltUntil=actor.turn+p[1]+(actor.s.eidolon>=6?1:0);for(const a of actors)assist(a,actor);record(actor,'Зона Жуань Мэй · пробитие RES');}
       else if(actor.id==='1309'){actor.e6Hits=0;actor.concertoATK=stat(actor).atk*p[0]+p[2];actor.concertoUntil=now+10000/p[1];for(const a of actors){if(a!==actor)a.distance=0;assist(a,actor);}record(actor,'Концерт · продвижение команды и отсчёт SPD 90');}
-      else if(actor.id==='1306'){const recovered=p[1]+(actor.s.eidolon>=4?1:0);gainSP(recovered);for(const a of actors){buff(a,actor.id,'cipher',{cipher:1},p[3]+(actor.s.eidolon>=1?1:0));assist(a,actor);}if(actor.s.eidolon>=6){const donor=actors.find(a=>a.buffs.some(b=>b.key==='sparkleSkill'&&b.expires>=a.turn));const shared=donor?.buffs.find(b=>b.key==='sparkleSkill'&&b.expires>=donor.turn);if(shared)sparkleSkillBuff(actor,donor,shared.values.critDamage,Math.max(1,shared.expires-donor.turn));}record(actor,'Искорка · +'+recovered+' SP и Шифр');}
+      else if(actor.id==='1306'){const recovered=(actor.s.novaflare?6:p[1])+(actor.s.eidolon>=4?1:0);if(actor.s.novaflare)actor.spReserve=Math.min(10,(actor.spReserve||0)+Math.max(0,sp+recovered-maxSP));gainSP(recovered);for(const a of actors){buff(a,actor.id,'cipher',{cipher:1},(actor.s.novaflare?3:p[3]+(actor.s.eidolon>=1?1:0)));assist(a,actor);}if(actor.s.eidolon>=6){const donor=actors.find(a=>a.buffs.some(b=>b.key==='sparkleSkill'&&b.expires>=a.turn));const shared=donor?.buffs.find(b=>b.key==='sparkleSkill'&&b.expires>=donor.turn);if(shared)sparkleSkillBuff(actor,donor,shared.values.critDamage,Math.max(1,shared.expires-donor.turn));}record(actor,'Искорка · +'+recovered+' SP и Шифр');}
       else if(actor.id==='1203'){hit(actor,p[0],all,'Ульта Лочи');if(actor.s.eidolon>=6){for(const d of dummies)d.luochaResUntil=d.turn+2;debuffApplied(actor);}luochaFlower(actor);afterAttack(actor,true);}
-      else if(actor.id==='1211'){if(actor.s.eidolon>=2)buff(actor,actor.id,'bailuE2',{healing:.15},2);for(const a of actors){a.vigorUntil=a.turn+p[2];heal(a,stat(actor).hp*p[0]+p[1],actor);assist(a,actor);}record(actor,'Ульта Байлу · лечение и Бодрость');}
+      else if(actor.id==='1211'){if(actor.s.eidolon>=2)buff(actor,actor.id,'bailuE2',{healing:.15},2);for(const a of livingAllies()){a.vigorUntil=a.vigorUntil>a.turn?a.vigorUntil+1:a.turn+p[2];a.vigorHeals=params(actor.id,'04')[4]+1;heal(a,stat(actor).hp*p[0]+p[1],actor);assist(a,actor);}record(actor,'Ульта Байлу · лечение и Бодрость');}
       else if(actor.id==='1104'){const shield=(stat(actor).def*p[0]+p[2])*shieldScale(actor);for(const a of actors){a.shield={amount:shield,expires:a.turn+p[1],source:actor.id};finalHealing(a,actor);assist(a,actor);}record(actor,'Щит Гепарда · '+shield.toFixed(2));}
       else if(actor.id==='1208'){hit(actor,0,all,'Ульта Фу Сюань',{baseDamage:stat(actor).hp*p[0]+(actor.s.eidolon>=6?2*Math.min(actor.matrixLoss||0,stat(actor).hp*1.2):0)});actor.matrixLoss=0;actor.reversals=Math.min(2,(actor.reversals||0)+1);for(const a of actors)if(a!==actor){heal(a,stat(actor).hp*.05+133,actor);assist(a,actor);}afterAttack(actor,true);settleHP();}
       else if(actor.id==='1101'){const cd=stat(actor).critDamage;for(const target of actors){buff(target,actor.id,'bronyaUlt',{atk:p[0],critDamage:p[1]*cd+p[2]},p[3]);assist(target,actor);}record(actor,'Ульта Брони · баф команды');}
       else if(actor.id==='1202'){const target=focusFor(actor);energy(target,(p[0]+(actor.s.eidolon>=6?10:0))/stat(target).energyRegen);buff(target,actor.id,'tingyunUlt',{damage:p[2]},p[1]);targetedRelics(actor,target);assist(target,actor);record(actor,'Ульта Тинъюнь → '+data.characters[target.id].name);}
       else if(actor.id==='1009'){if(actor.s.eidolon>=2)actor.keepCharges=true;for(const target of actors){buff(target,actor.id,'astaUlt',{speed:p[0]},p[1]);assist(target,actor);}record(actor,'Ульта Асты · скорость');}
-      else if(actor.id==='1106'){hit(actor,p[3],all,'Ульта Пелы',{pelaTrace:true});for(const i of all)applyDefenseDebuff(actor,i,'exposed',p[2]);energy(actor,params('1106','04')[0]);record(actor,'Ослабление DEF');afterAttack(actor,true);}
-      else if(actor.id==='1102'){buff(actor,actor.id,'seeleBoost',{damage:params('1102','04')[0],resPen:.2},1);const damage=hit(actor,p[0],[0],'Ульта Зеле');afterAttack(actor,true);if(actor.s.eidolon>=6){dummies[0].seeleFlurryUntil=dummies[0].turn+1;dummies[0].seeleFlurryDamage=damage*.15;debuffApplied(actor);}}
-      else if(actor.id==='1103'){hit(actor,p[0],all,'Ульта Сервал');for(const [i,d] of dummies.entries()){if(d.shock)d.shock.expires+=p[1];else if(actor.s.eidolon>=4&&chanceOf('serval-e4',effectChance(actor,1,i))){const skill=params('1103','02');d.shock={owner:actor.id,expires:d.turn+skill[3],coefficient:skill[4]};debuffApplied(actor,i);}}servalTalent(actor);afterAttack(actor,true);}
-      else if(actor.id==='1013'){hit(actor,p[0],all,'Ульта Герты');if(actor.s.eidolon>=6)buff(actor,actor.id,'hertaE6',{atk:.25},1);afterAttack(actor,true);}
-      else if(actor.id==='1003'){hit(actor,p[0],all,'Ульта Химеко');if(actor.s.eidolon>=6)for(let n=0;n<2;n++)hit(actor,p[0]*.4,[pick('himeko-e6',all.length)],'Химеко E6 · отскок',{toughness:0});himekoBurn(actor,all);afterAttack(actor,true);}
-      else if(actor.id==='1005'){hit(actor,p[0],all,'Ульта Кафки');for(const i of all)kafkaShock(actor,i);debuffApplied(actor);detonate(all,p[4]);afterAttack(actor,true);}
+      else if(actor.id==='1106'){hit(actor,p[3],all,'Ульта Пелы',{pelaTrace:true});for(const i of allTargets())if(chanceOf('pela-exposed',effectChance(actor,p[0],i)))applyDefenseDebuff(actor,i,'exposed',p[2]);record(actor,'Ослабление DEF');afterAttack(actor,true);}
+      else if(actor.id==='1102'){
+        seeleBoost(actor);
+        const index=allTargets()[0];
+        const damage=hit(actor,p[0],[index],'Ульта Зеле',{toughness:30});
+        afterAttack(actor,true);
+        if(actor.s.eidolon>=6&&dummies[index]&&(!boss||dummies[index].hp>0)){
+          const d=dummies[index];d.seeleFlurryUntil=d.turn+(actor.s.novaflare?3:1);
+          d.seeleFlurryDamage=damage*(actor.s.novaflare?.3:.15);debuffApplied(actor,index);
+        }
+      }
+      else if(actor.id==='1103'){
+        hit(actor,p[0],all,'Ульта Сервал');
+        for(const i of allTargets()){
+          const d=dummies[i],shocks=activeShocks(d),breakShock=d.breakStatuses?.Thunder;
+          for(const shock of shocks)shock.expires+=p[1];
+          if(breakShock?.remaining>0)breakShock.remaining+=p[1];
+          if(!shocks.length&&!breakShock?.remaining&&actor.s.eidolon>=4&&chanceOf('serval-e4',effectChance(actor,1,i))){
+            const skill=params(actor.id,'02');d.shock={owner:actor.id,expires:d.turn+skill[3],coefficient:skill[4]};debuffApplied(actor,i);
+          }
+        }
+        servalTalent(actor);afterAttack(actor,true);
+      }
+      else if(actor.id==='1013'){for(const i of allTargets())hit(actor,p[0],[i],'Ульта Герты',{bonus:dummies[i].freeze||dummies[i].breakFrozen?.2:0,toughness:20});if(actor.s.eidolon>=6)buff(actor,actor.id,'hertaE6',{atk:.25},1);afterAttack(actor,true);}
+      else if(actor.id==='1003'){const living=allTargets();hit(actor,p[0],living,'Ульта Химеко');if(boss)energy(actor,p[1]*living.filter(i=>dummies[i].hp<=0).length);if(actor.s.eidolon>=6)for(let n=0;n<2;n++)hit(actor,p[0]*.4,[pick('himeko-e6',all.length)],'Химеко E6 · отскок',{toughness:0});himekoBurn(actor,all);afterAttack(actor,true);}
+      else if(actor.id==='1005'){if(actor.s.novaflare)kafkaRecharge(actor);hit(actor,p[0],all,'Ульта Кафки');for(const i of all)kafkaShock(actor,i);detonate(all,p[4]);afterAttack(actor,true);}
       else if(actor.id==='1204'){hit(actor,p[0],all,'Ульта Цзин Юаня');lordAdd(actor,p[1],12);afterAttack(actor,true);}
-      else if(actor.id==='1305'){hit(actor,p[0],[0],'Ульта Рацио');actor.ratioMarks=p[1]+(actor.s.eidolon>=6?1:0);afterAttack(actor,true);}
-      else if(actor.id==='1205'){const s=stat(actor),next=s.hp*.5;if(actor.currentHP>next)loseHP(actor,actor.currentHP-next);else actor.currentHP=next;const lost=actor.hpLost;hit(actor,0,[0],'Ульта Блэйда',{baseDamage:s.atk*p[0]+s.hp*p[1]+lost*(p[4]+(actor.s.eidolon>=1?1.5:0))});if(all.length>1)hit(actor,0,all.slice(1,3),'Ульта Блэйда · соседние цели',{baseDamage:s.atk*p[2]+s.hp*p[3]+lost*p[5]});actor.hpLost=0;afterAttack(actor,true);bladeFollow(actor);}
+      else if(actor.id==='1305'){
+        const marked=enemyFor(actor);
+        hit(actor,p[0],[marked],'Ульта Рацио');
+        actor.ratioTarget=marked;
+        actor.ratioMarks=allTargets().includes(marked)?p[1]+(actor.s.eidolon>=6?1:0):0;
+        afterAttack(actor,true);
+      }
+      else if(actor.id==='1205'){const s=stat(actor),next=s.hp*.5;if(actor.currentHP>next)loseHP(actor,actor.currentHP-next);else actor.currentHP=next;const lost=actor.hpLost;hit(actor,0,[0],'Ульта Блэйда',{baseDamage:(actor.s.novaflare?s.hp*p[0]:s.atk*p[0]+s.hp*p[1])+lost*(p[4]+(actor.s.eidolon>=1?1.5:0))});if(all.length>1)hit(actor,0,all.slice(1,3),'Ульта Блэйда · соседние цели',{baseDamage:(actor.s.novaflare?s.hp*p[2]:s.atk*p[2]+s.hp*p[3])+lost*p[5]});actor.hpLost=actor.s.novaflare?lost*.5:0;afterAttack(actor,true);bladeFollow(actor);}
       else if(actor.id==='1002'){const enemy=enemyFor(actor);hit(actor,p[0]+(slowed(enemy)?p[1]:0),[enemy],'Ульта Дань Хэна',{toughness:30});afterAttack(actor,true);}
-      else if(actor.id==='1109'){hit(actor,p[0],[0],'Ульта Хук');hookTalent(actor,[0]);actor.hookEnhanced=true;actor.distance=Math.max(0,actor.distance-2000);energy(actor,5);afterAttack(actor,true);}
+      else if(actor.id==='1109'){hit(actor,p[0],[0],'Ульта Хук',{toughness:30});hookTalent(actor,[0]);actor.hookEnhanced=true;actor.distance=Math.max(0,actor.distance-2000);energy(actor,5);afterAttack(actor,true);}
       else if(actor.id==='1210'){hit(actor,p[0],all,'Ульта Гуйнайфэнь');detonate(all,p[1],true);afterAttack(actor,true);}
       else if(actor.id==='1105'){for(const a of actors){const low=a.currentHP<=stat(a).hp*.3;heal(a,stat(actor).hp*p[0]+p[1],actor);if(low&&actor.s.eidolon>=2)a.natashaE2=actor.id;assist(a,actor);}record(actor,'Ульта Наташи · лечение');}
     }
@@ -1639,74 +2780,106 @@
       }
       return true;
     }
-    function runUlts(){if(boss){settleEncounter();if(boss.result!=='timeout')return;}
-      settleFinal();if(form.active)return;
+    function runUlts(){if(enemyActionDepth)return;settleFinal();if(boss){settleEncounter();if(boss.result!=='timeout')return;}if(find('1102')?.seeleExtraPending&&!form.active)return;
+      settleFinal();if(form.active||find('1102')?.seeleExtraPending)return;
       let fired=true,guard=0;
-      while(fired&&guard++<100){fired=false;for(const actor of [...actors].sort((a,b)=>(models[b.id].role==='support')-(models[a.id].role==='support'))){if(form.active)break;if(actor.defeated)continue;if(actor.id==='1507'&&actor.rageUntil>now&&actor.energy<data.characters[actor.id].max_sp)continue;if(actor.id==='1310'&&actor.combustionUntil>now)continue;if(actor.id==='1317'&&actor.ink>0)continue;if(actor.id==='1221'&&actor.parry)continue;if(['1313','1512'].includes(actor.id)&&actors.length===1)continue;if(actor.id==='1309'&&actor.concertoUntil>now)continue;if(actor.id==='1105'&&actors.every(a=>a.currentHP>=stat(a).hp*.7))continue;const ready=actor===aeon?actor.resource>=8:actor.id==='1415'?actor.resource>=(actor.ripple?12:24):actor.id==='1506'?actor.resource>=60&&!actor.godmode:actor.id==='1407'?actor.resource>=34000&&!memo('1407').active:actor.id==='1408'?actor.resource>=12:actor.id==='1220'?actor.resource>=6:actor.id==='1308'?actor.resource>=9:actor.energy+1e-8>=(actor.id==='1221'?120:data.characters[actor.id].max_sp);if(ready&&!waitForUltimate(actor)){const previous=actor.actionKind;actor.actionKind='ultimate';if(G)G.beforeUltimate(actor);ult(actor);if(G)G.afterUltimate(actor);afterUlt(actor);actor.actionKind=previous;fired=true;if(boss){settleEncounter();if(boss.result!=='timeout')return;}}}}
-      if(guard>=100)throw Error('Защита от бесконечной цепочки ульт.');
+      while(fired){fired=false;for(const actor of [...actors].sort((a,b)=>(models[b.id].role==='support')-(models[a.id].role==='support'))){if(form.active)break;if(actor.defeated||controlled(actor))continue;if(actor.id==='1507'&&actor.rageUntil>now&&actor.energy<data.characters[actor.id].max_sp)continue;if(actor.id==='1310'&&actor.combustionUntil>now)continue;if(actor.id==='1317'&&actor.ink>0)continue;if(actor.id==='1221'&&actor.parry)continue;if(['1313','1512'].includes(actor.id)&&actors.length===1)continue;if(actor.id==='1503'&&focusFor(actor)===actor)continue;if(actor.id==='1309'&&actor.concertoUntil>now)continue;if(actor.id==='1105'&&actors.every(a=>a.currentHP>=stat(a).hp*.7))continue;const ready=actor===aeon?actor.resource>=8:actor.id==='1415'?actor.resource>=(actor.ripple?12:24):actor.id==='1506'?actor.resource>=60&&!actor.godmode:actor.id==='1407'?actor.resource>=34000&&!memo('1407').active:actor.id==='1408'?actor.resource>=12:actor.id==='1220'?actor.resource>=6:actor.id==='1308'?actor.resource>=9:actor.energy+1e-8>=(actor.id==='1221'?120:data.characters[actor.id].max_sp);if(ready&&!waitForUltimate(actor)){if(guard++>=100)timeline.limit('ultimates',100);const previous=actor.actionKind;actor.actionKind='ultimate';if(G)G.beforeUltimate(actor);ult(actor);if(G)G.afterUltimate(actor);afterUlt(actor);actor.actionKind=previous;fired=true;if(boss){settleEncounter();if(boss.result!=='timeout')return;}if(find('1102')?.seeleExtraPending)return;}}}
+
     }
-    function castRegularSkill(actor){const target=focusFor(actor),p=params(actor.id,'02');
-if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.id))energy(actor,actor.id==='1212'?20:30);
+    function castRegularSkill(actor,opening=false){const target=focusFor(actor),p=params(actor.id,'02');
+if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!opening&&!['1205','1405'].includes(actor.id))energy(actor,actor.id==='1212'?20:30);
         if(actor.id==='1221'){heal(actor,stat(actor).atk*p[2]+p[3]);hit(actor,p[0],[0],'Навык Юньли');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Юньли · соседние цели');afterAttack(actor);}
         else if(actor.id==='1222'){hit(actor,p[0],allTargets(),'Навык Линша');for(const a of livingAllies())heal(a,stat(actor).atk*p[1]+p[2],actor);if(!fuyuan.actions)fuyuan.distance=10000;fuyuan.actions=Math.min(5,fuyuan.actions+3);actor.fuyuanActive=true;actor.lastHPSeen=hpLossSerial;fuyuan.distance=Math.max(0,fuyuan.distance-2000);afterAttack(actor);}
         else if(actor.id==='1225'){actor.fugueUntil=actor.turn+3;actor.prayer=target.id;if(!actor.fugueFirst){actor.fugueFirst=true;gainSP();}targetedRelics(actor,target);assist(target,actor);record(actor,'Фуга · Молитва лисы');}
-        else if(actor.id==='1307'){const ts=allTargets().slice(0,3);hit(actor,p[0],ts,'Навык Чёрного Лебедя');for(const i of ts){const types=dotTypes(i);arcanaAdd(i,1);for(const t of types)arcanaAdd(i);if(chanceOf('black-swan-defense',effectChance(actor,1,i))){applyDefenseDebuff(actor,i,'swanDefUntil',3);}}afterAttack(actor);}
+        else if(actor.id==='1307'){
+          const main=enemyFor(actor),adjacent=allTargets().filter(i=>Math.abs(i-main)===1);
+          hit(actor,p[0],[main],'Навык Чёрного Лебедя',{toughness:20});
+          if(adjacent.length)hit(actor,p[0],adjacent,'Навык Чёрного Лебедя · соседние цели',{toughness:10});
+          for(const i of [main,...adjacent]){
+            if(!allTargets().includes(i))continue;
+            if(!actor.s.novaflare){const types=dotTypes(i);arcanaAdd(i,1);for(const t of types)arcanaAdd(i);}
+            blackSwanDefense(actor,i);
+          }
+          afterAttack(actor);
+        }
         else if(actor.id==='1308'){acheronGain(p[2]);hit(actor,p[0],[0],'Навык Ахерон');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Ахерон · соседние цели');afterAttack(actor);}
         else if(actor.id==='1401')hertaSkill(actor);
         else if(actor.id==='1403'){actor.sanctifyUntil=actor.turn+p[1];for(const a of actors)assist(a,actor);record(actor,'Трибби · Освящение');}
-        else if(actor.id==='1405'){anaxaSkill(actor);anaxaSkill(actor);}
-        else if(actor.id==='1406'){let applied=false;for(const i of allTargets().slice(0,3))if(chanceOf('cipher-weakness',effectChance(actor,1.2,i))){dummies[i].cipherWeakUntil=dummies[i].turn+2;debuffApplied(actor,i);applied=true;}if(applied)buff(actor,actor.id,'cipherAtk',{atk:.3},2);hit(actor,p[0],[0],'Навык Цифер');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Цифер · соседние цели');afterAttack(actor);}
+        else if(actor.id==='1405'){const target=anaxaSkill(actor);if(target!==undefined)anaxaSkill(actor,target);}
+        else if(actor.id==='1406'){const primary=enemyFor(actor),adjacent=allTargets().filter(i=>Math.abs(i-primary)===1);actor.patron=primary;let applied=false;for(const i of [primary,...adjacent])if(chanceOf('cipher-weakness',effectChance(actor,1.2,i))){dummies[i].cipherWeakUntil=dummies[i].turn+2;debuffApplied(actor,i);applied=true;}if(applied)buff(actor,actor.id,'cipherAtk',{atk:.3},2);hit(actor,p[0],[primary],'Навык Цифер');if(adjacent.length)hit(actor,p[1],adjacent,'Навык Цифер · соседние цели');afterAttack(actor);}
         else if(actor.id==='1410'){for(const i of allTargets())if(chanceOf('hysilens-vulnerability',effectChance(actor,1,i))){dummies[i].hysiVulnUntil=dummies[i].turn+3;debuffApplied(actor,i);}hit(actor,p[0],allTargets(),'Навык Гисиленсы');afterAttack(actor);}
-        else if(actor.id==='1006'){const many=debuffCount()>=3;if(chanceOf('silver-wolf-res',effectChance(actor,p[4],0))){dummies[0].swResUntil=dummies[0].turn+p[6];dummies[0].swResAmount=p[5]+(many?.03:0);debuffApplied(actor);}hit(actor,p[0],[0],'Навык Серебряного Волка');afterAttack(actor);}
+        else if(actor.id==='1006')silverSkill(actor,enemyFor(actor),p);
         else if(actor.id==='1107'){hit(actor,p[0],allTargets(),'Навык Клары');const marked=allTargets().filter(i=>dummies[i].svarogMark);if(marked.length)hit(actor,p[1],marked,'Метка Сварога · навык');if(!(actor.s.eidolon>=1))for(const d of dummies)d.svarogMark=false;afterAttack(actor);}
-        else if(actor.id==='1112'){actor.followups++;hit(actor,p[0],[0],'Навык Топаз',{followup:true});afterAttack(actor);}
-        else if(actor.id==='1209'){actor.soulUntil=actor.turn+1;splitHit(actor,p[0],enemyFor(actor),'Навык Яньцина',[.25,.25,.25,.25],20);afterAttack(actor);}
-        else if(actor.id==='1217'){const patient=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0],i=actors.indexOf(patient);heal(patient,stat(actor).hp*p[0]+p[1],actor);assist(patient,actor);for(const n of [i-1,i+1].filter(n=>n>=0&&n<actors.length)){heal(actors[n],stat(actor).hp*p[2]+p[3],actor);assist(actors[n],actor);}actor.divineUntil=actor.turn+2+(actor.s.eidolon>=1?1:0);record(actor,'Хохо · Жертвенность жизни');}
-        else if(actor.id==='1218'){hit(actor,p[0],[0],'Навык Цзяоцю');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Цзяоцю · соседние цели');ash(actor,allTargets().slice(0,3));ash(actor,[0],p[2],false);afterAttack(actor);}
+        else if(actor.id==='1112'){const marked=enemyFor(actor);markDebt(marked);actor.followups++;hit(actor,p[0],[marked],'Навык Топаз',{followup:true});afterAttack(actor);}
+        else if(actor.id==='1209'){actor.soulUntil=actor.turn+1;splitHit(actor,p[0],enemyFor(actor),'Навык Яньцина',packetPlans['120902']);afterAttack(actor);}
+        else if(actor.id==='1217'){const patient=[...actors].filter(a=>!a.defeated&&!a.departed).sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0],i=actors.indexOf(patient);cleanse(patient,actor);heal(patient,stat(actor).hp*p[0]+p[1],actor);assist(patient,actor);for(const n of [i-1,i+1].filter(n=>n>=0&&n<actors.length)){heal(actors[n],stat(actor).hp*p[2]+p[3],actor);assist(actors[n],actor);}huohuoProvision(actor,params(actor.id,'04')[0]);}
+        else if(actor.id==='1218'){hit(actor,p[0],[0],'Навык Цзяоцю');const adjacent=[1,2].filter(i=>allTargets().includes(i));if(adjacent.length)hit(actor,p[1],adjacent,'Навык Цзяоцю · соседние цели');const struck=allTargets().filter(i=>i===0||adjacent.includes(i));ash(actor,struck);if(struck.includes(0))ash(actor,[0],p[2],false);afterAttack(actor);}
         else if(actor.id==='1304'){aventShield(actor,p[0],p[1]);for(const a of actors)assist(a,actor);}
-        else if(actor.id==='1313'){const summoned=Boolean(memo(target.id)?.active)||target.id==='1204'||target.id==='1112'||(target.id==='1222'&&fuyuan.actions>0)||(target.id==='1414'&&dragon.active);buff(target,actor.id,'sundaySkill',{damage:p[1]+(summoned?p[3]:0)},p[2]);sundayCrit(target,actor);if(actor.s.eidolon>=1)buff(target,actor.id,'sundayDef',{},2);if(data.characters[target.id].path!=='Shaman'&&target!==actor&&!actor.buffs.some(b=>b.key==='summerGuest'&&b.expires>=actor.turn)){target.distance=0;if(target.id==='1204'&&lord)lord.distance=0;if(target.id==='1112'&&numby)numby.distance=0;if(target.id==='1222'&&fuyuan.actions>0)fuyuan.distance=0;if(target.id==='1414'&&dragon.active)dragon.distance=0;const spirit=memo(target.id);if(spirit?.active&&memoSpeed(spirit)>0)spirit.distance=0;}if(actor.beatified===target.id&&actor.beatifiedUntil>actor.turn)gainSP();targetedRelics(actor,target);assist(target,actor);record(actor,'Воскресенье · продвижение → '+data.characters[target.id].name);}
+        else if(actor.id==='1313'){cleanse(target,actor);const summoned=Boolean(memo(target.id)?.active)||target.id==='1204'||target.id==='1112'||(target.id==='1222'&&fuyuan.actions>0)||(target.id==='1414'&&dragon.active);buff(target,actor.id,'sundaySkill',{damage:p[1]+(summoned?p[3]:0)},p[2]);sundayCrit(target,actor);if(actor.s.eidolon>=1)buff(target,actor.id,'sundayDef',{},2);if(data.characters[target.id].path!=='Shaman'&&target!==actor&&!actor.buffs.some(b=>b.key==='summerGuest'&&b.expires>=actor.turn)){target.distance=0;if(target.id==='1204'&&lord)lord.distance=0;if(target.id==='1112'&&numby)numby.distance=0;if(target.id==='1222'&&fuyuan.actions>0)fuyuan.distance=0;if(target.id==='1414'&&dragon.active)dragon.distance=0;const spirit=memo(target.id);if(spirit?.active&&memoSpeed(spirit)>0)spirit.distance=0;}if(actor.beatified===target.id&&actor.beatifiedUntil>actor.turn)gainSP();targetedRelics(actor,target);assist(target,actor);record(actor,'Воскресенье · продвижение → '+data.characters[target.id].name);}
         else if(actor.id==='1314'){actor.debtor=target.id;actor.debtUntil=actor.turn+p[3];if(target!==actor)buff(target,actor.id,'debtSpeed',{speed:p[0]},100000);targetedRelics(actor,target);assist(target,actor);record(actor,'Сборщик долгов → '+data.characters[target.id].name);}
-        else if(actor.id==='1004'){const echo=actor.weltEcho>0;if(echo)actor.weltEcho--;for(let n=0;n<3+(actor.s.eidolon>=6?1:0);n++){const i=n?randomTarget():0;hit(actor,p[0],[i],'Навык Вельта · попадание',{bonus:!maxToughness||dummies[i].toughness===0?.2:0});if(chanceOf('welt-slow',effectChance(actor,p[1]+(actor.s.eidolon>=4?.35:0),i))){dummies[i].weltSlowUntil=dummies[i].turn+p[3];debuffApplied(actor);}weltTalent(actor,[i]);if(echo)hit(actor,p[0]*.8,[i],'Вельт E1 · дополнительный урон',{kind:'additional',toughness:0});}afterAttack(actor);}
+        else if(actor.id==='1004'&&actor.s.novaflare)weltNovaSkill(actor,p);
+        else if(actor.id==='1004'){const echo=actor.weltEcho>0;if(echo)actor.weltEcho--;for(let n=0;n<3+(actor.s.eidolon>=6?1:0);n++){const i=n?randomTarget():0;hit(actor,p[0],[i],'Навык Вельта · попадание',{bonus:maxToughness&&dummies[i].toughness===0?.2:0});if(chanceOf('welt-slow',effectChance(actor,p[1]+(actor.s.eidolon>=4?.35:0),i))){dummies[i].weltSlowUntil=dummies[i].turn+p[3];debuffApplied(actor);}weltTalent(actor,[i]);if(echo)hit(actor,p[0]*.8,[i],'Вельт E1 · дополнительный урон',{kind:'additional',toughness:0});}afterAttack(actor);}
         else if(actor.id==='1302'){hit(actor,p[0],allTargets(),'Навык Аргенти');argentiTalent(actor,dummies.length);afterAttack(actor);}
-        else if(actor.id==='1212'){hit(actor,p[0],[0],'Непостижимая Зарница');jingliuGain(actor,p[1]);if(!actor.transmigration)actor.distance=Math.max(0,actor.distance-1000);afterAttack(actor);}
+        else if(actor.id==='1212'){if(actor.s.novaflare){jingliuNovaAttack(actor,p[0],0,'Непостижимая Зарница');energy(actor,15);}
+          else hit(actor,p[0],[0],'Непостижимая Зарница');
+          jingliuGain(actor,p[1]);if(!actor.transmigration&&!actor.s.novaflare)actor.distance=Math.max(0,actor.distance-1000);afterAttack(actor);}
         else if(actor.id==='1303'){actor.meiSkillUntil=actor.turn+p[2];for(const a of actors)assist(a,actor);record(actor,'Обертон Жуань Мэй · баф урона');}
         else if(actor.id==='1309'){actor.robinSkillUntil=actor.turn+p[1];energy(actor,5);for(const a of actors)assist(a,actor);record(actor,'Навык Зарянки · баф урона');}
-        else if(actor.id==='1306'){sparkleSkillBuff(actor,target,stat(actor).critDamage*(p[0]+(actor.s.eidolon>=6?.3:0))+p[1],target===actor?1:2);if(target!==actor)target.distance=Math.max(0,target.distance-10000*p[3]);targetedRelics(actor,target);assist(target,actor);record(actor,'Навык Искорки → '+data.characters[target.id].name);}
+        else if(actor.id==='1306'){sparkleSkillBuff(actor,target,stat(actor).critDamage*(p[0]+(actor.s.eidolon>=6?.3:0))+p[1],actor.s.novaflare?2:target===actor?1:2);if(actor.s.novaflare&&actor.s.eidolon>=1)buff(actor,actor.id,'sparkleNovaSpeed',{speedPct:.15},2);if(target!==actor)target.distance=Math.max(0,target.distance-10000*p[3]);targetedRelics(actor,target);assist(target,actor);record(actor,'Навык Искорки → '+data.characters[target.id].name);}
         else if(actor.id==='1203'){const patient=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0];luochaSkillHeal(actor,patient,p);assist(patient,actor);luochaFlower(actor);record(actor,'Навык Лочи → '+data.characters[patient.id].name);}
         else if(actor.id==='1211'){const patient=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0],amount=stat(actor).hp*p[0]+p[1];targetedRelics(actor,patient);bailuSkillHeal(actor,patient,amount);assist(patient,actor);for(let n=1;n<=p[3];n++){const other=actors[pick('bailu-bounce',actors.length)];bailuSkillHeal(actor,other,amount*Math.pow(1-p[2],n));assist(other,actor);}record(actor,'Навык Байлу · лечение с отскоками');}
         else if(actor.id==='1104'){hit(actor,p[0],[0],'Навык Гепарда');if(chanceOf('gepard-freeze',effectChance(actor,p[1]+(actor.s.eidolon>=1?.35:0),0))){dummies[0].freeze={owner:actor.id,coefficient:p[3]};debuffApplied(actor);record(actor,'Заморозка');}afterAttack(actor);}
-        else if(actor.id==='1208'){const active=actor.matrixUntil>actor.turn,before=actors.map(a=>stat(a).hp);if(actor.matrixWasActive)energy(actor,20);const hp=stat(actor).hp-(active?actor.matrixHP:0);actor.matrixHP=hp*p[3];actor.matrixUntil=actor.turn+p[2];for(const [i,a] of actors.entries()){a.currentHP+=Math.max(0,stat(a).hp-before[i]);assist(a,actor);}record(actor,'Матрица предвидения · HP и крит. шанс');}
-        else if(actor.id==='1101'){if(actor.s.eidolon>=1&&actor.turn>=(actor.bronyaRefundReady||0)&&chanceOf('bronya-refund',.5)){gainSP();actor.bronyaRefundReady=actor.turn+2;}if(actor.s.eidolon>=2)target.bronyaSpeedPending=true;buff(target,actor.id,'bronyaSkill',{damage:p[0]},p[2]+(actor.s.eidolon>=6?1:0));if(target!==actor)target.distance=0;targetedRelics(actor,target);assist(target,actor);record(actor,'Навык Брони → '+data.characters[target.id].name);}
-        else if(actor.id==='1202'){const flat=Math.min(target.s.baseAtk*p[1],stat(actor).atk*p[3]);buff(target,actor.id,'benediction',{flatAtk:flat},p[2]);actor.blessing={target:target.id,expires:target.turn+p[2]};buff(actor,actor.id,'tySpeed',{speedPct:.2},1);targetedRelics(actor,target);if(target!==actor)assist(target,actor);record(actor,'Благословение → '+data.characters[target.id].name);}
-        else if(actor.id==='1106'){hit(actor,p[0],[0],'Навык Пелы',{pelaTrace:true});if(actor.s.eidolon>=4&&chanceOf('pela-e4',effectChance(actor,1,0))){dummies[0].pelaIceUntil=dummies[0].turn+2;debuffApplied(actor);}if(isExposed())energy(actor,params('1106','04')[0]);afterAttack(actor);}
-        else if(actor.id==='1009'){const struck=new Set([0]);hit(actor,p[0],[0],'Навык Асты · первый удар');for(let n=0;n<4+(actor.s.eidolon>=1?1:0);n++){const index=randomTarget();struck.add(index);hit(actor,p[0],[index],'Навык Асты · отскок');}actor.charges=Math.min(p.length?params('1009','04')[1]:5,actor.charges+struck.size*2);afterAttack(actor);}
-        else if(actor.id==='1102'){const old=actor.buffs.find(b=>b.key==='seeleSpeed'&&b.expires>=actor.turn)?.values.speedPct||0;buff(actor,actor.id,'seeleSpeed',{speedPct:actor.s.eidolon>=2?Math.min(p[1]*2,old+p[1]):p[1]},p[2]);hit(actor,p[0],[0],'Навык Зеле');afterAttack(actor);}
+        else if(actor.id==='1208'){actor.matrixCCUsed=false;const active=actor.matrixUntil>actor.turn,before=actors.map(a=>stat(a).hp);if(actor.matrixWasActive)energy(actor,20);const hp=stat(actor).hp-(active?actor.matrixHP:0);actor.matrixHP=hp*p[3];actor.matrixUntil=actor.turn+p[2];for(const [i,a] of actors.entries()){a.currentHP+=Math.max(0,stat(a).hp-before[i]);assist(a,actor);}record(actor,'Матрица предвидения · HP и крит. шанс');}
+        else if(actor.id==='1101'){cleanse(target,actor);if(actor.s.eidolon>=1&&actor.turn>=(actor.bronyaRefundReady||0)&&chanceOf('bronya-refund',.5)){gainSP();actor.bronyaRefundReady=actor.turn+2;}if(actor.s.eidolon>=2)target.bronyaSpeedPending=true;buff(target,actor.id,'bronyaSkill',{damage:p[0]},p[2]+(actor.s.eidolon>=6?1:0));if(target!==actor)target.distance=0;targetedRelics(actor,target);assist(target,actor);record(actor,'Навык Брони → '+data.characters[target.id].name);}
+        else if(actor.id==='1202'){const flat=Math.min(target.s.baseAtk*p[1],stat(actor).atk*p[3]);const previous=blessedAlly(actor);if(previous&&previous!==target)previous.buffs=previous.buffs.filter(effect=>effect.source!==actor.id||effect.key!=='benediction');buff(target,actor.id,'benediction',{flatAtk:flat},p[2]);actor.blessing={target:target.id,expires:target.turn+p[2]};buff(actor,actor.id,'tySpeed',{speedPct:.2},1);targetedRelics(actor,target);if(target!==actor)assist(target,actor);record(actor,'Благословение → '+data.characters[target.id].name);}
+        else if(actor.id==='1106'){hit(actor,p[0],[0],'Навык Пелы',{pelaTrace:true});if(actor.s.eidolon>=4&&chanceOf('pela-e4',effectChance(actor,1,0))){dummies[0].pelaIceUntil=dummies[0].turn+2;debuffApplied(actor);}afterAttack(actor);}
+        else if(actor.id==='1009'){const struck=new Set([0]);hit(actor,p[0],[0],'Навык Асты · первый удар');for(let n=0;n<4+(actor.s.eidolon>=1?1:0);n++){const index=randomTarget();struck.add(index);hit(actor,p[0],[index],'Навык Асты · отскок');}astaCharge(actor,struck);afterAttack(actor);}
+        else if(actor.id==='1102')seeleSkill(actor,enemyFor(actor));
         else if(actor.id==='1220'){buff(actor,actor.id,'fxAttack',{atk:.48},3);hit(actor,p[0],[0],'Навык Фэйсяо');afterAttack(actor);feixiaoFollow(actor);}
-        else if(actor.id==='1013'){hit(actor,p[0],dummies.map((_,i)=>i),'Навык Герты',{bonus:.45});afterAttack(actor);}
-        else if(actor.id==='1103'){hit(actor,p[0],[0],'Навык Сервал');const adjacent=Array.from({length:Math.min(2,dummies.length-1)},(_,i)=>i+1);if(adjacent.length)hit(actor,p[1],adjacent,'Навык Сервал · соседние цели');for(let i=0;i<Math.min(3,dummies.length);i++)dummies[i].shock={owner:actor.id,expires:dummies[i].turn+p[3],coefficient:p[4]};debuffApplied(actor);servalTalent(actor);afterAttack(actor);}
+        else if(actor.id==='1013'){for(const i of allTargets())hit(actor,p[0],[i],'Навык Герты',{bonus:enemyHPFraction(i)>=p[1]?p[2]+.25:0,toughness:10});afterAttack(actor);}
+        else if(actor.id==='1103'){hit(actor,p[0],[0],'Навык Сервал');const adjacent=Array.from({length:Math.min(2,dummies.length-1)},(_,i)=>i+1);if(adjacent.length)hit(actor,p[1],adjacent,'Навык Сервал · соседние цели');for(const i of [0,...adjacent])if(chanceOf('serval-shock',effectChance(actor,p[2]+.2,i))){dummies[i].shock={owner:actor.id,expires:dummies[i].turn+p[3],coefficient:p[4]};debuffApplied(actor,i);}servalTalent(actor);afterAttack(actor);}
         else if(actor.id==='1003'){hit(actor,p[0],[0],'Навык Химеко');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Химеко · соседние цели');himekoBurn(actor,allTargets().slice(0,3));afterAttack(actor);}
-        else if(actor.id==='1005'){hit(actor,p[0],[0],'Навык Кафки');if(dummies.length>1)hit(actor,p[2],allTargets().slice(1,3),'Навык Кафки · соседние цели');detonate([0],p[1]);afterAttack(actor);}
+        else if(actor.id==='1005'){
+          const main=enemyFor(actor),adjacent=allTargets().filter(i=>i!==main&&(!boss||main===0||i===0)).slice(0,2);
+          if(main!==undefined){
+            hit(actor,p[0],[main],'Навык Кафки');
+            const living=adjacent.filter(i=>allTargets().includes(i));
+            hit(actor,p[2],living,'Навык Кафки · соседние цели');
+            if(allTargets().includes(main))detonate([main],p[1]);
+            if(actor.s.novaflare)detonate(living,p[3]);
+          }
+          afterAttack(actor);
+        }
         else if(actor.id==='1204'){buff(actor,actor.id,'jingCrit',{crit:.1},2);hit(actor,p[0],allTargets(),'Навык Цзин Юаня');lordAdd(actor,p[1],6);afterAttack(actor);}
-        else if(actor.id==='1305'){actor.ratioStacks=Math.min(actor.s.eidolon>=1?10:6,actor.ratioStacks+debuffCount());hit(actor,p[0],[0],'Навык Рацио');dummies[0].ratioDebuff=dummies[0].turn+2;debuffApplied(actor);afterAttack(actor);if(chanceOf('ratio-followup',Math.min(1,params('1305','04')[1]+params('1305','04')[2]*debuffCount())))ratioFollow(actor);}
+        else if(actor.id==='1305'){
+          const index=enemyFor(actor),debuffs=debuffCount(index),talent=params(actor.id,'04');
+          actor.ratioStacks=Math.min(actor.s.eidolon>=1?10:6,actor.ratioStacks+debuffs);
+          hit(actor,p[0],[index],'Навык Рацио');
+          const follows=chanceOf('ratio-followup',Math.min(1,talent[1]+talent[2]*debuffs));
+          if(allTargets().includes(index)&&chanceOf('ratio-effect-res',effectChance(actor,1,index))){
+            dummies[index].ratioDebuff=dummies[index].turn+2;debuffApplied(actor,index);
+          }
+          afterAttack(actor);
+          const living=allTargets();
+          if(follows&&living.length)ratioFollow(actor,living.includes(index)?index:living[pick('ratio-skill-target',living.length)]);
+        }
         else if(actor.id==='1205'){loseHP(actor,stat(actor).hp*p[0]);buff(actor,actor.id,'hellscape',{damage:p[3]},p[1]-1);actor.bladeUntil=actor.turn+p[1];record(actor,'Адский пейзаж · расход HP');if(G)G.afterSkill(actor);bladeFollow(actor);bladeEnhanced(actor);}
         else if(actor.id==='1002'){
           const enemy=enemyFor(actor),target=dummies[enemy];
-          for(const share of [.3,.15,.15,.4]){
-            if(boss&&target.hp<=0)break;
-            let critical=false;
-            hit(actor,p[0]*share,[enemy],'Навык Дань Хэна',{toughness:20*share,onCritical:()=>{critical=true;}});
-            if(critical&&(!boss||target.hp>0)&&chanceOf('dan-heng-slow',effectChance(actor,p[3],enemy))){
-              target.slowUntil=target.turn+p[2];
-              target.danSlow=actor.s.eidolon>=6?p[1]+.08:p[1];
-              debuffApplied(actor,enemy);
-              record(actor,actor.s.eidolon>=6?'Замедление · скорость болванки −20%':'Замедление · скорость болванки −12%');
+          let critical=false;
+          splitHit(actor,p[0],enemy,'Навык Дань Хэна',packetPlans['100202'],{
+            onCritical:()=>{critical=true;},beforePacket:()=>{critical=false;},afterPacket:()=>{
+              if(critical&&(!boss||target.hp>0)&&chanceOf('dan-heng-slow',effectChance(actor,p[3],enemy))){
+                target.slowUntil=target.turn+p[2];target.danSlow=actor.s.eidolon>=6?p[1]+.08:p[1];debuffApplied(actor,enemy);
+                record(actor,actor.s.eidolon>=6?'Замедление · скорость болванки −20%':'Замедление · скорость болванки −12%');
+              }
             }
-          }
+          });
           afterAttack(actor);
         }
         else if(actor.id==='1109'){const enhanced=actor.hookEnhanced,q=enhanced?data.character_skills['110909'].params[actor.s.eidolon>=3?11:9]:p;actor.hookEnhanced=false;hit(actor,q[0],[0],enhanced?'Усиленный навык Хук':'Навык Хук',{bonus:enhanced&&actor.s.eidolon>=1?.2:0});if(enhanced&&dummies.length>1)hit(actor,q[4],allTargets().slice(1,3),'Усиленный навык Хук · соседние цели',{bonus:actor.s.eidolon>=1?.2:0});applyBurn(actor,'hookBurn',[0],q[1],q[3],q[2]+(actor.s.eidolon>=2?1:0));hookTalent(actor,enhanced?allTargets().slice(0,3):[0]);afterAttack(actor);}
         else if(actor.id==='1210'){hit(actor,p[0],[0],'Навык Гуйнайфэнь');if(dummies.length>1)hit(actor,p[1],allTargets().slice(1,3),'Навык Гуйнайфэнь · соседние цели');guiAttack(actor,allTargets().slice(0,3),p[2],true);afterAttack(actor);}
-        else if(actor.id==='1105'){const patient=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0];heal(patient,stat(actor).hp*p[0]+p[3],actor);patient.hot={owner:actor.id,amount:stat(actor).hp*p[1]+p[4],turns:p[2]+1};targetedRelics(actor,patient);if(patient!==actor)assist(patient,actor);record(actor,'Лечение → '+data.characters[patient.id].name);}
+        else if(actor.id==='1105'){const patient=[...actors].filter(a=>!a.defeated&&!a.departed).sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0];cleanse(patient,actor);heal(patient,stat(actor).hp*p[0]+p[3],actor);patient.hot={owner:actor.id,amount:stat(actor).hp*p[1]+p[4],turns:p[2]+1};targetedRelics(actor,patient);if(patient!==actor)assist(patient,actor);record(actor,'Лечение → '+data.characters[patient.id].name);}
     }
     function playTurn(actor){
       const rule=scenario.rotation;
@@ -1721,9 +2894,10 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       finally{actor.s.policy=previous;}
     }
     function regular(actor){
-      turnOwner=actor;turnSPSpent=0;beginAction(actor);if(scenario.audit)record(actor,'Начало хода',0,'turn',null,{action:actor.actionKey});if(novaAllyAssist(actor)){finishTurn(actor);return;}
+      turnOwner=actor;turnSPSpent=0;beginAction(actor);if(scenario.audit)record(actor,actor.extraTurnActive?'Дополнительный ход':'Начало хода',0,actor.extraTurnActive?'extra-turn':'turn',null,{action:actor.actionKey,distance:actor.distance,normalTurns:actor.normal,turnCounter:actor.turn});if(!actor.extraTurnActive&&novaAllyAssist(actor)){finishTurn(actor);return;}
+      if(!actor.extraTurnActive){
       actor.matrixWasActive=actor.matrixUntil>actor.turn;
-      const q=find('1201');if(q)drawTile(q);actor.turn++;actor.normal++;actor.distance=10000;if(actor.lynxHot){const hot=actor.lynxHot,healer=find(hot.owner);if(hot.expires>=actor.turn){const enhanced=actor.buffs.some(b=>b.source===hot.owner&&b.key==='survival'&&b.expires>=actor.turn);const p=params(healer.id,'04');heal(actor,stat(healer).hp*(p[1]+(enhanced?p[3]:0))+p[2]+(enhanced?p[4]:0),healer);}if(hot.expires<=actor.turn)actor.lynxHot=null;}if(G)G.startTurn(actor);if(G?.has(actor,'106',4)&&actor.currentHP<=stat(actor).hp*.5){
+      const q=find('1201');if(q)drawTile(q);actor.turn++;actor.normal++;actor.distance=10000;if(actor.id==='1102')actor.seeleSkillUsed=false;if(actor.lynxHot){const hot=actor.lynxHot,healer=find(hot.owner);if(hot.expires>=actor.turn){const enhanced=actor.buffs.some(b=>b.source===hot.owner&&b.key==='survival'&&b.expires>=actor.turn);const p=params(healer.id,'04');heal(actor,stat(healer).hp*(p[1]+(enhanced?p[3]:0))+p[2]+(enhanced?p[4]:0),healer);}if(hot.expires<=actor.turn)actor.lynxHot=null;}if(G)G.startTurn(actor);if(G?.has(actor,'106',4)&&actor.currentHP<=stat(actor).hp*.5){
         const max=stat(actor).hp;
         actor.currentHP=Math.min(max,actor.currentHP+max*.08);
         energy(actor,5);
@@ -1735,6 +2909,13 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       if(actor.id==='1314'&&!(actor.debtUntil>actor.turn))for(const a of actors)a.buffs=a.buffs.filter(b=>!(b.source==='1314'&&b.key==='debtSpeed'));
       const jade=find('1314');if(jade?.debtor===actor.id&&jade.debtUntil>jade.turn)jade.pawn=Math.min(50,(jade.pawn||0)+3);
       huohuoHeal(actor);
+      if(controlled(actor)){
+        record(actor,'Заморозка · пропуск действия',0,'controlled');
+        actor.debuffs=allyDebuffs(actor).filter(d=>d.kind!=='freeze');
+        actor.distance=5000;
+        finishTurn(actor);
+        return;
+      }
       actor.buffs=actor.buffs.filter(b=>!(b.key==='sparkleSkill'&&b.expires<=actor.turn));
       actor.currentHP=Math.min(actor.currentHP,stat(actor).hp);if(actor.id==='1409'&&actor.rainUntil===actor.turn){for(const a of livingAllies())a.currentHP=Math.min(a.currentHP,stat(a).hp);record(actor,'После дождя · окончание');}
       if(actor.id==='1302')actor.apotheosis=Math.min(10+(actor.s.eidolon>=4?2:0),(actor.apotheosis||0)+1);
@@ -1748,17 +2929,18 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       const bailu=find('1211');if(bailu?.s.eidolon>=1&&actor.vigorUntil===actor.turn&&actor.currentHP>=stat(actor).hp)energy(actor,8);
       sixthStartTurn(actor);
       if(aeon?.emanator===actor.id)wishpower(1);
+      }
       if(actor===aeon){aeonRegular(actor);finishTurn(actor);return;}
       if(finalRegular(actor)||sixthRegular(actor)||fifthRegular(actor)||batchRegular(actor)||breakRegular(actor)){finishTurn(actor);return;}
       if(actor.id==='1104')actor.gepardATK=stat(actor).def*.35;
       if(actor.id==='1212'&&actor.transmigration){coup(actor,()=>jingliuEnhanced(actor),true);jingliuEnhanced(actor);finishTurn(actor);return;}
       if(actor.id==='1213'){ilBasic(actor);finishTurn(actor);return;}
-      if(actor.id==='1005')actor.fuaReady=true;
+      if(actor.id==='1005'&&!actor.s.novaflare)actor.fuaReady=true;
       if(actor.id==='1220'){actor.e2Triggers=0;if(!actor.fuaSinceTurn){attacks++;if(attacks%2===0)actor.resource=Math.min(12,actor.resource+1);}actor.fuaSinceTurn=false;actor.fuaReady=true;}
-      if(actor.id==='1202')energy(actor,5);
+      if(actor.id==='1202'||actor.id==='1006'&&actor.s.novaflare)energy(actor,5);
       if(actor.id==='1009'){if(actor.turn>1&&!actor.keepCharges)actor.charges=Math.max(0,actor.charges-params('1009','04')[2]+(actor.s.eidolon>=6?1:0));actor.keepCharges=false;}
       const target=focusFor(actor),p=params(actor.id,'02');let useSkill=false;
-      if(actor.s.policy!=='basic'&&sp>0){
+      if(actor.s.policy!=='basic'&&(sp>0||actor.id==='1306'&&actor.s.novaflare&&actor.freeSkill)){
         if(actor.s.policy==='skill')useSkill=actor.id!=='1105';
         else if(actor.id==='1202')useSkill=!target.buffs.some(b=>b.source===actor.id&&b.key==='benediction');
         else if(actor.id==='1101')useSkill=true;
@@ -1784,39 +2966,44 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       if(actor.id==='1314'&&actor.debtUntil>actor.turn)useSkill=false;
       actor.actionKind=useSkill?'skill':'basic';
       if(G&&!useSkill)G.beforeBasic(actor);
-      if(useSkill){spendSP();coup(actor,()=>castRegularSkill(actor));castRegularSkill(actor);
+      if(useSkill){if(actor.id==='1306'&&actor.s.novaflare&&actor.freeSkill)actor.freeSkill=false;else spendSP();coup(actor,()=>castRegularSkill(actor));castRegularSkill(actor);
       }else{
         if(actor.id==='1205'&&actor.bladeUntil>actor.turn){bladeEnhanced(actor);runUlts();actor.buffs=actor.buffs.filter(b=>b.expires>actor.turn);if(G)G.endTurn(actor);return;}
-        gainSP();energy(actor,actor.id==='1306'?30:20);const bonus=actor.id==='1202'?.4:actor.id==='1004'&&(!maxToughness||dummies[0].toughness===0)?.2:0;
+        gainSP();energy(actor,actor.id==='1306'?30:20);const bonus=actor.id==='1202'?.4:actor.id==='1004'&&!actor.s.novaflare&&maxToughness&&dummies[0].toughness===0?.2:0;
         const followup=actor.id==='1112';if(followup)actor.followups++;
         if(actor.id==='1304'&&actor.s.eidolon>=2){dummies[0].avenResUntil=dummies[0].turn+3;debuffApplied(actor);}
         const fugueBasic=actor.id==='1225'&&actor.fugueUntil>actor.turn;
         if(actor.id==='1002'||actor.id==='1209'){
-          const shares=actor.id==='1002'?[.45,.55]:[.5,.25,.25];
-          splitHit(actor,params(actor.id,'01')[0],enemyFor(actor),'Базовая атака',shares,10);
-        }else{hit(actor,fugueBasic?1:params(actor.id,'01')[0],[actor.id==='1002'?enemyFor(actor):0],'Базовая атака',{bonus:bonus+(actor.id==='1405'?.3:0),followup,baseDamage:['1208','1217','1403'].includes(actor.id)?params(actor.id,'01')[0]*stat(actor).hp:actor.id==='1304'?params(actor.id,'01')[0]*stat(actor).def:undefined,guaranteedCrit:actor.id==='1101',pelaTrace:actor.id==='1106'});}
+          splitHit(actor,params(actor.id,'01')[0],enemyFor(actor),'Базовая атака',packetPlans[actor.id+'01']);
+        }else{hit(actor,fugueBasic?1:params(actor.id,'01')[0],[actor.id==='1002'?enemyFor(actor):0],'Базовая атака',{bonus,followup,baseDamage:(['1208','1217','1403'].includes(actor.id)||actor.s.novaflare&&['1205','1212'].includes(actor.id))?params(actor.id,'01')[0]*stat(actor).hp:actor.id==='1304'?params(actor.id,'01')[0]*stat(actor).def:undefined,guaranteedCrit:actor.id==='1101',pelaTrace:actor.id==='1106'});}
         if(fugueBasic&&dummies.length>1)hit(actor,.5,allTargets().slice(1,3),'Базовая Фуги · соседние цели');
         if(actor.id==='1403'&&dummies.length>1)hit(actor,0,allTargets().slice(1,3),'Базовая Трибби · соседние цели',{baseDamage:stat(actor).hp*.15});
         if(actor.id==='1222'||actor.id==='1405')energy(actor,10);
-        if(actor.id==='1307'){const types=dotTypes(0);arcanaAdd(0);for(const t of types)arcanaAdd(0);}
+        if(actor.id==='1307'&&!actor.s.novaflare){const types=dotTypes(0);arcanaAdd(0);for(const t of types)arcanaAdd(0);}
         if(actor.id==='1314'&&dummies.length>1)hit(actor,params(actor.id,'01')[1],allTargets().slice(1,3),'Базовая Яшмы · соседние цели');
         if(actor.id==='1218')ash(actor,[0]);
-        if(actor.id==='1004'){weltTalent(actor,[0]);if(actor.weltEcho>0){actor.weltEcho--;hit(actor,params(actor.id,'01')[0]*.5,[0],'Вельт E1 · дополнительный урон',{kind:'additional',toughness:0});}}if(actor.id==='1302')argentiTalent(actor,1);
+        if(actor.id==='1004'&&actor.s.novaflare){
+          const target=[...(actor.attackTargets||[])][0];
+          if(allTargets().includes(target)){
+            weltTalent(actor,[target]);
+            hit(actor,params(actor.id,'01')[0]*.8,[target],'Вельт · Суждение',{kind:'additional',toughness:0});
+          }
+        }else if(actor.id==='1004'){weltTalent(actor,[0]);if(actor.weltEcho>0){actor.weltEcho--;hit(actor,params(actor.id,'01')[0]*.5,[0],'Вельт E1 · дополнительный урон',{kind:'additional',toughness:0});}}if(actor.id==='1302')argentiTalent(actor,1);
         if(actor.id==='1101')actor.distance=Math.max(0,actor.distance-10000*params('1101','04')[0]);
-        if(actor.id==='1009'){actor.charges=Math.min(5,actor.charges+2);applyBurn(actor,'burn',[0],.8,.5,3);}
-        if(actor.id==='1106'&&isExposed())energy(actor,params('1106','04')[0]);
+        if(actor.id==='1102')actor.distance=Math.max(0,actor.distance-2000);
+        if(actor.id==='1009'){astaCharge(actor,[0]);applyBurn(actor,'burn',[0],.8,.5,3);}
         if(actor.id==='1103'){const adjacent=allTargets().slice(1,2);if(actor.s.eidolon>=1&&adjacent.length)hit(actor,params('1103','01')[0]*.6,adjacent,'Сервал E1 · соседняя цель',{toughness:0});servalTalent(actor);}
         if(actor.id==='1003')himekoBurn(actor,[0]);
         if(actor.id==='1105'&&actor.s.eidolon>=6)hit(actor,0,[0],'Наташа E6 · дополнительный урон',{kind:'additional',baseDamage:stat(actor).hp*.4,toughness:0});
         if(actor.id==='1109')hookTalent(actor,[0]);
         if(actor.id==='1210')guiAttack(actor,[0],.8);
-        if(actor.id==='1202'&&actor.blessing){const blessed=find(actor.blessing.target);if(blessed.buffs.some(b=>b.source===actor.id&&b.key==='benediction')){const scale=stat(blessed).atk/stat(actor).atk;hit(actor,(params('1202','04')[0]+(actor.s.eidolon>=4?.2:0))*scale,[0],'Талант Тинъюнь');}}
+        if(actor.id==='1202'){const blessed=blessedAlly(actor);if(blessed)hit(blessed,params('1202','04')[0],[0],'Талант Тинъюнь',{kind:'additional',element:'Thunder',triggerSource:actor.id});}
         afterAttack(actor);
-        if(actor.id==='1405')anaxaSkill(actor);
+        if(actor.id==='1405'&&weaknessCount(0)>=5)anaxaSkill(actor,0);
       }
       if(G){if(useSkill&&!['1205','1405'].includes(actor.id))G.afterSkill(actor);else if(!useSkill)G.afterBasic(actor);}finishTurn(actor);
     }
-    function finishTurn(actor){if(actor.bronyaSpeedPending){actor.bronyaSpeedPending=false;buff(actor,'1101','bronyaE2',{speedPct:.3},1);}if(actor.id==='1413'&&actor.actionKind==='skill'&&actor.ode==='evernight')everGain(1);if(actor.id==='1409'&&actor.actionKind==='skill'&&actor.odeSky>0)actor.odeSky--;expireBangers(actor);actor.bangers=(actor.bangers||[]).filter(b=>b.expires>actor.turn);sixthAction(actor);cerydraAction(actor);yukongAction(actor);settleHP();settleFinal();runUlts();if(scenario.audit)for(const b of actor.buffs)if(b.expires<=actor.turn)record(actor,'Истёк эффект · '+b.key,0,'buff-expired');actor.buffs=actor.buffs.filter(b=>b.expires>actor.turn);const yk=find('1207');if(yk?.bow>0&&!(actor===yk&&yk.bowAcquiredTurn===yk.turn)){yk.bow--;if(!yk.bow)yk.bowCrit=false;record(yk,'Ревущая тетива · осталось '+yk.bow);}if(actor.dragonShield?.expires<=actor.turn)actor.dragonShield=null;actor.currentHP=Math.min(actor.currentHP,stat(actor).hp);actor.righteous=0;if(actor.s.eidolon<4||actor.id!=='1213'||actor.outroarUntil===actor.turn)actor.outroar=0;if(actor.shield?.expires<=actor.turn)actor.shield=null;if(actor.avenShield?.expires<=actor.turn)actor.avenShield=null;if(G)G.endTurn(actor);activeActor=null;turnOwner=null;}
+    function finishTurn(actor){if(actor.extraTurnActive){sixthAction(actor);cerydraAction(actor);yukongAction(actor);settleHP();settleFinal();runUlts();activeActor=null;turnOwner=null;return;}if(actor.id==='1005'&&actor.s.novaflare)kafkaRecharge(actor);const sparkle=find('1306');if(sparkle?.s.novaflare&&!sparkle.defeated&&sparkle.spReserve>0&&sp<maxSP){const restored=Math.min(sparkle.spReserve,maxSP-sp);sparkle.spReserve-=restored;gainSP(restored);record(sparkle,'Искорка · SP из резерва');}if(actor.bronyaSpeedPending){actor.bronyaSpeedPending=false;buff(actor,'1101','bronyaE2',{speedPct:.3},1);}if(actor.id==='1413'&&actor.actionKind==='skill'&&actor.ode==='evernight')everGain(1);if(actor.id==='1409'&&actor.actionKind==='skill'&&actor.odeSky>0)actor.odeSky--;expireBangers(actor);actor.bangers=(actor.bangers||[]).filter(b=>b.expires>actor.turn);sixthAction(actor);cerydraAction(actor);yukongAction(actor);settleHP();settleFinal();runUlts();if(scenario.audit)for(const b of actor.buffs)if(b.expires<=actor.turn)record(actor,'Истёк эффект · '+b.key,0,'buff-expired');actor.buffs=actor.buffs.filter(b=>b.expires>actor.turn||actor.seeleExtraPending);const yk=find('1207');if(yk?.bow>0&&!(actor===yk&&yk.bowAcquiredTurn===yk.turn)){yk.bow--;if(!yk.bow)yk.bowCrit=false;record(yk,'Ревущая тетива · осталось '+yk.bow);}if(actor.dragonShield?.expires<=actor.turn)actor.dragonShield=null;actor.currentHP=Math.min(actor.currentHP,stat(actor).hp);actor.righteous=0;if(actor.s.eidolon<4||actor.id!=='1213'||actor.outroarUntil===actor.turn)actor.outroar=0;if(actor.shield?.expires<=actor.turn)actor.shield=null;if(actor.avenShield?.expires<=actor.turn)actor.avenShield=null;if(G)G.endTurn(actor);activeActor=null;turnOwner=null;}
     // The same modeled ally-targeted ultimates qualify for both team relics.
     const allyUltimates=new Set(['1101','1104','1105','1110','1202','1211','1215','1217','1313','1503','1512','8009','1009','1306','8005','1303','1309']);
     function allyUltimateRelics(actor){
@@ -1825,7 +3012,7 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
         buff(ally,'114','messenger',{speedPct:.12},1);
       if(G.has(actor,'118',4))for(const ally of actors)buff(ally,'118','watchmaker',{breakEffect:.3},2);
     }
-    function afterUlt(actor){const ty=find('1202');if(ty?.s.eidolon>=1&&actor.buffs.some(b=>b.source===ty.id&&b.key==='benediction'&&b.expires>=actor.turn))buff(actor,ty.id,'tingyunE1',{speedPct:.2},1);const il=find('1213');if(il&&il!==actor&&il.s.eidolon>=6)il.ilPen=Math.min(3,(il.ilPen||0)+1);if(actor.id==='1413'&&actor.ode==='evernight')everGain(1);sixthAfterUlt(actor);sixthAction(actor);yukongAction(actor,actor.ultimateKey);const saber=find('1014');if(saber){resonance(saber,3);energy(saber,5);buff(saber,saber.id,'saberTalent',{damage:params(saber.id,'04')[2]},2);}const c=find('1412');if(c?.merit===actor.id&&!c.cUltUsed&&c.cCharge<8){c.cUltUsed=true;cCharge(c,1);}const m=find('1224');if(m?.master===actor.id&&actor.lastHeroAttackKey!==actor.ultimateKey)marchGain(m);allyUltimateRelics(actor);const t=form.active?null:find('1403');if(t&&(t!==actor||t.s.eidolon>=6)&&!(t.tribSeen||new Set()).has(actor.id)){t.tribSeen??=new Set();t.tribSeen.add(actor.id);t.followups++;energy(t,5);hit(t,0,allTargets(),'Трибби · бонус-атака',{followup:true,baseDamage:stat(t).hp*params(t.id,'04')[0],bonus:t.s.eidolon>=6?7.29:0});t.tribStacks=Math.min(3,(t.tribStacksUntil>t.turn?t.tribStacks||0:0)+1);t.tribStacksUntil=t.turn+3;afterAttack(t,false,'followup');}activeActor=null;}
+    function afterUlt(actor){if(actor.id==='1308'&&actor.acheronTechnique){actor.acheronTechnique=false;acheronGain(1,randomTarget(),'Четырёхфазное вознесение');}const ty=find('1202');if(ty?.s.eidolon>=1&&actor.buffs.some(b=>b.source===ty.id&&b.key==='benediction'&&b.expires>=actor.turn))buff(actor,ty.id,'tingyunE1',{speedPct:.2},1);const il=find('1213');if(il&&il!==actor&&il.s.eidolon>=6)il.ilPen=Math.min(3,(il.ilPen||0)+1);if(actor.id==='1413'&&actor.ode==='evernight')everGain(1);sixthAfterUlt(actor);sixthAction(actor);yukongAction(actor,actor.ultimateKey);const saber=find('1014');if(saber){resonance(saber,3);energy(saber,5);buff(saber,saber.id,'saberTalent',{damage:params(saber.id,'04')[2]},2);}const c=find('1412');if(c?.merit===actor.id&&!c.cUltUsed&&c.cCharge<8){c.cUltUsed=true;cCharge(c,1);}const m=find('1224');if(m?.master===actor.id&&actor.lastHeroAttackKey!==actor.ultimateKey)marchGain(m);allyUltimateRelics(actor);const t=form.active?null:find('1403');if(t&&(t!==actor||t.s.eidolon>=6)&&!(t.tribSeen||new Set()).has(actor.id)){t.tribSeen??=new Set();t.tribSeen.add(actor.id);t.followups++;beginAction(t);if(G)G.followupStart(t,actors);energy(t,5);hit(t,0,allTargets(),'Трибби · бонус-атака',{followup:true,toughness:5,baseDamage:stat(t).hp*params(t.id,'04')[0],bonus:t.s.eidolon>=6?7.29:0});t.tribStacks=Math.min(3,(t.tribStacksUntil>t.turn?t.tribStacks||0:0)+1);t.tribStacksUntil=t.turn+3;if(G)G.followupEnd(t);afterAttack(t,false,'followup');}activeActor=null;}
     function randomTarget(){const key='bounce-'+(activeActor?.id??'enemy');if(!boss)return pick(key,dummies.length);const targets=allTargets();return targets[pick(key,targets.length)]??0;}
     function enemyFor(actor){
       const targets=allTargets();
@@ -1833,21 +3020,323 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       return targets[0]??0;
     }
     function allTargets(){return dummies.map((_,i)=>i).filter(i=>!boss||dummies[i].hp>0);}
+    function markDebt(index){
+      if(numby.target!==undefined&&numby.target!==index)dummies[numby.target].topazE1=0;
+      numby.target=index;
+    }
+    function updateDebt(){
+      if(!numby||find('1112').defeated)return;
+      const targets=allTargets();
+      if(targets.length&&!targets.includes(numby.target))markDebt(targets[pick('topaz-debt',targets.length)]);
+    }
     function hookTalent(actor,targets){const burned=targets.filter(burning);if(!burned.length)return;hit(actor,params('1109','04')[0],burned,'Талант Хук · дополнительный урон',{kind:'additional'});energy(actor,params('1109','04')[1]);heal(actor,stat(actor).hp*.05);if(actor.s.eidolon>=4){const p=params('1109','02');const adjacent=[...new Set(burned.flatMap(i=>[i-1,i+1]))].filter(i=>i>=0&&i<dummies.length);applyBurn(actor,'hookBurn',adjacent,1,p[3],p[2]+1);}}
-    function bladeEnhanced(actor){actor.actionKind='basic';if(G)G.beforeBasic(actor);const p=data.character_skills['120508'].params[actor.s.eidolon>=5?6:5];loseHP(actor,stat(actor).hp*p[0]);energy(actor,30);const s=stat(actor);hit(actor,0,[0],'Частокол мечей',{baseDamage:s.atk*p[1]+s.hp*p[3]});if(dummies.length>1)hit(actor,0,allTargets().slice(1,3),'Частокол мечей · соседние цели',{baseDamage:s.atk*p[2]+s.hp*p[4]});afterAttack(actor);if(G)G.afterBasic(actor);if(!maxToughness||dummies.slice(0,3).some(d=>d.toughness===0))heal(actor,s.hp*.05+100);bladeFollow(actor);}
-    function lordTurn(){const actor=find('1204'),p=params('1204','04'),hits=lord.hits;actor.followups++;if(G)G.followupStart(actor,actors);for(let i=0;i<hits;i++){const index=randomTarget();hit(actor,p[1],[index],'Повелитель молний · удар',{followup:true,group:true,extraCritDamage:hits>=6?.25:0});const adjacent=[index-1,index+1].filter(j=>j>=0&&j<dummies.length);if(adjacent.length)hit(actor,p[1]*(p[4]+(actor.s.eidolon>=1?.25:0)),adjacent,'Повелитель молний · соседние цели',{followup:true,group:true,extraCritDamage:hits>=6?.25:0});if(actor.s.eidolon>=4)energy(actor,2);if(actor.s.eidolon>=6)for(const target of [index,...adjacent])dummies[target].jingWeak=Math.min(3,(dummies[target].jingWeak||0)+1);}if(G)G.followupEnd(actor);afterAttack(actor,false,'followup');if(actor.s.eidolon>=2)buff(actor,actor.id,'jingE2',{},2);if(actor.s.eidolon>=6)for(const d of dummies)d.jingWeak=0;lord.hits=3;lord.distance=10000;lord.exUntil=actor.turn+4;runUlts();}
-    function numbyTurn(){const actor=find('1112'),enhanced=numby.enhanced>0;if(actor.s.eidolon>=4)actor.distance=Math.max(0,actor.distance-2000);numby.acting=true;numby.distance=10000;actor.followups++;hit(actor,params('1112','04')[1]+(enhanced?params('1112','03')[0]:0),[0],enhanced?'Счетовод · усиленная атака':'Счетовод · атака',{followup:true,extraCritDamage:enhanced?params('1112','03')[1]:0});if(enhanced){numby.enhanced--;energy(actor,10);}if(actor.s.eidolon>=2)energy(actor,5);afterAttack(actor,false,'followup');numby.acting=false;runUlts();}
+    function bladeEnhanced(actor){actor.actionKind='basic';if(G)G.beforeBasic(actor);const p=actor.s.novaflare?params(actor.id,'08',5):data.character_skills['120508'].params[actor.s.eidolon>=5?6:5];loseHP(actor,stat(actor).hp*p[0]);energy(actor,30);const s=stat(actor);hit(actor,0,[0],'Частокол мечей',{baseDamage:actor.s.novaflare?s.hp*p[1]+(actor.s.eidolon>=1?actor.hpLost*1.5:0):s.atk*p[1]+s.hp*p[3]});if(dummies.length>1)hit(actor,0,allTargets().slice(1,3),'Частокол мечей · соседние цели',{baseDamage:actor.s.novaflare?s.hp*p[2]:s.atk*p[2]+s.hp*p[4]});afterAttack(actor);if(G)G.afterBasic(actor);if(!actor.s.novaflare&&(!maxToughness||dummies.slice(0,3).some(d=>d.toughness===0)))heal(actor,s.hp*.05+100);bladeFollow(actor);}
+    function lordTurn(){const actor=find('1204'),p=params('1204','04'),hits=lord.hits;beginAction(actor);actor.followups++;if(G)G.followupStart(actor,actors);for(let i=0;i<hits;i++){const index=randomTarget();hit(actor,p[1],[index],'Повелитель молний · удар',{followup:true,group:true,extraCritDamage:hits>=6?.25:0});const adjacent=[index-1,index+1].filter(j=>j>=0&&j<dummies.length);if(adjacent.length)hit(actor,p[1]*(p[4]+(actor.s.eidolon>=1?.25:0)),adjacent,'Повелитель молний · соседние цели',{followup:true,group:true,extraCritDamage:hits>=6?.25:0});if(actor.s.eidolon>=4)energy(actor,2);if(actor.s.eidolon>=6)for(const target of [index,...adjacent])dummies[target].jingWeak=Math.min(3,(dummies[target].jingWeak||0)+1);}if(G)G.followupEnd(actor);afterAttack(actor,false,'followup');if(actor.s.eidolon>=2)buff(actor,actor.id,'jingE2',{},2);if(actor.s.eidolon>=6)for(const d of dummies)d.jingWeak=0;lord.hits=3;lord.distance=10000;lord.exUntil=actor.turn+4;runUlts();}
+    function numbyTurn(){if(!allTargets().length)return;const actor=find('1112'),enhanced=numby.enhanced>0;beginAction(actor);if(actor.s.eidolon>=4)actor.distance=Math.max(0,actor.distance-2000);numby.acting=true;numby.distance=10000;actor.followups++;hit(actor,params('1112','04')[1]+(enhanced?params('1112','03')[0]:0),[numby.target],enhanced?'Счетовод · усиленная атака':'Счетовод · атака',{followup:true,extraCritDamage:enhanced?params('1112','03')[1]:0});if(enhanced){numby.enhanced--;energy(actor,10);}if(actor.s.eidolon>=2)energy(actor,5);afterAttack(actor,false,'followup');numby.acting=false;if(actor.topazTechniqueEnergy){energy(actor,actor.topazTechniqueEnergy);actor.topazTechniqueEnergy=0;}runUlts();}
+    function techniqueHit(a,coefficient,targets=allTargets(),options={}){
+      return hit(a,coefficient,targets,'Техника · '+data.characters[a.id].name,
+        {kind:'technique',toughness:20,...options});
+    }
+    function techniqueDebuff(a,targets,key,duration,chance=1){
+      for(const i of targets)if(chanceOf('technique-'+key,effectChance(a,chance,i))){
+        dummies[i][key]=dummies[i].turn+duration;
+        debuffApplied(a,i);
+      }
+    }
+    function techniqueBuff(a,targets,values,duration){
+      for(const ally of targets)buff(ally,a.id,'technique',values,duration);
+    }
+    function techniqueFreeze(a,targets,chance,coefficient,hp=false){
+      for(const i of targets)if(chanceOf('technique-freeze',effectChance(a,chance,i))){
+        dummies[i].freeze={owner:a.id,coefficient,hp};
+        debuffApplied(a,i);
+      }
+    }
+    function openingSkill(a,target){
+      const previous=a.actionKind,oldTarget=a.openingTarget;
+      a.actionKind='skill';a.openingTarget=target;
+      beginAction(a);
+      if(['1412','1414'].includes(a.id))batchSkill(a,false,true);
+      else castRegularSkill(a,true);
+      if(G)G.afterSkill(a);
+      a.actionKind=previous;a.openingTarget=oldTarget;
+    }
+    function techniqueEffect(step){
+      const a=find(step.id),p=skill(a.id,'07')?.params?.[0]||[];
+      const target=find(step.ally)||focusFor(a),all=allTargets();
+      if(!all.length)return;
+      beginAction(a);a.actionKind='technique';
+      record(a,'Применение техники',0,'technique',null,{wave:boss?.phase||1,recipient:target.id});
+      const party=actors.filter(ally=>!ally.defeated);
+      switch(a.id){
+        case '1001':
+          reduceToughness(a,0,20);
+          techniqueFreeze(a,[randomTarget()],p[0],p[2]);break;
+        case '1002':case '1013':case '1401':
+          techniqueBuff(a,[a],{atk:p[0]},p[1]);break;
+        case '1003':
+          techniqueDebuff(a,all,'himekoFireVulnUntil',p[2],p[0]);break;
+        case '1004':
+          for(const i of all)if(chanceOf('technique-imprison',effectChance(a,p[0],i))){
+            dummies[i].imprisonedUntil=dummies[i].turn+1;
+            dummies[i].distance+=10000*p[1];debuffApplied(a,i);
+          }break;
+        case '1005':
+          techniqueHit(a,p[2]);
+          for(const i of allTargets())kafkaShock(a,i);break;
+        case '1006':
+          techniqueHit(a,p[0],all,{ignoreWeakness:true});break;
+        case '1008':case '1009':case '1206':case '1214':
+          techniqueHit(a,p[0]);
+          if(a.id==='1009')astaCharge(a,all);break;
+        case '1014':
+          techniqueBuff(a,[a],{atk:p[0]},p[1]);resonance(a,p[2]);break;
+        case '1015':
+          techniqueHit(a,p[0]);a.archerCharge+=p[1];a.resource=a.archerCharge;break;
+        case '1101':
+          techniqueBuff(a,party,{atk:p[0]},p[1]);break;
+        case '1102':
+          seeleBoost(a);
+          if(a.s.novaflare)techniqueHit(a,params(a.id,'02')[0],[randomTarget()],{guaranteedCrit:true,toughness:20});
+          break;
+        case '1103':
+          techniqueHit(a,p[3],[randomTarget()]);
+          for(const i of allTargets())if(chanceOf('technique-shock',effectChance(a,p[0],i))){
+            dummies[i].shock={owner:a.id,expires:dummies[i].turn+p[2],coefficient:p[1]};
+            debuffApplied(a,i);
+          }break;
+        case '1104':
+          for(const ally of party)ally.shield={amount:(stat(a).def*p[0]+p[2])*shieldScale(a),expires:ally.turn+p[1],source:a.id};
+          break;
+        case '1105':
+          techniqueHit(a,p[3],[randomTarget()]);
+          techniqueDebuff(a,allTargets(),'natashaWeakenUntil',p[2],p[0]);break;
+        case '1106':
+          techniqueHit(a,p[3],[randomTarget()]);
+          for(const i of allTargets())if(chanceOf('technique-pela',effectChance(a,p[0],i)))
+            applyDefenseDebuff(a,i,'pelaTechniqueUntil',p[2]);
+          break;
+        case '1107':
+          reduceToughness(a,0,20);a.counterAggroUntil=a.turn+p[0];break;
+        case '1108':
+          for(const d of dummies)d.distance+=10000*p[2];break;
+        case '1109':
+          techniqueHit(a,p[3],[randomTarget()]);
+          applyBurn(a,'hookBurn',allTargets(),p[0],p[1],p[2]);break;
+        case '1110':
+          for(const ally of party)ally.lynxHot={owner:a.id,expires:ally.turn+p[0]+1};break;
+        case '1111':{
+          const index=randomTarget();techniqueHit(a,p[0],[index]);
+          if(allTargets().includes(index)&&chanceOf('technique-bleed',effectChance(a,p[1],index))){
+            const q=params(a.id,'02');dummies[index].lukaBleed={owner:a.id,expires:dummies[index].turn+q[4],coefficient:q[3]};debuffApplied(a,index);
+          }a.will=Math.min(4,(a.will||0)+1);break;
+        }
+        case '1112':a.topazTechniqueEnergy=p[0];break;
+        case '1201':drawTile(a,p[0]);break;
+        case '1202':
+          for(let n=0;n<(step.uses||1);n++)energy(a,p[0]/stat(a).energyRegen);break;
+        case '1203':a.flowers=1;luochaFlower(a);break;
+        case '1204':lordAdd(a,p[0],0);break;
+        case '1205':
+          loseHP(a,stat(a).hp*p[1]);
+          techniqueHit(a,a.s.novaflare?0:p[0],all,{baseDamage:a.s.novaflare?stat(a).hp*p[0]:undefined});break;
+        case '1207':a.bow=p[2];a.bowAcquiredTurn=a.turn;break;
+        case '1208':{
+          const hp=stat(a).hp,before=party.map(ally=>stat(ally).hp);
+          a.matrixHP=hp*params(a.id,'02')[3];a.matrixUntil=a.turn+p[1];a.matrixCCUsed=false;
+          party.forEach((ally,i)=>ally.currentHP+=stat(ally).hp-before[i]);break;
+        }
+        case '1209':a.yanTechniqueUntil=a.turn+p[2];break;
+        case '1210':
+          for(let n=0;n<p[1]&&allTargets().length;n++){
+            const i=randomTarget();techniqueHit(a,p[0],[i],{toughness:5});
+            if(allTargets().includes(i)&&chanceOf('technique-firekiss',effectChance(a,p[2],i)))firekiss(i);
+          }break;
+        case '1211':
+          for(const ally of party){ally.vigorUntil=ally.turn+p[0]+1;ally.vigorHeals=params(a.id,'04')[4]+1;}break;
+        case '1212':
+          energy(a,p[5]);jingliuGain(a,p[0]);
+          techniqueFreeze(a,all,p[1],p[4],a.s.novaflare);break;
+        case '1213':
+          techniqueHit(a,p[2]);a.squama=(a.squama||0)+p[0];a.resource=a.squama;break;
+        case '1215':
+          reduceToughness(a,0,20);a.burden=randomTarget();a.burdenHits=0;a.burdenRefunds=0;
+          debuffApplied(a,a.burden);break;
+        case '1217':techniqueDebuff(a,all,'huohuoAtkUntil',p[2],p[0]);break;
+        case '1218':techniqueHit(a,p[0]);ash(a,allTargets(),p[2]);break;
+        case '1220':
+          a.resource=Math.min(12,a.resource+p[3]);
+          techniqueHit(a,p[2],all,{guaranteedCrit:true});break;
+        case '1221':
+          buff(a,a.id,'yunliTechnique',{damage:p[0]},1);
+          yunliCounter(a,true,randomTarget());
+          a.buffs=a.buffs.filter(b=>b.key!=='yunliTechnique');break;
+        case '1222':
+          fuyuan.actions=params(a.id,'04')[6];fuyuan.distance=10000;a.fuyuanActive=true;
+          techniqueDebuff(a,all,'befogUntil',p[0]);break;
+        case '1223':techniqueBuff(a,[a],{damage:p[1]},p[2]);break;
+        case '1224':energy(a,p[1]);break;
+        case '1225':
+          a.distance=Math.max(0,a.distance-10000*p[3]);techniqueDebuff(a,all,'fugueDefUntil',p[2],p[1]);break;
+        case '1301':
+          techniqueDebuff(a,all,'besottedUntil',p[0]);techniqueHit(a,p[1]);break;
+        case '1302':techniqueHit(a,p[1]);energy(a,p[2]);break;
+        case '1303':openingSkill(a,target);energy(a,30);break;
+        case '1304':
+          techniqueBuff(a,party,{def:p[step.outcome??0]},p[3]);break;
+        case '1305':techniqueDebuff(a,all,'ratioTechniqueSlowUntil',p[3],p[1]);break;
+        case '1306':
+          gainSP(p[0]);if(a.s.novaflare)energy(a,p[1]);break;
+        case '1307':
+          for(const i of all){let chance=p[0],count=0;
+            while(count++<64&&chanceOf('technique-arcana',effectChance(a,chance,i))){
+              arcanaAdd(i,1,1,true);chance*=p[1];
+            }
+          }break;
+        case '1308':
+          techniqueHit(a,p[0],all,{ignoreWeakness:true});a.acheronTechnique=true;break;
+        case '1309':energy(a,p[1]);break;
+        case '1310':
+          for(const i of all)implantWeakness(i,'Fire',p[2]);
+          techniqueHit(a,p[1]);break;
+        case '1312':a.mishaHits+=p[1];a.resource=a.mishaHits;break;
+        case '1313':a.sundayTechnique=true;break;
+        case '1314':
+          techniqueHit(a,p[1]);a.pawn=Math.min(50,(a.pawn||0)+p[2]);break;
+        case '1315':a.boothillTechnique=true;break;
+        case '1317':
+          energy(a,p[3]);
+          for(const i of all){
+            reduceToughness(a,i,p[4],{ignoreWeakness:true});
+            breakDamage(a,i,p[1],'Imaginary','Техника Раппы · урон пробития');
+            for(const j of all.filter(j=>Math.abs(j-i)===1))
+              breakDamage(a,j,p[2],'Imaginary','Техника Раппы · соседняя цель');
+          }break;
+        case '1321':a.dahliaUntil=a.turn+3;break;
+        case '1402':
+          spawnMemory(a.id);energy(a,p[1]);techniqueHit(a,p[0]);
+          if(allTargets().length)dummies[randomTarget()].stitch=true;break;
+        case '1403':a.sanctifyUntil=a.turn+p[0];break;
+        case '1404':
+          techniqueHit(a,0,all,{baseDamage:stat(a).hp*p[1]});
+          techniqueDebuff(a,allTargets(),'tauntUntil',p[3]);a.mydeiCharge=(a.mydeiCharge||0)+p[4];break;
+        case '1405':{
+          const entry=(scenario.prebattle||[]).find(step=>techniqueType(step.id)==='attack');
+          const element=data.characters[entry?.id||core.id].element;
+          for(const i of all)implantWeakness(i,element,p[1]);break;
+        }
+        case '1406':{
+          const before=a.bank||0;techniqueHit(a,p[2]);
+          a.bank=(a.bank||0)+((a.bank||0)-before)*p[1];break;
+        }
+        case '1407':{
+          const m=spawnMemory(a.id);m.unit.currentHP=34000*p[1];m.distance=0;
+          for(const ally of party)loseHP(ally,ally.currentHP*p[0]);
+          a.resource=34000*p[3];break;
+        }
+        case '1408':
+          for(const ally of party)energy(ally,p[2]);
+          phainonGain(p[1]);gainSP(p[3]);techniqueHit(a,p[0]);break;
+        case '1409':
+          techniqueBuff(a,party,{hp:p[2]},p[3]);
+          for(const ally of party)heal(ally,stat(a).hp*p[0]+p[1],a);break;
+        case '1410':
+          for(let n=0;n<p[2];n++)hysiApply(all);break;
+        case '1412':case '1414':openingSkill(a,target);break;
+        case '1413':a.everSkillUntil=a.turn+2;everGain(p[0]);break;
+        case '1415':a.cyreneZoneUntil=a.turn+2;break;
+        case '1501':gainSP(p[0]);techniqueHit(a,p[1]);break;
+        case '1502':a.yaoZoneUntil=a.turn+3;punch(3);break;
+        case '1503':
+          if(target===a)throw Error('Жемчуг не может передать образец себе.');
+          addBanger(a,p[1]);a.pearlLearn=p[0];a.pearlModel=target.id;break;
+        case '1504':techniqueHit(a,p[1]);a.ashCharge=(a.ashCharge||0)+p[2];break;
+        case '1505':techniqueHit(a,p[0]);addBanger(a,p[1]);break;
+        case '1506':
+          elationHit(a,params(a.id,'03')[2]/all.length,all,'Техника · Премиальная коробочка',p[0],{kind:'technique'});break;
+        case '1507':
+          techniqueDebuff(a,all,'tauntUntil',1);a.mortTechniqueUntil=a.turn+p[1];break;
+        case '1508':a.gems=Math.min(33,a.gems+p[0]);a.resource=a.gems;break;
+        case '1509':techniqueHit(a,p[1]);enthusiasm(p[2]);break;
+        case '1510':a.navUntil=a.turn+3;a.assistUses=a.s.eidolon>=2?2:1;break;
+        case '1512':
+          a.distance=Math.max(0,a.distance-10000*p[2]);mood(a,p[0],a);
+          techniqueBuff(a,party,{damage:p[1]},2);break;
+        case '1513':techniqueHit(a,p[0]);waveFervor(a,p[1]);addBanger(a,p[2]);break;
+        case '8001':
+          for(const ally of party)heal(ally,stat(ally).hp*p[0],a);break;
+        case '8003':
+          a.trailShield={amount:(stat(a).def*p[0]+p[1])*shieldScale(a),expires:a.turn+p[2],source:a.id};break;
+        case '8005':techniqueBuff(a,party,{breakEffect:p[0]},p[1]);break;
+        case '8007':
+          for(const d of dummies)d.distance+=10000*p[1];
+          techniqueHit(a,p[2],all,{element:'Ice'});break;
+        case '8009':techniqueBuff(a,party,{elation:p[step.outcome===1?0:2]},p[4]);break;
+        default:throw Error('Нет обработчика техники '+a.id);
+      }
+      const dahliaStep=scenario.prebattle?.find(step=>step.id==='1321');
+      if(dahliaStep)for(const [key,hits] of Object.entries(a.breakHits||{})){
+        const index=Number(key);
+        if(hits.broken>0)
+          creditBreak(a,index,breakBase*hits.broken/10*.6*breakMultiplier(a,index),
+            'Георгина · суперпробитие начала боя','superbreak');
+      }
+      a.attackTargets=null;a.breakHits={};activeActor=null;
+    }
+    function applyOpeningTechniques(){
+      const steps=scenario.prebattle||[];
+      const cost=steps.reduce((sum,step)=>sum+(step.uses||1)*(['1408','1510'].includes(step.id)?2:step.id==='1506'?0:1),0);
+      const budget=5+(find('1408')?3:0)+(find('1510')?3:0);
+      if(cost>budget)throw Error('Для подготовки нужно '+cost+' очков техники, доступно '+budget+'.');
+      const ordered=[...steps.filter(step=>techniqueType(step.id)!=='attack'),...steps.filter(step=>techniqueType(step.id)==='attack')];
+      for(const step of ordered)techniqueEffect(step);
+      if(steps.length&&allTargets().length&&!steps.some(step=>techniqueType(step.id)==='attack')){
+        const initiator=find(scenario.entryId)||core;
+        beginAction(initiator);initiator.actionKind='technique';
+        reduceToughness(initiator,allTargets()[0],20);
+        record(initiator,'Начало боя обычной атакой',0,'entry');
+        initiator.attackTargets=null;initiator.breakHits={};activeActor=null;
+      }
+      const march=find('1224');
+      if(march&&steps.length)marchGain(march,Math.min(3,steps.reduce((sum,step)=>sum+(step.uses||1),0)));
+      settleHP();
+    }
+    // Nested actions may interrupt another actor (or the same actor). Restore
+    // the interrupted bookkeeping after the complete handler, including hooks.
+    runUlts=isolatedAction(runUlts);
+    aventFollow=isolatedAction(aventFollow);
+    sixthAfterAttack=isolatedAction(sixthAfterAttack);
+    cerydraAction=isolatedAction(cerydraAction);
+    feixiaoFollow=isolatedAction(feixiaoFollow);
+    ratioFollow=isolatedAction(ratioFollow);
+    kafkaFollow=isolatedAction(kafkaFollow);
+    hertaFollow=isolatedAction(hertaFollow);
+    bladeFollow=isolatedAction(bladeFollow);
+    jadeFollow=isolatedAction(jadeFollow);
+    mozeFollow=isolatedAction(mozeFollow);
+    marchFollow=isolatedAction(marchFollow);
+    yunliCounter=isolatedAction(yunliCounter);
+    fuyuanTurn=isolatedAction(fuyuanTurn);
+    novaAssist=isolatedAction(novaAssist);
     // Standing dummies stay at 100% HP. Optional toughness is restored on their turn;
     // take turns for DoT/debuff durations, and never attack or die.
     if(find('1303'))for(const actor of actors)if(actor.id!=='1303')buff(actor,'1303','ruanSpeed',{speedPct:params('1303','04')[0]},100000);
     if(find('1403')){energy(find('1403'),30);find('1403').tribSeen=new Set();}
     if(find('1410')){find('1410').hysiUntil=3;gainSP();}
     if(find('1308'))dummies[0].knots=5;
-    if(find('1307'))for(const i of allTargets())arcanaAdd(i);
+    if(find('1307'))blackSwanEntry(find('1307'));
+    const novaWolf=find('1006');
+    if(novaWolf?.s.novaflare){energy(novaWolf,20);if(novaWolf.s.eidolon>=2)for(const enemy of dummies)enemy.swE2=true;}
     if(find('1401')){for(const i of allTargets())interpret(i);interpret(randomTarget(),25);}
     if(find('1304'))aventShield(find('1304'));
     if(find('1314')){find('1314').pawn=dummies.length;find('1314').distance=Math.max(0,find('1314').distance-5000);}
-    if(find('1217'))find('1217').divineUntil=1;
+    const huohuo=find('1217');
+    if(huohuo?.s.novaflare){energy(huohuo,30);huohuoProvision(huohuo,2);}
+    else if(huohuo){huohuo.divineUntil=1;huohuo.divineCleanses=6;}
+    const kafka=find('1005');
+    if(kafka?.s.novaflare)kafka.resource=kafka.kafkaCharges=params(kafka.id,'04')[4];
+    const welt=find('1004');
+    if(welt?.s.novaflare)energy(welt,30);
     for(const [id,amount] of [['1213',15],['1218',15],['1313',25]])if(find(id))energy(find(id),amount);
     const isCompanion=actor=>actor.id==='1510'||companions.has(actor.id);
     if(G)for(const actor of actors)if(G.has(actor,'327'))
@@ -1857,15 +3346,17 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
     if(find('1208'))find('1208').reversals=1;
     if(find('1302')){const argenti=find('1302');if(argenti.s.eidolon>=4)argenti.apotheosis=2;energy(argenti,2*dummies.length);}
     if(find('1001')?.s.eidolon>=2){const march=find('1001'),target=[...actors].sort((a,b)=>a.currentHP/stat(a).hp-b.currentHP/stat(b).hp)[0];target.marchShield={amount:(stat(march).def*.24+320)*shieldScale(march),expires:target.turn+3,source:march.id};record(march,'Март 7 E2 · начальный щит');}
+    const novaSparkle=find('1306');if(novaSparkle?.s.novaflare&&novaSparkle.s.eidolon>=1)buff(novaSparkle,novaSparkle.id,'sparkleNovaSpeed',{speedPct:.15},2);
     if(find('1309'))find('1309').distance=Math.max(0,find('1309').distance-2500);
     if(find('1210'))find('1210').distance=Math.max(0,find('1210').distance-2500);
     if(find('1103'))energy(find('1103'),15);if(find('1204'))energy(find('1204'),15);
-    if(find('1310'))find('1310').energy=Math.max(120,find('1310').energy);if(find('1111')){const luka=find('1111');luka.will=1;if(luka.s.eidolon>=4)luka.lukaE4=1;}if(find('1003')&&maxToughness)find('1003').himekoCharges=1;if(find('1321')){const a=find('1321');a.partner=core===a?focusFor(a).id:core.id;energy(a,35);dahliaBless(1);}
+    if(find('1310'))find('1310').energy=Math.max(120,find('1310').energy);if(find('1111')){const luka=find('1111');luka.will=1;if(luka.s.eidolon>=4)luka.lukaE4=1;}if(find('1003'))find('1003').himekoCharges=1;if(find('1321')){const a=find('1321');a.partner=core===a?focusFor(a).id:core.id;energy(a,35);dahliaBless(1);}
     if(find('1014')){const a=find('1014');a.energy=Math.max(216,a.energy);a.manaBurst=true;resonance(a,1);}if(find('1015')){find('1015').archerCharge=1;find('1015').resource=1;}if(find('1404')){const a=find('1404'),extra=Math.min(4000,Math.max(0,stat(a).hp-4000));a.mydeiCrit=extra*.00012;a.mydeiHeal=extra*.000075;}if(find('1414'))find('1414').distance=6000;if(find('1223')){const a=find('1223');a.distance=7000;if(a.s.eidolon>=1)energy(a,20);}if(find('1224'))find('1224').distance=7500;
     if(find('1404')?.s.eidolon>=6){const a=find('1404');a.vendettaHP=stat(a).hp*.5;a.vendetta=true;a.currentHP+=a.vendettaHP;record(a,'Мидей E6 · Кровная месть в начале боя');}
     if(find('8005')?.s.eidolon>=2)buff(find('8005'),'8005','hmcE2',{energyRegen:.25},3);
     if(find('1402'))find('1402').energy=Math.max(175,find('1402').energy);if(find('1408')){find('1408').resource=find('1408').s.eidolon>=6?7:1;find('1408').phainonAtkStacks=1;}if(find('8001'))energy(find('8001'),15);if(find('8003')?.s.eidolon>=4)find('8003').magma=4;if(find('1312')){find('1312').mishaHits=3;find('1312').resource=3;}
     sixthInit();finalInit();
+    if(find('1101'))for(const ally of actors)buff(ally,'1101','bronyaOpeningDefense',{def:.2},2);
     if(find('1315')?.s.eidolon>=1)find('1315').pocket=1;
     if(find('1317')?.s.eidolon>=6)find('1317').rappaCharges=5;
     if(find('1401')?.s.eidolon>=2)find('1401').inspiration=1;
@@ -1874,8 +3365,25 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
     const ratio=find('1305');if(ratio?.s.eidolon>=1)ratio.ratioStacks=4;
     const gallagher=find('1301');if(gallagher?.s.eidolon>=1){gallagher.s.effectRes+=.5;energy(gallagher,20);}
     if(aeon){aeon.distance=7000;aeon.energy=0;aeon.resource=aeon.s.eidolon>=1?5:0;}
+    if(G){
+      if(actors.some(actor=>G.has(actor,'330')&&stat(actor).speed>=145-1e-9))subspaceBreakEffect=.18;
+      for(const actor of actors){
+        if(G.has(actor,'329')&&elation(actor)>=.4-1e-9){
+          actor.distance=Math.max(0,actor.distance-4000);
+          if(scenario.audit)record(actor,'Миг радости бога · продвижение действия на 40%',0,'advance');
+        }
+      }
+      if(subspaceBreakEffect&&scenario.audit)record(null,'Подпространственный центр · эффект пробития команды +18%',0,'buff');
+    }
     if(boss)record(null,'Гепард · фаза 1 · призваны стражи',0,'phase',null,{targets:[0,1,2]});
     for(const actor of actors)refreshPunklorde(actor);
+    applyOpeningTechniques();
+    for(const status of scenario.initialDebuffs||[]){
+      const actor=find(status.id);
+      actor.debuffs??=[];
+      actor.debuffs.push({...status,expires:actor.turn+status.turns});
+      record(actor,'Начальное ослабление · '+status.kind,0,'debuff');
+    }
     const initialStats=Object.fromEntries(actors.map(a=>[a.id,stat(a)]));runUlts();
     const checkpoints=(scenario.sampleCycles||[]).map(cycles=>({cycles,av:150+(cycles-1)*100}));
     let sampleIndex=0;
@@ -1884,23 +3392,42 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
         checkpoints[sampleIndex++].total=actors.reduce((sum,a)=>sum+a.total,0);
       }
     }
-    while(now<horizon-1e-9&&(!boss||boss.result==='timeout')&&steps++<10000){
-      let next=actors[0],delta=Infinity;
-      for(const actor of actors){const dt=form.active||actor.departed||actor.defeated||(actor.id==='1309'&&actor.concertoUntil>now)||(actor.id==='1512'&&actor.fever)?Infinity:actor.distance/stat(actor).speed;if(dt<delta-1e-9){delta=dt;next=actor;}}
-      const lordDelta=lord&&!form.active?lord.distance/(60+10*(lord.hits-3)):Infinity,lordNext=lordDelta<delta-1e-9;if(lordNext)delta=lordDelta;
-      const numbyDelta=numby&&!form.active?numby.distance/80:Infinity,numbyNext=numbyDelta<delta-1e-9;if(numbyNext)delta=numbyDelta;
-      const fuyuanDelta=fuyuan?.actions>0&&!form.active?fuyuan.distance/90:Infinity,fuyuanNext=fuyuanDelta<delta-1e-9;if(fuyuanNext)delta=fuyuanDelta;
-      const dragonDelta=dragon?.active&&!form.active?dragon.distance/165:Infinity,dragonNext=dragonDelta<delta-1e-9;if(dragonNext)delta=dragonDelta;
-      const ff=find('1310'),combustDelta=ff?.combustionUntil>now&&!form.active?ff.combustionUntil-now:Infinity,combustNext=combustDelta<delta-1e-9;if(combustNext)delta=combustDelta;
-      const robin=find('1309'),concertDelta=robin?.concertoUntil>now&&!form.active?robin.concertoUntil-now:Infinity,concertNext=concertDelta<delta-1e-9;if(concertNext)delta=concertDelta;
-      let memoryNext=null;for(const m of memories)if(m.active&&!form.active&&memoSpeed(m)>0){const dt=m.distance/memoSpeed(m);if(dt<delta-1e-9){delta=dt;memoryNext=m;}}const ag=find('1402'),supremeDelta=ag?.supremeUntil>now&&!form.active?ag.supremeUntil-now:Infinity,supremeNext=supremeDelta<delta-1e-9;if(supremeNext)delta=supremeDelta;const formDelta=form.active?form.distance/(phainonSpeed(find('1408'))):Infinity,formNext=formDelta<delta-1e-9;if(formNext)delta=formDelta;
-      const ahaDelta=elationActors.length&&!form.active?aha.distance/ahaSpeed():Infinity,ahaNext=ahaDelta<delta-1e-9;if(ahaNext)delta=ahaDelta;const mb=find('1507'),rageDelta=mb?.rageUntil>now&&!form.active?mb.rageUntil-now:Infinity,rageNext=rageDelta<delta-1e-9;if(rageNext)delta=rageDelta;
-      const summer=find('1512'),summerDelta=summer?.fever&&!form.active?summer.summerDistance/140:Infinity,summerNext=summerDelta<delta-1e-9;if(summerNext)delta=summerDelta;
-      const dummySpeed=targetSpeed;let dummyIndex=-1,dummyDelta=Infinity;
-      for(const i of allTargets()){const dt=dummies[i].distance/dummySpeed(i);if(dt<dummyDelta-1e-9){dummyIndex=i;dummyDelta=dt;}}
-      const dummyNext=dummyDelta<delta-1e-9;if(dummyNext)delta=dummyDelta;
+    while(now<=horizon+1e-9&&(!boss||boss.result==='timeout')){
+      settleFinal();
+      if(boss){settleEncounter();if(boss.result!=='timeout')break;}
+      const seele=find('1102');
+      if(seele?.seeleExtraPending&&!seele.defeated&&!form.active){
+        if(steps++>=10000)timeline.limit('events',10000);
+        eventSerial++;
+        seeleExtraTurn(seele);
+        continue;
+      }
+      if(extraTurns.length&&!form.active){if(steps++>=10000)timeline.limit('events',10000);eventSerial++;takeExtraTurn(extraTurns.shift());continue;}
+      // Keep one winner: an earlier candidate must never leave a stale flag.
+      const ff=find('1310'),robin=find('1309'),ag=find('1402'),mb=find('1507'),summer=find('1512');
+      const candidates=actors.map(actor=>({kind:'actor',actor,delta:form.active||actor.departed||actor.defeated||(actor.id==='1309'&&actor.concertoUntil>now)||(actor.id==='1512'&&actor.fever)?Infinity:actor.distance/stat(actor).speed}));
+      const schedule=(kind,delta,extra={})=>candidates.push({kind,delta,...extra});
+      schedule('lord',lord&&!find('1204').defeated&&!controlled(find('1204'))&&!form.active?lord.distance/(60+10*(lord.hits-3)):Infinity);
+      schedule('numby',numby&&!find('1112').defeated&&!form.active?numby.distance/80:Infinity);
+      schedule('fuyuan',fuyuan?.actions>0&&!find('1222').defeated&&!form.active?fuyuan.distance/90:Infinity);
+      schedule('dragon',dragon?.active&&!find('1414').defeated&&!form.active?dragon.distance/165:Infinity);
+      schedule('combust',ff?.combustionUntil>now&&!form.active?ff.combustionUntil-now:Infinity);
+      schedule('concert',robin?.concertoUntil>now&&!form.active?robin.concertoUntil-now:Infinity);
+      for(const m of memories)if(m.active&&!form.active&&memoSpeed(m)>0)schedule('memory',m.distance/memoSpeed(m),{memory:m});
+      schedule('supreme',ag?.supremeUntil>now&&!form.active?ag.supremeUntil-now:Infinity);
+      schedule('form',form.active?form.distance/phainonSpeed(find('1408')):Infinity);
+      schedule('aha',elationActors.length&&!form.active?aha.distance/ahaSpeed():Infinity);
+      schedule('rage',mb?.rageUntil>now&&!form.active?mb.rageUntil-now:Infinity);
+      schedule('summer',summer?.fever&&!form.active?summer.summerDistance/140:Infinity);
+      const dummySpeed=targetSpeed;
+      for(const index of allTargets())schedule('dummy',dummies[index].distance/dummySpeed(index),{index});
+      const selected=timeline.select(candidates);
+      if(!selected)break;
+      const delta=selected.delta,next=selected.actor,memoryNext=selected.memory,dummyIndex=selected.index;
+      const dummyNext=selected.kind==='dummy',summerNext=selected.kind==='summer',ahaNext=selected.kind==='aha',rageNext=selected.kind==='rage',formNext=selected.kind==='form',supremeNext=selected.kind==='supreme',combustNext=selected.kind==='combust',concertNext=selected.kind==='concert',dragonNext=selected.kind==='dragon',fuyuanNext=selected.kind==='fuyuan',numbyNext=selected.kind==='numby',lordNext=selected.kind==='lord';
       captureBefore(now+delta);
       if(now+delta>horizon+1e-8)break;
+      if(steps++>=10000)timeline.limit('events',10000);
       if(form.active){form.distance=Math.max(0,form.distance-delta*phainonSpeed(find('1408')));for(const a of actors){if(a.concertoUntil>now)a.concertoUntil+=delta;if(a.combustionUntil>now)a.combustionUntil+=delta;if(a.supremeUntil>now)a.supremeUntil+=delta;if(a.rageUntil>now)a.rageUntil+=delta;}}else for(const m of memories)if(m.active&&memoSpeed(m)>0)m.distance=Math.max(0,m.distance-delta*memoSpeed(m));
       if(!form.active&&summer?.fever)summer.summerDistance=Math.max(0,summer.summerDistance-delta*140);
       if(!form.active&&elationActors.length)aha.distance=Math.max(0,aha.distance-delta*ahaSpeed());
@@ -1908,7 +3435,8 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       if(!form.active&&fuyuan?.actions>0)fuyuan.distance=Math.max(0,fuyuan.distance-delta*90);
       for(const actor of actors)if(!form.active&&!actor.departed&&!(actor.id==='1309'&&actor.concertoUntil>now)&&!(actor.id==='1512'&&actor.fever))actor.distance=Math.max(0,actor.distance-delta*stat(actor).speed);if(lord&&!form.active)lord.distance=Math.max(0,lord.distance-delta*(60+10*(lord.hits-3)));if(numby&&!form.active)numby.distance=Math.max(0,numby.distance-delta*80);for(let i=0;i<dummies.length;i++)dummies[i].distance=Math.max(0,dummies[i].distance-delta*dummySpeed(i));now+=delta;
       eventSerial++;
-      if(dummyNext){activeActor=null;enemySerial++;enemyPhase=true;enemyIndex=dummyIndex;const d=dummies[dummyIndex],canAttack=!(maxToughness&&d.toughness===0)&&!d.freeze;for(const enemy of dummies)enemy.hysiCount=0;d.distance=10000;if(maxToughness){if(d.rebloom&&d.toughness===0){const m=find(d.rebloom.owner);d.rebloom=null;d.rebloomLock=true;d.distance=10000*(.1+.2*breakValue(m));breakDamage(m,dummyIndex,.5,'Ice','Цветение Жуань Мэй');record(m,'Цветение · восстановление стойкости отложено');enemyPhase=false;enemyIndex=-1;continue;}breakTick(dummyIndex);if(d.toughness===0){if(d.breakFrozen){d.breakFrozen=false;d.distance=5000;record(null,'Заморозка пробития · восстановление отложено');}else{d.toughness=maxToughness;d.exo=0;d.rebloomLock=false;record(null,'Стойкость восстановлена · цель '+(dummyIndex+1));}}}const jiao=find('1218');if(jiao&&jiao.jiaoZoneUntil>jiao.turn&&(jiao.jiaoTriggers||0)<6){jiao.jiaoTriggers=(jiao.jiaoTriggers||0)+1;ash(jiao,[dummyIndex],params('1218','03')[1]);record(jiao,'Зона Цзяоцю · активация '+jiao.jiaoTriggers);}const swan=find('1307');if(swan?.s.eidolon>=4&&d.epiphanyUntil>d.turn&&!d.swanEnergyUsed){d.swanEnergyUsed=true;energy(swan,8);}for(const key of dotKeys)if(d[key])dotHit(dummyIndex,key,1,key==='arcana'?'Тик Аркана':burnKeys.includes(key)?'Тик Горения':'Тик DoT',true);if(d.freeze){const freezer=find(d.freeze.owner);if(freezer?.id==='1104'&&freezer.s.eidolon>=2)d.gepardSlowUntil=d.turn+2;hit(freezer,d.freeze.coefficient,[dummyIndex],'Заморозка · урон',{kind:'additional',fixedCritical:1});d.freeze=null;d.distance=5000;record(null,'Разморозка · продвижение 50%');}d.turn++;d.sublimation=false;for(const key of dotKeys)if(d[key]?.expires<=d.turn)d[key]=null;record(null,'Ход болванки '+(dummyIndex+1));if(canAttack&&(!maxToughness||d.toughness>0)&&!form.active){if(boss&&d.hp>0)bossTurn(dummyIndex);else if(!boss&&scenario.enemyAttacks==='training')trainingAttack(dummyIndex);}enemyPhase=false;enemyIndex=-1;runUlts();}
+      if(scenario.audit)record(selected.actor||selected.memory?.owner||null,'Очередь · '+selected.kind,0,'scheduled',null,{scheduledKind:selected.kind,selectedDelta:delta,queueIndex:selected.index??null});
+      if(dummyNext){activeActor=null;enemySerial++;enemyPhase=true;enemyIndex=dummyIndex;const d=dummies[dummyIndex],canAttack=!(maxToughness&&d.toughness===0)&&!d.freeze;for(const enemy of dummies)enemy.hysiCount=0;d.distance=10000;if(maxToughness){if(d.rebloom&&d.toughness===0){const m=find(d.rebloom.owner);d.rebloom=null;d.rebloomLock=true;d.distance=10000*(.1+.2*breakValue(m));breakDamage(m,dummyIndex,.5,'Ice','Цветение Жуань Мэй');record(m,'Цветение · восстановление стойкости отложено');enemyPhase=false;enemyIndex=-1;continue;}breakTick(dummyIndex);if(d.toughness===0){if(d.breakFrozen){d.breakFrozen=false;d.distance=5000;record(null,'Заморозка пробития · восстановление отложено');}else{d.toughness=maxToughness;d.exo=0;d.rebloomLock=false;record(null,'Стойкость восстановлена · цель '+(dummyIndex+1));}}}const jiao=find('1218');if(jiao&&jiao.jiaoZoneUntil>jiao.turn&&(jiao.jiaoTriggers||0)<6){jiao.jiaoTriggers=(jiao.jiaoTriggers||0)+1;ash(jiao,[dummyIndex],params('1218','03')[1]);record(jiao,'Зона Цзяоцю · активация '+jiao.jiaoTriggers);}swanEpiphanyEnergy(d);for(const key of dotKeys)if(d[key])dotHit(dummyIndex,key,1,key==='arcana'?'Тик Аркана':burnKeys.includes(key)?'Тик Горения':'Тик DoT',true);if(d.freeze){const freezer=find(d.freeze.owner);if(freezer?.id==='1104'&&freezer.s.eidolon>=2)d.gepardSlowUntil=d.turn+2;hit(freezer,d.freeze.coefficient,[dummyIndex],'Заморозка · урон',{kind:'additional',fixedCritical:1,baseDamage:d.freeze.hp?stat(freezer).hp*d.freeze.coefficient:undefined});d.freeze=null;d.distance=5000;record(null,'Разморозка · продвижение 50%');}d.turn++;d.sublimation=false;for(const key of dotKeys)if(d[key]?.expires<=d.turn)d[key]=null;record(null,'Ход болванки '+(dummyIndex+1));if(canAttack&&(!maxToughness||d.toughness>0)&&!form.active){if(boss&&d.hp>0)bossTurn(dummyIndex);else if(!boss&&scenario.enemyAttacks==='training')trainingAttack(dummyIndex);if(boss)settleHP();}enemyPhase=false;enemyIndex=-1;runUlts();}
       else if(summerNext){summerTick(summer);runUlts();}
       else if(ahaNext){aha.distance=10000;ahaTurn();runUlts();}
       else if(rageNext){mb.rageUntil=0;mb.energy=Math.max(mb.energy,data.characters[mb.id].max_sp*.75);record(mb,'Безмерная ярость · окончание');runUlts();}
@@ -1923,12 +3451,12 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
       else if(lordNext)lordTurn();
       else playTurn(next);
       if(boss)settleEncounter();
-      const y=find('1221');if(!form.active&&!y?.defeated&&y?.parry&&y.parryAt<eventSerial&&(!boss||boss.result==='timeout')){yunliCounter(y);runUlts();}
+      const y=find('1221');if(!form.active&&!y?.defeated&&y?.parry&&y.parryAt<eventSerial&&(!boss||boss.result==='timeout')){yunliCounter(y,false,randomTarget());runUlts();}
     }
-    if(steps>=10000)throw Error('Слишком много событий: проверь скорость и продвижение действий.');
+
     captureBefore(Infinity);
     const total=actors.reduce((sum,a)=>sum+a.total,0);
-    return {ids:[...ids],...(boss?{encounter:{result:boss.result,phasesCleared:boss.cleared,finishAV:boss.result==='timeout'?horizon:now,survivors:actors.filter(a=>!a.defeated).length}}:{}),aha:elationActors.length?{turns:aha.count,punchline:aha.punchline}:null,...(checkpoints.length?{checkpoints}:{}),total,per100AV:total/horizon*100,horizon,damageByTarget,initialStats,memories:memories.map(m=>({owner:m.owner.id,name:m.name,active:m.active,hp:m.unit.currentHP,maxHP:m.baseHP?memoStat(m).hp:0,speed:m.baseHP?memoSpeed(m):0,turns:m.turn})),toughness:dummies.map(d=>({current:d.toughness,max:maxToughness,exo:d.exo,breaks:d.breaks})),breakdown:actors.map(a=>({id:a.id,damage:a.total,memoDamage:a.memoDamage||0,breakDamage:a.breakDamage||0,superDamage:a.superDamage||0,breaks:a.breakCount||0,turns:a.normal,ults:a.ults,followups:a.followups,energy:a.energy,resource:a.resource,currentHP:Math.min(a.currentHP,stat(a).hp),maxHP:stat(a).hp,shield:Math.max(0,...activeShields(a).map(shield=>shield.amount)),recorded:a.bank||0,ode:a.ode||null,godmode:!!a.godmode,mood:a.mood||0,assistUses:a.assistUses||0,banger:banger(a),elation:elation(a),special:a.gems??a.enthusiasm??0})),events,finalSP:sp,maxSP};
+    return {hitCoverage:{unverifiedToughness:[...packetWarnings]},ids:[...ids],...(boss?{encounter:{result:boss.result,phasesCleared:boss.cleared,finishAV:boss.result==='timeout'?horizon:now,survivors:actors.filter(a=>!a.defeated).length}}:{}),aha:elationActors.length?{turns:aha.count,punchline:aha.punchline}:null,...(checkpoints.length?{checkpoints}:{}),total,per100AV:total/horizon*100,horizon,damageByTarget,initialStats,memories:memories.map(m=>({owner:m.owner.id,name:m.name,active:m.active,hp:m.unit.currentHP,maxHP:m.baseHP?memoStat(m).hp:0,speed:m.baseHP?memoSpeed(m):0,turns:m.turn})),toughness:dummies.map(d=>({current:d.toughness,max:maxToughness,exo:d.exo,breaks:d.breaks})),breakdown:actors.map(a=>({id:a.id,damage:a.total,memoDamage:a.memoDamage||0,breakDamage:a.breakDamage||0,superDamage:a.superDamage||0,breaks:a.breakCount||0,turns:a.normal,ults:a.ults,followups:a.followups,energy:a.energy,resource:a.resource,currentHP:Math.min(a.currentHP,stat(a).hp),maxHP:stat(a).hp,shield:Math.max(0,...activeShields(a).map(shield=>shield.amount)),recorded:a.bank||0,ode:a.ode||null,godmode:!!a.godmode,mood:a.mood||0,assistUses:a.assistUses||0,banger:banger(a),elation:elation(a),special:a.gems??a.enthusiasm??0})),events,finalSP:sp,maxSP};
   }
   function compareResults(a,b){
     if(a.encounter&&b.encounter){const wins=row=>row.encounter.wins??Number(row.encounter.result==='victory');const difference=wins(b)-wins(a);if(difference)return difference;if(wins(a)&&wins(a)===(a.encounter.count??1))return (a.encounter.meanFinishAV??a.encounter.finishAV)-(b.encounter.meanFinishAV??b.encounter.finishAV)||b.total-a.total;}
@@ -2014,5 +3542,5 @@ if(G&&actor.id!=='1405')G.beforeSkill(actor);if(!['1205','1405'].includes(actor.
     '1321','1402','1404','1407','1408','1409','1413','1414','1415','8005',
     '1501','1502','1503','1504','1505','1506','1507','1508','1509','1510',
     '1512','1513','8001','8003','8007','8009'].filter(id=>models[id]));
-  root.HSR_TEAM={models,aliases,eidolonModels,canonical,defaults,validateStats,validateScenario,simulate,evaluate,compareBattles,createFarmSearch,combinations,createSearch,compatible,battleInput,replayBattle,compareResults,createRotationSearch};
+  root.HSR_TEAM={models,aliases,techniqueType,validatePrebattle,novaflareModels,catalogNovaflare,eidolonModels,canonical,defaults,timeline,packetPlans,packetRules,validateStats,validateScenario,battleIdentity,validateBattleRequest,simulate,evaluate,compareBattles,createFarmSearch,combinations,createSearch,compatible,battleInput,replayBattle,compareResults,createRotationSearch};
 })(typeof window==='undefined'?globalThis:window);

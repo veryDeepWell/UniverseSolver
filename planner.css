@@ -126,8 +126,20 @@
   position: absolute; inset: 6px auto auto 50%; transform: translateX(-50%);
 }
 #plan .plan-member-card > .plan-db-icon img { width: 52px; height: 52px; }
-.plan-mark { color: var(--mark); }
-.plan-mark > span { font-weight: 750; }
+.plan-mark, #plan .plan-mark, #profile .plan-mark {
+  display: inline; color: var(--mark, inherit); background: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0;
+  font: inherit; letter-spacing: inherit; vertical-align: baseline;
+}
+.phenomenon-text, #plan .phenomenon-text, #profile .phenomenon-text {
+  display: inline; color: inherit; background: none; margin: 0; padding: 0;
+  border: 0; border-radius: 0; font: inherit; letter-spacing: inherit; vertical-align: baseline;
+}
+.plan-mark > .phenomenon-icon, #plan .plan-mark > .phenomenon-icon,
+#profile .plan-mark > .phenomenon-icon {
+  color: inherit; font: inherit; font-weight: 750; background: none;
+  padding: 0; margin: 0; border: 0; vertical-align: baseline;
+}
 .mark-health { --mark: #f49eab; }
 .mark-attack { --mark: #ffc489; }
 .mark-defense { --mark: #9ed0ff; }

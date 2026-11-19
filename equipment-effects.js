@@ -1,11 +1,11 @@
 /* Explicit equipment rules. Unknown 4-piece/planar effects fail closed. */
-(function(root){
+(function installEquipment(root){
   const cavern4=['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116','117','118','119','120','121','122','123','124','125','127','126','128','129','130','131','132','133','134'];
-  const planar=['301','302','303','304','305','306','307','308','309','310','311','312','313','314','315','316','317','318','319','320','321','322','323','324','325','326','327','328'];
+  const planar=['301','302','303','304','305','306','307','308','309','310','311','312','313','314','315','316','317','318','319','320','321','322','323','324','325','326','327','328','329','330'];
   const supportsFour=id=>cavern4.includes(id);
   const dukeHitCoverage=new Set(['1005','1205','1112','1209','1314','1221','1222','1403','1406','1015','1223','1414']);
   const approximateDuke=(pack,actorId)=>counts(pack)['115']===4&&dukeHitCoverage.has(actorId);
-  const cones=['20000','20002','20005','20006','20009','21001','21003','21008','21022','21029','23001','23024','24001','24003'];
+  const cones=['20000','20002','20005','20006','20009','21001','21003','21008','21022','21029','22009','23001','23024','23065','24001','24003'];
   function coneProfile(characterId, reference, cone, ratios, data){
     const character=data.characters[characterId];
     if((!cone.baseOnly&&!cones.includes(cone.id))||data.light_cones[cone.id]?.path!==character.path||
@@ -74,6 +74,11 @@
   function modifiers(actor,actors,data,allyCount=actors.length,forMemo=false){
     const p=actor.eq?.p||{},r={atk:p.AttackAddedRatio||0,hp:p.HPAddedRatio||0,def:p.DefenceAddedRatio||0,speedPct:p.SpeedAddedRatio||0,speed:0,crit:p.CriticalChanceBase||0,critDamage:p.CriticalDamageBase||0,damage:p.AllDamageTypeAddedRatio||0,energyRegen:p.SPRatioBase||0,effectHit:p.StatusProbabilityBase||0,effectRes:p.StatusResistanceBase||0};
     if(actors.some(a=>a.id==='1106'))r.effectHit+=.1;
+    if(actor.eq?.cone?.id==='22009'){
+      const [perCharacter,aeonBonus]=actor.eq.cone.params;
+      r.critDamage+=perCharacter*actors.filter(a=>data.characters[a.id].path==='Elation').length;
+      if(actors.some(a=>a.id==='1511'&&!a.defeated&&!a.departed))r.critDamage+=aeonBonus;
+    }
     for(const owner of actors)if(owner.eq?.cone?.id==='20005')
       r.chorus=Math.max(r.chorus||0,owner.eq.cone.params[0]);
     r.atk+=r.chorus||0;
@@ -178,6 +183,13 @@
     }
   }
   function followupStart(actor,actors=[]){
+    // A grouped FUA may reach this hook both from its handler and from hit().
+    // One action must reset Duke and credit Duran only once.
+    if(actor.actionKey!==undefined){
+      actor.eq.followupActions??=new Set();
+      if(actor.eq.followupActions.has(actor.actionKey))return;
+      actor.eq.followupActions.add(actor.actionKey);
+    }
     if(has(actor,'115',4))actor.eq.duke=0;
     followupDamageStart(actor);
     for(const owner of actors)if(has(owner,'315'))owner.eq.duran=Math.min(5,owner.eq.duran+1);
@@ -198,8 +210,11 @@
     actor.eq.assist=Math.min(2,actor.eq.assist+1);
   }
   function skillPointSpent(actors,count){if(count===3)for(const actor of actors)if(has(actor,'324'))timed(actor,'livestream',{critDamage:.32},3);}
-  function endTurn(actor){for(const [key,value] of Object.entries(actor.eq.timed))if(value.expires<=actor.turn)delete actor.eq.timed[key];}
+  function endTurn(actor){
+    if(actor.seeleExtraPending||actor.seeleExtraActive||actor.extraTurnActive)return;
+    for(const [key,value] of Object.entries(actor.eq.timed))if(value.expires<=actor.turn)delete actor.eq.timed[key];
+  }
   function memoryAttack(actor){if(has(actor,'123',4))timed(actor,'memoryCrit',{critDamage:.3},2);}
   function healing(actor,target){if(has(actor,'125',4)&&target!==actor&&target._memo?.owner!==actor&&actor.eq.healTurn!==actor.turn){actor.eq.healTurn=actor.turn;timed(actor,'healerRain',{speedPct:.06},2);}}
-  root.HSR_EQUIPMENT={cavern4,planar,cones,coneProfile,supportsFour,approximateDuke,counts,validate,init,modifiers,thresholdModifiers,conditional,damage,startTurn,beforeBasic,beforeSkill,afterSkill,beforeUltimate,afterUltimate,afterBasic,afterAttack,followupStart,followupDamageStart,hitStart,hitEnd,followupEnd,receivedAttack,enemyDefeated,hpLoss,debuff,assist,skillPointSpent,endTurn,has,memoryAttack,healing};
+  root.HSR_EQUIPMENT={rulesSource:()=>installEquipment.toString(),cavern4,planar,cones,coneProfile,supportsFour,approximateDuke,counts,validate,init,modifiers,thresholdModifiers,conditional,damage,startTurn,beforeBasic,beforeSkill,afterSkill,beforeUltimate,afterUltimate,afterBasic,afterAttack,followupStart,followupDamageStart,hitStart,hitEnd,followupEnd,receivedAttack,enemyDefeated,hpLoss,debuff,assist,skillPointSpent,endTurn,has,memoryAttack,healing};
 })(typeof window==='undefined'?globalThis:window);
